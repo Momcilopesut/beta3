@@ -336,6 +336,36 @@ button:focus-visible { outline: 3px solid var(--hl-edge); outline-offset: 2px; }
 .tier h3 { margin: 0 0 6px; font: 700 13px/1.2 var(--body); text-transform: uppercase; letter-spacing: .12em; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
 .tier h3 .lvl { color: #b4521a; letter-spacing: 2px; }
 .tier h3 .tp { font: 500 11px var(--mono); color: #2350c4; text-transform: none; letter-spacing: 0; }
+.finder { background: var(--book-page); color: var(--book-ink); border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; display: grid; gap: 10px; }
+.search { display: flex; align-items: center; gap: 8px; background: #fff; border: 2px solid var(--book-line); border-radius: 10px; padding: 0 12px; }
+.search:focus-within { border-color: var(--book); }
+.search input { flex: 1; min-width: 0; border: none; outline: none; background: transparent; font: 500 16px/1 var(--body); color: var(--book-ink); padding: 11px 0; }
+.browse summary { cursor: pointer; font: 600 13px var(--body); color: #7b2d26; }
+#tagbar { display: grid; gap: 8px; margin-top: 10px; }
+.tg { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.tg-name { font: 700 10.5px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: #6b665a; width: 100%; }
+.tag { font: 500 12px/1.2 var(--mono); padding: 4px 8px; border-radius: 999px; border: 1px solid #c9d6f2; background: #eef3fe; color: #2350c4; cursor: pointer; }
+.tag span { opacity: .6; }
+.tag:hover { border-color: #2350c4; }
+.tag.on { background: #2350c4; color: #fff; border-color: #2350c4; }
+.tag-card { background: #fff; border: 2px solid #2350c4; border-radius: 10px; padding: 12px 14px; display: grid; gap: 6px; }
+.tag-card p { margin: 0; line-height: 1.5; }
+.tag-card code { font: 12.5px var(--mono); background: #f1ecdd; padding: 0 4px; border-radius: 4px; }
+.tc-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
+.tc-head b { font: 700 18px/1.2 var(--display); }
+.tc-group { font: 700 10.5px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: #6b665a; }
+.tc-clear { margin-left: auto; font: 500 12.5px var(--body); padding: 5px 10px; border-radius: 7px; border: 1px solid #2350c4; background: #fff; color: #2350c4; cursor: pointer; }
+.tc-kitchen { color: #6e4a1f; }
+.tc-ex { margin: 0; background: #fffdf6; border: 1px solid #d8d1bd; border-radius: 6px; padding: 8px 10px; font: 13px/1.5 var(--mono); color: #23211b; white-space: pre-wrap; }
+.tc-ex .kw { color: #7b3fb5; font-weight: 600; } .tc-ex .st { color: #2c7a4b; } .tc-ex .nu { color: #b4521a; } .tc-ex .bi { color: #2350c4; }
+.tc-used { font-size: 13px; color: #6b665a; }
+.dish-row { border-bottom: 1px dotted var(--book-line); padding-bottom: 8px; }
+.dish-row .dish-btn { border-bottom: none; }
+.dish-tags { display: flex; flex-wrap: wrap; gap: 4px; padding-left: 58px; }
+.dish-tags .tag { font-size: 11px; padding: 3px 7px; }
+.no-match { margin: 0; color: #6b665a; }
+.ticket-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.ticket-tags .tag { font-size: 10.5px; padding: 3px 7px; }
 .dish-btn { display: flex; gap: 12px; align-items: center; width: 100%; text-align: left; padding: 10px 8px; border: none; border-bottom: 1px dotted var(--book-line);
   background: transparent; color: var(--book-ink); cursor: pointer; border-radius: 6px; font: inherit; }
 .dish-btn:hover { background: rgba(123, 45, 38, .07); }
@@ -373,6 +403,13 @@ button:focus-visible { outline: 3px solid var(--hl-edge); outline-offset: 2px; }
     <div class="book-head">
       <span class="term"><h2 id="book-title">Recipe book</h2><span class="tp">every dish is a Python program</span></span>
       <button type="button" id="close-book">Back to the kitchen</button>
+    </div>
+    <div class="finder">
+      <label class="search"><span aria-hidden="true">🔎</span>
+        <input type="search" id="q" autocomplete="off" placeholder="Search dishes or Python words: loop, list, text, error…" aria-label="Search recipes">
+      </label>
+      <details class="browse" id="browse"><summary>Browse all <span id="tag-count"></span> Python topics</summary><div id="tagbar"></div></details>
+      <div id="tag-card"></div>
     </div>
     <div class="pages" id="pages"></div>
   </div>
@@ -568,6 +605,92 @@ const NEEDS = {
   oven:     [["📘", "Oven blueprint", "class Oven"], ["🔧", "Setup instructions", "__init__"], ["♨️", "Oven", "instance (object)"],
              ["🎛️", "Temperature dial", "attribute self.temp"], ["🔥", "Heat button", "method heat()"], ["🔪", "Cutting boards", "method frames"]],
 };
+
+/* Python concepts used as tags. Each: group, name, everyday search words, plain definition, kitchen comparison, tiny example. */
+const TAG_GROUPS = ["Basics", "Data types", "Operators", "Control flow", "Collections", "Functions", "Memory", "Classes", "Errors"];
+const T = (group, name, also, def, kitchen, ex) => ({ group, name, also, def, kitchen, ex });
+const TAGS = {
+  variable:    T("Basics", "Variables", "name label identifier store", "A name you give a value so you can use it later. In Python a variable is a label that points at an object; it doesn't hold the value inside itself.", "Masking tape tied to a container with twine.", "price = 3"),
+  assignment:  T("Basics", "Assignment (=)", "equals bind set", "`=` works out the right side first, then ties the name on the left to the result. One `=` assigns; two `==` compare.", "Tying a label to something.", "total = 2 + 3"),
+  reassign:    T("Basics", "Reassignment", "change update overwrite rebind", "Assigning to a name that already exists moves its label to a new object. The old object itself isn't changed.", "Moving a label from one jar to another.", "x = 1\nx = 2"),
+  print:       T("Basics", "print()", "output show display console", "A built-in function that shows values as text. Give it several values separated by commas and it prints them with spaces in between. Text appears without its quotes.", "Calling the dish out at the pass.", 'print("Hello", 42)'),
+  literal:     T("Basics", "Literals", "value constant hardcoded", "A value written directly into the code, like `5`, `\"mint\"` or `[1, 2]`.", "An amount written right on the ticket.", 'speed = 5\nname = "Ada"'),
+  expression:  T("Basics", "Expressions", "calculate evaluate formula", "Any piece of code that produces a value, like `2 * 3` or `name + \"!\"`. Python works it out before using the result.", "Doing the sum before you fill the container.", "glasses = lemons * 2"),
+  indentation: T("Basics", "Indentation & blocks", "spaces tab block colon", "Python groups lines by indenting them (usually 4 spaces) under a line that ends in `:`. The indented lines form a block that belongs to that line.", "Sub-steps written under a heading in a recipe.", "if hungry:\n    eat()"),
+  int:         T("Data types", "int (whole numbers)", "integer number numbers", "Whole numbers like 0, 7 or -3. You can do arithmetic with them.", "A count of things: 6 glasses, 5 cubes.", "cups = 6"),
+  str:         T("Data types", "str (text)", "string strings text quotes word", "Text inside single or double quotes. The quotes mark where the text starts and ends; they aren't part of it.", "The words on a label or an order.", 'dish = "soup"'),
+  bool:        T("Data types", "bool (True / False)", "boolean true false yes no", "The two values `True` and `False`. Comparisons like `8 > 6` produce them, and `if` and `while` use them to decide what to do.", "The answer to a yes-or-no kitchen check.", "8 > 6   # True"),
+  immutable:   T("Data types", "Immutable values", "immutability unchangeable constant sealed", "Objects that can't be changed after they're made, such as numbers and strings. 'Changing' one actually makes a new object.", "A sealed jar: to get 6 cubes you fill a new jar.", "x = 5\nx = x + 1   # a new 6"),
+  mutable:     T("Data types", "Mutable values", "mutation change modify in place", "Objects you can change in place, such as lists and dicts. Every name pointing at the object sees the change.", "An open bowl you can keep adding to.", 'bowl.append("milk")'),
+  arithmetic:  T("Operators", "Arithmetic (+ − * /)", "math add subtract multiply divide sum plus minus times", "Math on numbers: `+` adds, `-` subtracts, `*` multiplies, `/` divides.", "Doing sums with amounts.", "3 * 2   # 6"),
+  concat:      T("Operators", "Joining strings (+)", "concatenation concatenate combine text join", "`+` between two strings glues them end to end into a new string. It doesn't add a space for you.", "Sticking two word strips together.", '"lemon" + "ade"   # lemonade'),
+  augmented:   T("Operators", "+= and −=", "augmented assignment increment decrement running total add to", "`x += 5` is short for `x = x + 5`; `x -= 1` is short for `x = x - 1`. Handy for running totals and counters.", "Adding to the reading on the scale.", "score += 1"),
+  comparison:  T("Operators", "Comparisons (== < >)", "compare equal greater less than condition", "Operators that compare two values and give `True` or `False`: `==` equal, `!=` not equal, `<` less, `>` greater, `<=` and `>=`.", "Checking the timer or thermometer against a mark.", "temp < 100"),
+  if:          T("Control flow", "if / else", "conditional condition branch decision choice", "Runs a block only when a condition is True; `else` runs when it's False. Exactly one of the two branches runs.", "Choosing the hard-boil or soft-boil path.", 'if minutes > 6:\n    egg = "hard"\nelse:\n    egg = "soft"'),
+  for:         T("Control flow", "for loop", "loop loops iterate iteration each repeat", "Repeats a block once for every item in a collection, giving the current item a name each time.", "Weighing ingredients off the tray one at a time.", "for g in [200, 150]:\n    print(g)"),
+  while:       T("Control flow", "while loop", "loop loops repeat until condition", "Repeats a block for as long as its condition stays True, re-checking before every pass. Something inside must eventually make the condition False.", "Keep heating while the soup is below 100°.", "while temp < 100:\n    temp += 40"),
+  loopvar:     T("Control flow", "Loop variable", "iterator counter item", "The name a `for` loop re-binds to each item in turn. After the loop it keeps the last item.", "The label you move onto each ingredient as you pick it up.", "for item in basket:"),
+  accumulator: T("Control flow", "Running total", "accumulator sum total count add up", "A common pattern: start a variable at 0, then add to it inside a loop.", "Zeroing the scale, then adding each ingredient.", "total = 0\nfor n in nums:\n    total += n"),
+  list:        T("Collections", "list", "array lists sequence square brackets collection", "An ordered collection in square brackets, like `[\"egg\", \"flour\"]`. Lists can change: you can add, remove and replace items.", "A mixing bowl, tray or plate holding things in order.", 'batter = ["flour", "egg"]'),
+  index:       T("Collections", "Indexing [ ]", "index position zero-based first last square brackets", "Getting an item by its position with `[n]`. Counting starts at 0, so `[0]` is the first item and `[-1]` is the last.", "Spot 0 on the plate is the first thing you laid down.", "stack[0]"),
+  itemassign:  T("Collections", "Changing an item", "item assignment replace update set", "`my_list[1] = x` replaces the item at that position; `my_dict[\"key\"] = x` sets that key's value (adding it if it's new).", "Swapping the ham for a tomato.", 'stack[1] = "tomato"'),
+  append:      T("Collections", "append()", "add to list push add item", "List method that adds one item to the end, changing the list in place.", "Pouring one more ingredient into the same bowl.", 'batter.append("milk")'),
+  pop:         T("Collections", "pop()", "remove take last delete", "List method that removes an item and hands it back. With no number it takes the last item.", "Lifting the top slice off the plate.", "lid = stack.pop()"),
+  len:         T("Collections", "len()", "length count size how many", "Built-in function giving how many items are in a collection, or how many characters are in a string.", "Counting what's in the bowl.", "len([1, 2, 3])   # 3"),
+  copy:        T("Collections", "copy()", "duplicate clone shallow copy", "Makes a new list (or dict) with the same items, so changing one doesn't change the other.", "A second bowl filled with the same batter.", "savory = sweet.copy()"),
+  dict:        T("Collections", "dict (dictionary)", "dictionary map lookup key value curly braces", "A collection of `key: value` pairs in curly braces, like `{\"salt\": 3}`. You look values up by key instead of position, and each key appears once.", "A spice cabinet with a named drawer for each spice.", 'spices = {"salt": 3}'),
+  keys:        T("Collections", "Keys & values", "key value lookup", "In a dict, the key is the name you look up (like a drawer label) and the value is what's stored under it.", "The name on the drawer and what's inside it.", 'spices["salt"]   # 3'),
+  items:       T("Collections", ".items()", "pairs iterate dictionary loop over dict", "Dict method that gives each (key, value) pair, so a `for` loop can read both at once.", "Walking along the drawers, reading name and amount.", "for k, v in d.items():"),
+  unpacking:   T("Collections", "Unpacking", "multiple assignment tuple pair split", "Splitting a pair (or more) into several names at once.", "Copying a drawer's name and amount onto two labels.", 'name, qty = ("salt", 2)'),
+  methods:     T("Collections", "Methods", "dot method call", "Functions that belong to an object, called with a dot: `bowl.append(\"milk\")`.", "A tool that belongs to a particular container.", 'text.upper()'),
+  function:    T("Functions", "Functions (def)", "def function functions procedure reuse call", "A named, reusable block of code made with `def`. Defining it saves the recipe; calling it with `()` runs it.", "A recipe card: written once, used for every order.", 'def greet(name):\n    return "Hi " + name'),
+  params:      T("Functions", "Parameters & arguments", "parameter argument input pass", "Parameters are the names in a function's definition (`leaf` in `def make_tea(leaf)`); arguments are the values you pass when calling it (`\"mint\"`).", "The ingredient slot on the card, and the ingredient you hand over.", 'make_tea("mint")'),
+  return:      T("Functions", "return", "return value result give back output", "Ends a function and hands a value back to whoever called it. Without `return`, a function gives back `None`.", "Putting the finished food on the plate to hand back.", "return cup"),
+  scope:       T("Functions", "Local variables & scope", "local global scope visible", "Names created inside a function only exist while that call runs; the rest of the program can't see them.", "Labels on a cutting board vanish when the board is put away.", "def f():\n    x = 1   # local"),
+  callstack:   T("Functions", "Frames & the call stack", "frame stack call stack nested calls", "Each function call gets its own frame, a workspace for its local names. Frames stack up while calls wait for each other and are removed when they return.", "A fresh cutting board for every call, stacked while they wait.", "cake(3) → cake(2) → cake(1)"),
+  recursion:   T("Functions", "Recursion", "recursive calls itself", "A function that calls itself on a smaller version of the problem. It needs a base case that stops the chain.", "A cake recipe that says: make a smaller cake, then add a layer.", "def f(n):\n    if n == 1:\n        return 1\n    return n * f(n - 1)"),
+  basecase:    T("Functions", "Base case", "stop condition end recursion", "The simple case a recursive function answers directly, without calling itself again.", "A one-layer cake: just bake the sponge.", 'if layers == 1:\n    return "base"'),
+  objects:     T("Memory", "Objects", "object value memory heap", "Every value in Python is an object living in memory: numbers, text, lists, functions, everything.", "Everything on the steel rack.", "type(5)   # <class 'int'>"),
+  references:  T("Memory", "References", "reference pointer points to refer", "A variable doesn't contain its object; it refers to it. Several names can refer to the same object.", "The twine from a label to its container.", "a = [1]\nb = a   # same list"),
+  aliasing:    T("Memory", "Aliasing", "alias same object shared two names", "When two names refer to the same object, a change made through one shows up through the other. `=` never copies.", "Two labels tied to one bowl.", "mixing = sweet"),
+  gc:          T("Memory", "Garbage collection", "memory cleanup freed delete", "When no name refers to an object any more, Python frees its memory automatically.", "Unlabeled leftovers go to the dish sink.", "x = [1]\nx = None   # old list freed"),
+  class:       T("Classes", "Classes", "class oop object oriented blueprint", "A blueprint for making objects that bundle data (attributes) and behaviour (methods).", "An oven blueprint pinned to the rack.", "class Oven:\n    ..."),
+  instance:    T("Classes", "Instances", "instance object create construct", "An object built from a class by calling it, like `Oven(180)`. Each instance has its own attributes.", "A real oven built from the blueprint.", "oven = Oven(180)"),
+  init:        T("Classes", "__init__", "constructor init setup initialise initialize", "A special method that runs automatically when a new instance is made, to set it up.", "The setup instructions followed for every new oven.", "def __init__(self, temp):"),
+  self:        T("Classes", "self", "this instance itself", "The first parameter of a method: the instance the method was called on. Python passes it in for you.", "\"This very oven\", the one whose button was pressed.", "self.temp = temp"),
+  attributes:  T("Classes", "Attributes", "attribute property field dot value", "Values stored on an object, read and set with a dot: `oven.temp`.", "The dial setting on that particular oven.", "oven.temp   # 200"),
+  exceptions:  T("Errors", "Exceptions", "error errors crash bug problem", "Errors that happen while a program runs. If nothing handles them, the program stops with a message naming the error.", "The kitchen alarm going off.", 'raise ValueError("oops")'),
+  tryexcept:   T("Errors", "try / except", "error handling catch handle", "Run risky code inside `try`; if a matching error happens, the `except` block runs instead of the program crashing.", "Oven mitts on, with a backup plan ready.", "try:\n    x = d[\"milk\"]\nexcept KeyError:\n    x = 0"),
+  keyerror:    T("Errors", "KeyError", "missing key dictionary error", "Raised when you look up a dict key that doesn't exist. `.get()` avoids it by returning `None`.", "Opening a drawer that isn't there.", 'fridge["milk"]'),
+  nameerror:   T("Errors", "NameError", "error mistake undefined name typo not defined", "Using a name Python doesn't know: a typo, a forgotten quote, or a variable from another function.", "Asking for a label nobody wrote.", "print(sugr)"),
+  typeerror:   T("Errors", "TypeError", "error mistake wrong type mix text number", "An operation on the wrong kind of value, like adding text to a number.", "Trying to weigh a word.", '"5" + 1'),
+  syntaxerror: T("Errors", "SyntaxError", "error mistake invalid syntax grammar typo", "Code Python can't even read, like `5 = sugar` or a missing colon.", "A ticket the cook can't read.", "5 = sugar"),
+  recursionerror: T("Errors", "RecursionError", "error mistake infinite recursion too deep", "Too many nested calls, usually because a recursive function has no working base case.", "Cutting boards piling up until the counter is full.", "def f(): return f()"),
+};
+const DISH_TAGS = {
+  toast:    ["variable", "assignment", "int", "str", "literal", "print", "objects", "references"],
+  sugar:    ["variable", "assignment", "reassign", "int", "immutable", "arithmetic", "expression", "references", "aliasing", "objects", "print"],
+  pizza:    ["str", "literal", "variable", "assignment", "print", "objects"],
+  lemonade: ["int", "str", "arithmetic", "concat", "expression", "variable", "assignment", "print", "objects"],
+  egg:      ["if", "comparison", "bool", "indentation", "int", "str", "variable", "print"],
+  pancakes: ["list", "append", "methods", "len", "mutable", "index", "str", "print", "objects"],
+  cookies:  ["for", "loopvar", "accumulator", "augmented", "list", "int", "indentation", "gc", "print"],
+  soup:     ["while", "comparison", "bool", "reassign", "arithmetic", "indentation", "int", "print"],
+  tea:      ["function", "params", "return", "scope", "callstack", "concat", "str", "gc", "objects", "references"],
+  bowls:    ["list", "aliasing", "references", "mutable", "append", "copy", "methods", "objects"],
+  spices:   ["dict", "keys", "itemassign", "augmented", "for", "items", "unpacking", "loopvar", "methods", "print"],
+  sandwich: ["list", "index", "itemassign", "pop", "methods", "mutable", "print"],
+  cake:     ["recursion", "basecase", "function", "params", "return", "callstack", "if", "comparison", "concat", "str"],
+  milk:     ["dict", "keys", "exceptions", "tryexcept", "keyerror", "indentation", "print"],
+  oven:     ["class", "instance", "init", "self", "attributes", "methods", "augmented", "function", "params", "callstack", "references"],
+};
+/* a dish also gets an error tag whenever its answers teach that mistake */
+function tagsOf(d) {
+  const text = JSON.stringify(d.steps.slice(1).map(s => [s.wrong, s.py]));
+  const auto = [["NameError", "nameerror"], ["TypeError", "typeerror"], ["SyntaxError", "syntaxerror"], ["RecursionError", "recursionerror"], ["KeyError", "keyerror"]]
+    .filter(([word]) => text.includes(word)).map(([, id]) => id);
+  return [...new Set([...(DISH_TAGS[d.id] || []), ...auto])];
+}
 
 const DISHES = [
   /* ---------- ★ starters ---------- */
@@ -1518,7 +1641,9 @@ function printTicket() {
     <ol id="lines">${D.code.map((src, n) =>
       `<li class="cl printing" data-n="${n + 1}" style="animation-delay:${n * 0.14}s"><span class="ln">${n + 1}</span><span class="src">${highlight(src) || " "}</span>${src.trim()
         ? `<button type="button" class="peek" data-n="${n + 1}" aria-expanded="false" aria-label="Break down line ${n + 1} word by word" title="Break this line down">🔍</button>` : ""}</li>`).join("")}</ol>
-    <div class="foot"><span>${esc(D.topics)}</span><span>${D.steps.length - 1} steps</span></div>`;
+    <div class="foot"><span>${D.steps.length - 1} steps · tap a topic to learn it</span></div>
+    <div class="ticket-tags">${tagsOf(D).map(t => `<button type="button" class="tag" data-ticket-tag="${t}">${esc(TAGS[t].name)}</button>`).join("")}</div>`;
+  $("#ticket").querySelectorAll("[data-ticket-tag]").forEach(b => b.onclick = () => openBook(b.dataset.ticketTag));
   openLine = null;
   $("#lines").addEventListener("click", e => {
     const b = e.target.closest(".peek");
@@ -1822,15 +1947,84 @@ render = function () {
   }
 };
 
+/* ---- recipe book: search, topic tags and the topic card ---- */
+let activeTag = null;
+const norm = s => s.toLowerCase().replace(/[^a-z0-9_+=<>*\-.]+/g, " ").trim();
+const tagChip = (id, on, count) => `<button type="button" class="tag ${on ? "on" : ""}" data-tag="${id}">${esc(TAGS[id].name)}${count != null ? ` <span>${count}</span>` : ""}</button>`;
+function haystack(d) {
+  const tags = tagsOf(d).map(t => `${TAGS[t].name} ${TAGS[t].also}`).join(" ");
+  const needs = (NEEDS[d.id] || []).map(n => `${n[1]} ${n[2]}`).join(" ");
+  return norm(`${d.name} ${d.topics} ${tags} ${needs} ${d.code.join(" ")}`);
+}
+/* a word matches the start of any word in the dish (so "if" doesn't match "slices"); symbols like += match anywhere */
+function matches(d, q) {
+  if (activeTag && !tagsOf(d).includes(activeTag)) return false;
+  const words = norm(q).split(" ").filter(Boolean);
+  const hay = haystack(d), tokens = hay.split(/[^a-z0-9_]+/);
+  return words.every(w => /^[a-z0-9_]+$/.test(w) ? tokens.some(t => t.startsWith(w)) : hay.includes(w));
+}
+/* a search word that names a topic opens that topic's card, so typing "loop" or "dictionary" explains it */
+function topicFor(q) {
+  const w = norm(q);
+  if (!w) return null;
+  const first = id => norm(TAGS[id].name).split(" ")[0];
+  const ids = Object.keys(TAGS);
+  return ids.find(id => norm(TAGS[id].name) === w)
+      || ids.find(id => TAGS[id].also.split(" ").includes(w))
+      || ids.find(id => first(id) === w)
+      || (w.length >= 3 && ids.find(id => first(id).startsWith(w))) || null;
+}
+function tagCardHTML(id) {
+  const t = TAGS[id], users = DISHES.filter(d => tagsOf(d).includes(id));
+  return `<div class="tag-card">
+    <div class="tc-head"><span class="tc-group">${esc(t.group)}</span><b>${esc(t.name)}</b>
+      ${activeTag === id ? `<button type="button" class="tc-clear" data-clear>Show all dishes</button>` : `<button type="button" class="tc-clear" data-tag="${id}">Show only these dishes</button>`}</div>
+    <p>${code(t.def)}</p>
+    <p class="tc-kitchen">🍳 In the kitchen: ${code(t.kitchen)}</p>
+    <pre class="tc-ex">${highlight(t.ex)}</pre>
+    <p class="tc-used">Taught in ${users.length} ${users.length === 1 ? "dish" : "dishes"}: ${users.map(d => `${d.pic} ${esc(d.name)}`).join(", ") || "none yet"}</p>
+  </div>`;
+}
 function renderBook() {
-  const tierHTML = ([lvl, name, py]) => `<div class="tier"><h3><span class="lvl">${"●".repeat(lvl)}${"○".repeat(5 - lvl)}</span>${term(name, py)}</h3>
-    ${DISHES.filter(d => d.tier === lvl).map(d => `<button type="button" class="dish-btn" data-id="${d.id}">
+  const q = $("#q").value;
+  const counts = {};
+  DISHES.forEach(d => tagsOf(d).forEach(t => { counts[t] = (counts[t] || 0) + 1; }));
+  const used = Object.keys(TAGS).filter(id => counts[id]);
+  $("#tag-count").textContent = used.length;
+  $("#tagbar").innerHTML = TAG_GROUPS.map(g => {
+    const ids = used.filter(id => TAGS[id].group === g);
+    return ids.length ? `<div class="tg"><span class="tg-name">${g}</span>${ids.map(id => tagChip(id, id === activeTag, counts[id])).join("")}</div>` : "";
+  }).join("");
+  const card = activeTag || topicFor(q);
+  $("#tag-card").innerHTML = card ? tagCardHTML(card) : "";
+
+  const shown = DISHES.filter(d => matches(d, q));
+  const tierHTML = ([lvl, name, py]) => {
+    const list = shown.filter(d => d.tier === lvl);
+    if (!list.length) return "";
+    return `<div class="tier"><h3><span class="lvl">${"●".repeat(lvl)}${"○".repeat(5 - lvl)}</span>${term(name, py)}</h3>
+    ${list.map(d => `<div class="dish-row"><button type="button" class="dish-btn" data-id="${d.id}">
       <span class="pic">${d.pic}</span><span class="info"><span class="name">${esc(d.name)}</span><span class="topics">${esc(d.topics)}</span></span>
-      <span class="best">${best[d.id] ? "⭐".repeat(best[d.id]) : "Not cooked yet"}</span></button>`).join("")}</div>`;
-  $("#pages").innerHTML = `<div class="page">${TIERS.slice(0, 3).map(tierHTML).join("")}</div><div class="page">${TIERS.slice(3).map(tierHTML).join("")}</div>`;
+      <span class="best">${best[d.id] ? "⭐".repeat(best[d.id]) : "Not cooked yet"}</span></button>
+      <div class="dish-tags">${tagsOf(d).map(t => tagChip(t, t === activeTag)).join("")}</div></div>`).join("")}</div>`;
+  };
+  const left = TIERS.slice(0, 3).map(tierHTML).join(""), right = TIERS.slice(3).map(tierHTML).join("");
+  $("#pages").innerHTML = shown.length
+    ? `<div class="page">${left || right}</div>${left && right ? `<div class="page">${right}</div>` : ""}`
+    : `<div class="page"><p class="no-match">No dishes match${q ? ` “${esc(q)}”` : ""}${activeTag ? ` with the topic ${esc(TAGS[activeTag].name)}` : ""}. Try a broader word like <b>loop</b>, <b>text</b> or <b>list</b>.</p></div>`;
   $("#pages").querySelectorAll(".dish-btn").forEach(b => b.onclick = () => startDish(b.dataset.id));
 }
-function openBook() { renderBook(); $("#book").hidden = false; $("#close-book").hidden = !D; }
+function setTag(id) { activeTag = id === activeTag ? null : id; renderBook(); }
+$("#book").addEventListener("click", e => {
+  const t = e.target.closest("[data-tag]");
+  if (t) { setTag(t.dataset.tag); return; }
+  if (e.target.closest("[data-clear]")) { activeTag = null; renderBook(); }
+});
+$("#q").addEventListener("input", renderBook);
+function openBook(tag) {
+  if (typeof tag === "string") { activeTag = tag; $("#q").value = ""; }
+  renderBook(); $("#book").hidden = false; $("#close-book").hidden = !D;
+}
 function closeBook() { $("#book").hidden = true; }
 
 $("#open-book").onclick = openBook;
