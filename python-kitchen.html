@@ -154,6 +154,15 @@ h1 { font: 800 clamp(26px, 4vw, 38px)/1.05 var(--display); margin: 0; }
 .opt .op { font: 500 12px/1.3 var(--mono); color: var(--py); }
 .opt.wrong { border-color: var(--bad); background: var(--bad-bg); cursor: default; }
 .opt.wrong .why { color: var(--bad); font-size: 13px; font-weight: 500; }
+.cmp { display: grid; gap: 3px; margin-top: 6px; }
+.cmp-l { font: 600 10.5px/1.2 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+code.line { display: block; font: 500 13px/1.5 var(--mono); background: #fffdf6; color: #23211b; border: 1px solid #d8d1bd; border-radius: 6px;
+  padding: 5px 9px; white-space: pre-wrap; overflow-wrap: anywhere; }
+code.line.bad { border-color: var(--bad); }
+code.line .kw { color: #7b3fb5; font-weight: 600; } code.line .st { color: #2c7a4b; } code.line .nu { color: #b4521a; }
+code.line .bi { color: #2350c4; } code.line .cm { color: #8f8a7a; font-style: italic; }
+code.line .dif { background: #fbd9d3; box-shadow: 0 0 0 1px #b8382a; border-radius: 3px; }
+.fb.ok code.line { margin: 2px 0; }
 .opt.hint { border-color: var(--good); box-shadow: 0 0 0 3px color-mix(in srgb, var(--good) 30%, transparent); }
 .opt code, .fb code { font: 12.5px var(--mono); background: color-mix(in srgb, currentColor 11%, transparent); padding: 0 4px; border-radius: 4px; }
 .shake { animation: shake .35s; }
@@ -329,14 +338,14 @@ const DISHES = [
   dish({ id: "toast", tier: 1, pic: "🍞", name: "Buttered toast", topics: "variables · print()",
     code: ["slices = 2", "print(slices)"] }, step => {
     step(1, ["Put 2 slices of bread in a jar and tie a `slices` label to it", "create the int 2, bind the name slices to it"],
-      [["Wait: nothing happens until you print", "assignment is delayed", "Every line runs in order. `=` makes the value and attaches the name right away."],
-       ["Put out 2 separate empty jars", "create two objects", "`2` is one int object whose value is 2."]],
+      [["Wait: nothing happens until you print", "assignment is delayed", "Every line runs in order. `=` makes the value and attaches the name right away. Only a comment (`#`) is skipped.", "# slices = 2"],
+       ["Put out 2 separate empty jars", "create two objects", "`2` is one int object whose value is 2, not two containers.", "slices = [[], []]"]],
       "The bread goes on the rack in a [jar|object] and a [label|variable] called `slices` is tied to it with [twine|a reference].",
       "`slices = 2` creates the int object 2 and binds the name `slices` to it.",
       st => { st.heap.o1 = { t: "int", v: "2", fill: "🍞", count: 2 }; g(st).slices = R("o1"); });
     step(2, ["Follow the label to the jar and send \"2\" to the pass", "print looks up slices and outputs 2"],
-      [["Send the word \"slices\" to the pass", "prints the text slices", "`slices` has no quotes, so it's a name. `print` shows what it refers to."],
-       ["Throw the bread away after serving", "print deletes the variable", "`print` only reads. Nothing is removed."]],
+      [["Send the word \"slices\" to the pass", "prints the text slices", "That needs quotes. Without quotes, `slices` is a name, and `print` shows what it refers to.", 'print("slices")'],
+       ["Throw the bread away after serving", "print deletes the variable", "`print` only reads. Removing a name takes a separate `del`.", "print(slices); del slices"]],
       "Follow the [twine|reference] to the bread and call out the amount at [the pass|output].",
       "`print(slices)` looks up the name and outputs `2`.",
       st => { st.out.push("2"); });
@@ -345,26 +354,26 @@ const DISHES = [
   dish({ id: "sugar", tier: 1, pic: "🍬", name: "Sugar swap", topics: "reassignment · immutable ints",
     code: ["sugar = 5", "backup = sugar", "sugar = sugar + 1", "print(sugar, backup)"] }, step => {
     step(1, ["Fill a sealed jar with 5 cubes and label it `sugar`", "create the int 5, bind sugar"],
-      [["Make an empty jar labeled `sugar`, fill it later", "create a name with no value", "Python makes the value 5 first, then ties the name to it."],
-       ["Write 5 on the label itself", "the name stores the value", "Names don't hold values. They point to objects."]],
+      [["Make an empty jar labeled `sugar`, fill it later", "create a name with no value", "The ticket gives the value right away: 5. An empty placeholder would be `None`.", "sugar = None"],
+       ["Tie the jar to the label the other way round", "assign right to left", "The name always goes on the left of `=`. Writing it backwards is a SyntaxError.", "5 = sugar"]],
       "Fill a [jar|object] with 5 cubes and [seal|make immutable] it. Tie the `sugar` [label|name] on with [twine|a reference].",
       "`sugar = 5` creates an int object 5, then binds the name `sugar` to it.",
       st => { st.heap.o1 = { t: "int", v: "5", cubes: 5 }; g(st).sugar = R("o1"); });
     step(2, ["Tie a second label, `backup`, to the same jar", "backup refers to the same object"],
-      [["Fill a second jar with 5 cubes for `backup`", "copy the int", "`=` never copies. It ties another label to the same object."],
-       ["Peel off `sugar` and write `backup` instead", "rename the variable", "`sugar` keeps its label. `backup` is an extra name."]],
+      [["Fill a second jar with 5 cubes for `backup`", "make a separate 5", "`backup = sugar` doesn't build a new value. It ties another label to the same object.", "backup = 5"],
+       ["Peel off `sugar` and write `backup` instead", "rename the variable", "`sugar` keeps its label. `backup` is an extra name, and nothing is deleted.", "backup = sugar; del sugar"]],
       "Two [labels|names] on one [jar|object]. There's still only one jar of sugar.",
       "`backup = sugar` copies the reference, not the object. Both names refer to the same 5.",
       st => { g(st).backup = R("o1"); });
     step(3, ["Fill a new jar with 6 cubes and move the `sugar` label to it", "create the int 6, rebind sugar"],
-      [["Open the jar and drop in one more cube", "change 5 into 6 in place", "Int jars are sealed (immutable). Python makes a new 6 instead."],
-       ["Make the 6 jar and move both labels", "backup changes too", "Only `sugar` is on the left of `=`, so only that label moves."]],
+      [["Open the jar and drop in one more cube", "change 5 into 6 in place", "Int jars are sealed (immutable). There's no way to change a 5 in place, so Python makes a new 6.", "sugar.add(1)"],
+       ["Make the 6 jar and move both labels", "backup changes too", "Only `sugar` is on the left of `=`, so only that label moves.", "sugar = backup = sugar + 1"]],
       "The jar is [sealed|immutable], so a [new jar|new object] of 6 is made and only the `sugar` [label|name] moves. `backup` stays on 5.",
       "`sugar + 1` creates a new object 6 and `sugar` is rebound to it. `backup` still refers to 5.",
       st => { st.heap.o2 = { t: "int", v: "6", cubes: 6 }; g(st).sugar = R("o2"); });
     step(4, ["Send \"6 5\" to the pass", "print outputs 6 5"],
-      [["Send \"6 6\"", "both names changed", "`backup` was still tied to the old jar of 5."],
-       ["Send \"5 5\"", "nothing changed", "`sugar` was moved to the new jar of 6."]],
+      [["Send \"6 6\"", "both names changed", "`backup` was still tied to the old jar of 5.", "print(sugar, sugar)"],
+       ["Send \"5 5\"", "nothing changed", "`sugar` was moved to the new jar of 6.", "print(backup, backup)"]],
       "Follow each [twine|reference] and call out what's in the jars at [the pass|output].",
       "`print` follows each reference and outputs `6 5`.",
       st => { st.out.push("6 5"); });
@@ -374,26 +383,26 @@ const DISHES = [
   dish({ id: "lemonade", tier: 2, pic: "🍋", name: "Lemonade", topics: "arithmetic · joining strings",
     code: ["lemons = 3", "cups = lemons * 2", 'drink = "lemon" + "ade"', "print(cups, drink)"] }, step => {
     step(1, ["Put 3 lemons in a jar labeled `lemons`", "create the int 3, bind lemons"],
-      [["Put 1 lemon in each of 3 jars", "create three objects", "`3` is a single int object."],
-       ["Squeeze the lemons first", "run line 2 early", "Lines run top to bottom. Line 1 only makes the value."]],
+      [["Put 1 lemon in each of 3 jars", "create three objects", "`3` is a single int object, not a collection of three things.", "lemons = [1, 1, 1]"],
+       ["Squeeze the lemons first", "run line 2 early", "Lines run top to bottom. Running line 2 first fails with NameError because `lemons` doesn't exist yet.", "cups = lemons * 2"]],
       "The lemons go in a [jar|int object] with a `lemons` [label|variable].",
       "`lemons = 3` creates the int 3 and binds `lemons` to it.",
       st => { st.heap.o1 = { t: "int", v: "3", fill: "🍋", count: 3 }; g(st).lemons = R("o1"); });
     step(2, ["Count the lemons, double it, and put 6 cups in a new jar labeled `cups`", "evaluate lemons * 2 = 6, bind cups"],
-      [["Double the lemons inside the `lemons` jar", "lemons becomes 6", "The right side is only read. `lemons` stays 3."],
-       ["Tie the `cups` label to the lemon jar", "cups refers to lemons", "`lemons * 2` computes a new value, 6."]],
+      [["Double the lemons inside the `lemons` jar", "lemons becomes 6", "The right side is only read. The ticket assigns to `cups`, so `lemons` stays 3.", "lemons = lemons * 2"],
+       ["Tie the `cups` label to the lemon jar", "cups refers to lemons", "`lemons * 2` computes a new value, 6. Without `* 2`, both names would share the 3.", "cups = lemons"]],
       "Read the lemon jar, do the sum, and fill a [new jar|new object] with the result.",
       "Python evaluates `lemons * 2` to 6, creates that int, and binds `cups` to it.",
       st => { st.heap.o2 = { t: "int", v: "6", fill: "🥤", count: 6 }; g(st).cups = R("o2"); });
     step(3, ["Join the words \"lemon\" and \"ade\" into one new jar: \"lemonade\"", "concatenate two strings into 'lemonade'"],
-      [["Add them like numbers", "arithmetic on text", "`+` on two strings joins them end to end."],
-       ["Keep \"lemon\" and \"ade\" in two jars", "make a list of two strings", "`+` builds one new string."]],
+      [["Join them with a space: \"lemon ade\"", "+ adds a space", "`+` joins strings exactly as they are. A space only appears if you add one.", 'drink = "lemon" + " " + "ade"'],
+       ["Keep \"lemon\" and \"ade\" in two jars", "make a list of two strings", "`+` builds one new string; square brackets would make a list.", 'drink = ["lemon", "ade"]']],
       "Stick the two words together into a [new sealed jar|new str object] labeled `drink`.",
       "`\"lemon\" + \"ade\"` concatenates into the new string `'lemonade'`, bound to `drink`.",
       st => { st.heap.o3 = { t: "str", v: "'lemonade'", fill: "🍋" }; g(st).drink = R("o3"); });
     step(4, ["Send \"6 lemonade\" to the pass", "print outputs 6 lemonade"],
-      [["Send \"6 'lemonade'\"", "print shows the quotes", "`print` shows text without its quotes."],
-       ["Send \"cups drink\"", "prints the names", "No quotes means names. Their values are printed."]],
+      [["Send \"6 'lemonade'\"", "print shows the quotes", "`print` shows text without its quotes. You'd need `repr()` to see them.", "print(cups, repr(drink))"],
+       ["Send \"cups drink\"", "prints the names", "That needs quotes. Without them, the names' values are printed.", 'print("cups", "drink")']],
       "Two jars, one call at [the pass|output].",
       "`print(cups, drink)` outputs `6 lemonade`, separated by a space.",
       st => { st.out.push("6 lemonade"); });
@@ -402,25 +411,25 @@ const DISHES = [
   dish({ id: "egg", tier: 2, pic: "🥚", name: "Boiled egg", topics: "if / else · comparison",
     code: ["minutes = 8", "if minutes > 6:", '    egg = "hard"', "else:", '    egg = "soft"', "print(egg)"] }, step => {
     step(1, ["Set the timer: write 8 on a `minutes` label", "bind minutes to 8"],
-      [["Set the timer to 6", "minutes is 6", "The ticket says 8. The 6 only appears in the check on line 2."],
-       ["Start the else steps", "jump to else", "Line 1 runs first; nothing has been checked yet."]],
+      [["Set the timer to 6", "minutes is 6", "The ticket says 8. The 6 only appears in the check on line 2.", "minutes = 6"],
+       ["Start the else steps", "jump to else", "Line 1 runs first; nothing has been checked yet.", 'egg = "soft"']],
       "Small numbers are written straight on the [tape|variable], no jar needed.",
       "`minutes` is bound to 8.",
       st => { g(st).minutes = P(8, { ico: "⏲️" }); });
     step(2, ["Check: is 8 more than 6? Yes, take the first path", "condition is True, run the if block"],
-      [["Take the else path", "condition is False", "8 > 6 is True."],
-       ["Do both paths, just in case", "run both blocks", "Only one branch of an if/else ever runs."]],
+      [["Take the else path", "condition is False", "The ticket checks `minutes > 6`, which is True for 8. Only a check like this one would be False.", "if minutes < 6:"],
+       ["Do both paths, just in case", "run both blocks", "Only one branch of an if/else ever runs. Doing both is just two plain lines.", 'egg = "hard"; egg = "soft"']],
       "[Check the timer|evaluate the condition] and pick [one path|one branch].",
       "`minutes > 6` is `True`, so Python enters the indented `if` block.");
     step(3, ["Boil it hard and label the egg `egg` = \"hard\"", "bind egg to 'hard'"],
-      [["Label it \"soft\"", "run the else line", "We're inside the `if` block; the else block is skipped."],
-       ["Label it \"hard\" and \"soft\"", "egg holds two values", "A name refers to one object at a time."]],
+      [["Label it \"soft\"", "run the else line", "We're inside the `if` block; the else block is skipped.", 'egg = "soft"'],
+       ["Label it \"hard\" and \"soft\"", "egg holds two values", "A name refers to one object at a time.", 'egg = ["hard", "soft"]']],
       "The egg is ready and gets a `egg` [label|variable].",
       "`egg = \"hard\"` runs inside the if block.",
       st => { g(st).egg = P("'hard'", { ico: "🥚" }); });
     step(6, ["Skip the soft-boil steps and send \"hard\" to the pass", "else is skipped, print outputs hard"],
-      [["Do the soft-boil steps too", "run the else block", "Once the if block ran, the else block is skipped."],
-       ["Send \"soft\"", "egg was overwritten", "Line 5 never ran, so `egg` is still 'hard'."]],
+      [["Do the soft-boil steps too", "run the else block", "Once the if block ran, the else block is skipped.", 'egg = "soft"'],
+       ["Send \"soft\"", "egg was overwritten", "Line 5 never ran, so `egg` is still 'hard'.", 'print("soft")']],
       "The [other path|else block] is skipped entirely. Serve at [the pass|output].",
       "Python jumps past `else` to line 6 and prints `hard`.",
       st => { st.out.push("hard"); });
@@ -429,26 +438,26 @@ const DISHES = [
   dish({ id: "pancakes", tier: 2, pic: "🥞", name: "Pancake batter", topics: "lists · append() · len()",
     code: ['batter = ["flour", "egg"]', 'batter.append("milk")', "size = len(batter)", "print(size)"] }, step => {
     step(1, ["Put flour and an egg in a mixing bowl labeled `batter`", "create a list of two strings"],
-      [["Put flour and egg in two separate jars", "make two variables", "Square brackets make one list holding both items."],
-       ["Put them in a sealed jar", "make a tuple", "Square brackets mean a list: an open bowl you can change."]],
+      [["Put flour and egg in two separate jars", "make two variables", "Square brackets make one list holding both items.", 'flour, egg = "flour", "egg"'],
+       ["Put them in a sealed jar", "make a tuple", "Round brackets would make a tuple, which can't change. Square brackets mean a list: an open bowl.", 'batter = ("flour", "egg")']],
       "A [mixing bowl|list] holds several things in order, counted from [spot 0|index 0].",
       "`[\"flour\", \"egg\"]` creates a list with indexes 0 and 1.",
       st => { st.heap.o1 = { t: "list", items: [P("'flour'"), P("'egg'")] }; g(st).batter = R("o1"); });
     step(2, ["Pour milk into the same bowl, at the end", "append adds 'milk' at index 2"],
-      [["Get a new bowl with all three", "append returns a new list", "`.append()` changes the existing bowl in place."],
-       ["Pour the milk in first, at spot 0", "insert at index 0", "`.append()` always adds to the end."]],
+      [["Get a new bowl with all three", "build a new list", "That's what `+` does. `.append()` changes the existing bowl in place.", 'batter = batter + ["milk"]'],
+       ["Pour the milk in first, at spot 0", "insert at index 0", "`.append()` always adds to the end. Putting it first needs `insert`.", 'batter.insert(0, "milk")']],
       "The bowl is [open|mutable], so the milk goes [straight in|in place].",
       "`batter.append(\"milk\")` modifies the list; it now has 3 items.",
       st => { st.heap.o1.items.push(P("'milk'")); });
     step(3, ["Count what's in the bowl (3) and write it on a `size` label", "len returns 3, bind size"],
-      [["Write 2 on the label", "count the original items", "The milk is already in. There are 3 items."],
-       ["Write \"milk\" on the label", "len returns the last item", "`len` counts items; it doesn't return one."]],
+      [["Write 2 on the label", "count the original items", "The milk is already in. There are 3 items, and `len` counts them for you.", "size = 2"],
+       ["Write \"milk\" on the label", "get the last item", "`len` counts items; getting the last one is `batter[-1]`.", "size = batter[-1]"]],
       "[Counting the bowl|len()] gives a number for a new [label|variable].",
       "`len(batter)` returns 3, which is bound to `size`.",
       st => { g(st).size = P(3, { ico: "🔢" }); });
     step(4, ["Send \"3\" to the pass", "print outputs 3"],
-      [["Send the whole bowl", "print the list", "We print `size`, not `batter`."],
-       ["Send \"2\"", "len ignores appended items", "Appended items count like any other."]],
+      [["Send the whole bowl", "print the list", "We print `size`, not `batter`.", "print(batter)"],
+       ["Send \"2\"", "len ignores appended items", "Appended items count like any other.", "print(len(batter) - 1)"]],
       "Call out the count at [the pass|output].",
       "`print(size)` outputs `3`.",
       st => { st.out.push("3"); });
@@ -459,38 +468,38 @@ const DISHES = [
     code: ["weight = 0", "for grams in [200, 150, 50]:", "    weight += grams", "print(weight)"] }, step => {
     const ing = [["flour", "🌾", 200], ["butter", "🧈", 150], ["chocolate", "🍫", 50]];
     step(1, ["Zero the scale: write 0 on a `weight` label", "bind weight to 0"],
-      [["Put all three ingredients on the scale", "run the loop now", "Line 1 only sets the starting total."],
-       ["Leave the scale blank", "weight is undefined", "`weight = 0` gives it a value right away."]],
+      [["Put all three ingredients on the scale", "add them up now", "Line 1 only sets the starting total. The loop does the adding.", "weight = 200 + 150 + 50"],
+       ["Leave the scale blank", "weight has no number", "`weight = 0` gives it a number to add to. `None + 200` would fail.", "weight = None"]],
       "Zero the scale. The [tape|variable] `weight` reads 0.",
       "`weight` is bound to 0.",
       st => { g(st).weight = P(0, { ico: "⚖️" }); });
     let total = 0;
     ing.forEach(([name, ico, gr], k) => {
       step(2, [`Pick up the ${k === 0 ? "first" : "next"} ingredient: ${gr} g of ${name}`, `the loop binds grams to ${gr}`],
-        [k === 0 ? ["Weigh the whole tray at once", "the body runs once for the list", "A for loop handles one item per pass."]
-                 : ["Stop: you've already weighed something", "the loop ends", "There are still items left on the tray."],
-         ["Go straight to the pass", "skip the loop", "The loop runs its body for every item first."]],
+        [k === 0 ? ["Weigh the whole tray at once", "grams is the whole list", "A for loop hands you one item per pass, not the whole list.", "grams = [200, 150, 50]"]
+                 : ["Stop: you've already weighed something", "leave the loop early", "There are still items left on the tray. Leaving early needs `break`.", "break"],
+         ["Go straight to the pass", "skip the loop", "The loop runs its body for every item first.", "print(weight)"]],
         `[Take the next item|next iteration] off the [prep tray|list]. The \`grams\` [tape|variable] reads ${gr}.`,
         `The \`for\` loop takes item ${k} and binds \`grams\` to ${gr}.`,
         st => { if (k === 0) st.heap.o1 = { t: "list", vessel: "tray", k: "Prep tray", hold: true, items: ing.map(([, i, n]) => P(n, { ico: i })) };
                 st.heap.o1.hl = k; g(st).grams = P(gr, { ico }); });
       const before = total; total += gr;
       step(3, [`Add it to the scale: ${before} + ${gr} = ${total}`, `weight += grams gives ${total}`],
-        [[`Set the scale to ${gr}`, "weight = grams", "`+=` adds to the running total; it doesn't replace it."],
-         ["Skip weighing this one", "the body is optional", "The indented line runs on every pass."]],
+        [[`Set the scale to ${gr}`, "replace the total", "`+=` adds to the running total; plain `=` would replace it.", "weight = grams"],
+         ["Skip weighing this one", "do nothing this pass", "The indented line runs on every pass.", "pass"]],
         `The scale now reads ${total}.`,
         `\`weight += grams\` means \`weight = weight + grams\`, so \`weight\` becomes ${total}.`,
         st => { g(st).weight = P(total, { ico: "⚖️" }); });
     });
     step(2, ["The tray is empty: stop repeating", "the loop ends"],
-      [["Start the tray again from the flour", "the loop restarts", "A for loop goes through the list once."],
-       ["Weigh one more time", "the loop runs 4 times", "There were exactly 3 items."]],
+      [["Start the tray again from the flour", "go back to the first item", "A for loop goes through the list once.", "grams = 200"],
+       ["Weigh one more time", "a 4th pass", "There were exactly 3 items, so the body ran 3 times.", "weight += grams"]],
       "No more items, so [the repeating stops|the loop ends]. The empty tray goes to the [sink|garbage].",
       "The list is used up and the loop finishes. `grams` keeps its last value.",
       st => { delete st.heap.o1.hl; delete st.heap.o1.hold; });
     step(4, ["Send \"400\" to the pass", "print outputs 400"],
-      [["Send \"50\"", "prints the last item", "`weight` holds the total, 400."],
-       ["Send \"0\"", "weight was reset", "Nothing reset it. It holds 400."]],
+      [["Send \"50\"", "print the last item", "`grams` holds the last item; `weight` holds the total, 400.", "print(grams)"],
+       ["Send \"0\"", "print the starting value", "Nothing reset it. It holds 400.", "print(0)"]],
       "The sink is [washed|garbage-collected] and the total goes to [the pass|output].",
       "`print(weight)` outputs 400.",
       st => { delete st.heap.o1; st.out.push("400"); });
@@ -499,32 +508,32 @@ const DISHES = [
   dish({ id: "soup", tier: 3, pic: "🍲", name: "Simmer the soup", topics: "while loops · conditions",
     code: ["temp = 20", "while temp < 100:", "    temp = temp + 40", "print(temp)"] }, step => {
     step(1, ["Put the pot on: write 20° on a `temp` label", "bind temp to 20"],
-      [["Turn the heat straight to 100°", "temp is 100", "The ticket starts at 20."],
-       ["Start checking before setting a temperature", "run line 2 first", "Line 1 runs first."]],
+      [["Turn the heat straight to 100°", "temp is 100", "The ticket starts at 20.", "temp = 100"],
+       ["Start checking before setting a temperature", "run line 2 first", "Line 1 runs first. Checking `temp` before it exists is a NameError.", "while temp < 100:"]],
       "The thermometer [tape|variable] reads 20.",
       "`temp` is bound to 20.",
       st => { g(st).temp = P(20, { ico: "🌡️" }); });
     [[20, 60], [60, 100]].forEach(([a, b]) => {
       step(2, [`Check: is ${a}° below 100°? Yes, keep heating`, "the condition is True, enter the loop"],
-        [["Stop heating", "the condition is False", `${a} < 100 is True.`],
-         ["Heat until it boils without checking again", "the condition is checked once", "A while loop re-checks before every pass."]],
+        [["Stop heating", "leave the loop", `${a} < 100 is True, so the loop keeps going. Stopping would need \`break\`.`, "break"],
+         ["Heat until it boils without checking again", "check only once", "A while loop re-checks before every pass. A one-time check is an `if`.", "if temp < 100:"]],
         `[Check the thermometer|test the condition]: ${a} is still below 100.`,
         `\`${a} < 100\` is \`True\`, so the loop body runs.`);
       step(3, [`Heat it: ${a} + 40 = ${b}°`, `temp is rebound to ${b}`],
-        [["Jump straight to 100°", "skip to the end", "Each pass only adds 40."],
-         [`Heat it to ${a + 20}°`, "add 20", "The ticket says `temp + 40`."]],
+        [["Jump straight to 100°", "skip to the end", "Each pass only adds 40.", "temp = 100"],
+         [`Heat it to ${a + 20}°`, "add 20", "The ticket says `temp + 40`.", "temp = temp + 20"]],
         `The [thermometer label|variable] now reads ${b}.`,
         `\`temp + 40\` is ${b}; \`temp\` is rebound to it.`,
         st => { g(st).temp = P(b, { ico: "🌡️" }); });
     });
     step(2, ["Check: is 100° below 100°? No, turn off the heat", "the condition is False, the loop ends"],
-      [["Yes, heat again to 140°", "100 < 100 is True", "100 is not less than 100. `<` excludes equal."],
-       ["Restart from 20°", "the loop restarts", "A while loop never resets its variables."]],
+      [["Yes, heat again to 140°", "100 counts as below 100", "100 is not less than 100. `<` excludes equal; only `<=` would include it.", "while temp <= 100:"],
+       ["Restart from 20°", "the loop restarts", "A while loop never resets its variables.", "temp = 20"]],
       "[Check|test the condition] again: not below 100 any more, so [stop|exit the loop].",
       "`100 < 100` is `False`, so Python leaves the loop and goes to line 4.");
     step(4, ["Send \"100\" to the pass", "print outputs 100"],
-      [["Send \"140\"", "the loop ran once more", "The check failed before a 4th pass."],
-       ["Send \"60\"", "prints the first loop value", "`temp` was updated twice to 100."]],
+      [["Send \"140\"", "the loop ran once more", "The check failed before a 4th pass.", "print(temp + 40)"],
+       ["Send \"60\"", "print the first loop value", "`temp` was updated twice, to 100.", "print(60)"]],
       "Serve the soup at [the pass|output].",
       "`print(temp)` outputs 100.",
       st => { st.out.push("100"); });
@@ -533,38 +542,38 @@ const DISHES = [
   dish({ id: "tea", tier: 3, pic: "🍵", name: "Mint tea", topics: "functions · parameters · return",
     code: ["def make_tea(leaf):", '    cup = leaf + " tea"', "    return cup", "", 'order = make_tea("mint")', "print(order)"] }, step => {
     step(1, ["Write a recipe card, put it on the rack, and label it `make_tea`", "def creates a function object"],
-      [["Brew a cup of tea right now", "def runs the body", "`def` only saves the recipe. The body runs when it's called."],
-       ["Skip the card entirely", "def is ignored", "`def` runs: it creates the function and binds its name."]],
+      [["Brew a cup of tea right now", "run the body immediately", "`def` only saves the recipe. The body runs when the function is called.", 'cup = "mint" + " tea"'],
+       ["Skip the card entirely", "def is ignored", "`def` runs: it creates the function and binds its name. Only a comment is skipped.", "# def make_tea(leaf):"]],
       "A [recipe card|function] goes on the rack. Nothing is brewed yet.",
       "`def` creates a function object bound to `make_tea`; its body does not run yet.",
       st => { st.heap.o1 = { t: "func", v: "make_tea(leaf)" }; g(st).make_tea = R("o1"); });
     step(5, ["Get a fresh cutting board for the recipe and label the mint `leaf` on it", "call make_tea: new frame, leaf = 'mint'"],
-      [["Put the `leaf` label on the main board", "leaf is global", "Parameters live in the new frame, not the global one."],
-       ["Label the mint `order`", "assign order first", "The right side (the call) must finish before `order` exists."]],
+      [["Put the `leaf` label on the main board", "leaf is global", "Parameters live in the new frame, not the global one.", 'leaf = "mint"'],
+       ["Label the mint `order`", "assign order first", "The right side (the call) must finish before `order` exists.", 'order = "mint"']],
       "A [fresh cutting board|new frame] comes out. The mint you handed over is labeled `leaf`, the [ingredient the card asks for|parameter].",
       "Calling `make_tea(\"mint\")` creates a new frame and binds the parameter `leaf` to `'mint'`.",
       st => { st.heap.o2 = { t: "str", v: "'mint'", fill: "🌿" }; st.frames.push({ name: "make_tea", vars: { leaf: R("o2") } }); });
     step(2, ["Brew a cup of mint tea and label it `cup` on this board", "local variable cup = 'mint tea'"],
-      [["Label the tea `cup` on the main board", "cup is global", "Variables made inside a function are local to its frame."],
-       ["Add \" tea\" into the mint jar", "change the string in place", "Strings are sealed. `+` makes a new one."]],
+      [["Label the tea `cup` on the main board", "cup is global", "Variables made inside a function are local to its frame unless you declare them `global`.", 'global cup; cup = leaf + " tea"'],
+       ["Add \" tea\" into the mint jar", "change the string in place", "Strings are sealed: they have no `append`. `+` makes a new one.", 'leaf.append(" tea")']],
       "This [label|local variable] only exists on this board.",
       "`cup` is a local variable in the function's frame.",
       st => { st.heap.o3 = { t: "str", v: "'mint tea'", vessel: "cup", k: "Teacup" }; active(st).cup = R("o3"); });
     step(3, ["Put the cup on the plate to hand back", "return cup"],
-      [["Send it straight to the pass", "return prints", "`return` hands the value back to the caller. It doesn't print."],
-       ["Keep it on the board", "return does nothing", "`return` sends the value back and ends the function."]],
+      [["Send it straight to the pass", "print it", "`return` hands the value back to the caller. It doesn't print.", "print(cup)"],
+       ["Keep it on the board", "no return", "Without `return` the function hands back `None`.", "pass"]],
       "The cup goes on the [plate|return value].",
       "`return cup` sets the return value to the object `cup` refers to.",
       st => { active(st).$ret = R("o3"); });
     step(5, ["Put the board away, and label the returned tea `order`", "the frame is discarded, order = 'mint tea'"],
-      [["Keep the board out in case", "the frame stays", "When a function returns, its frame is discarded."],
-       ["Label the mint jar `order`", "order = leaf", "The function returned the tea, not the mint."]],
+      [["Tie `order` to the recipe card", "assign the function, don't call it", "Without `()` nothing is cooked: `order` becomes another label on the recipe card.", "order = make_tea"],
+       ["Label the mint jar `order`", "order = the argument", "The function returned the tea, not the mint.", 'order = "mint"']],
       "The board is [put away|frame destroyed]. The tea gets an `order` [label|variable]. The mint has no label left, so it goes in the [sink|garbage].",
       "`leaf` and `cup` disappear with the frame. The returned object survives as `order`.",
       st => { st.frames.pop(); g(st).order = R("o3"); });
     step(6, ["Send \"mint tea\" to the pass", "print outputs mint tea"],
-      [["Send \"mint\"", "prints the argument", "`order` refers to the returned tea."],
-       ["Send \"cup\"", "prints the local name", "`cup` no longer exists; `order` is printed."]],
+      [["Send \"mint\"", "print the argument", "`order` refers to the returned tea.", 'print("mint")'],
+       ["Send \"cup\"", "print the local name", "`cup` vanished with the board, so this is a NameError.", "print(cup)"]],
       "The sink is [washed|garbage-collected] and the tea is served at [the pass|output].",
       "`print(order)` outputs `mint tea`.",
       st => { delete st.heap.o2; st.out.push("mint tea"); });
@@ -574,38 +583,38 @@ const DISHES = [
   dish({ id: "bowls", tier: 4, pic: "🥣", name: "The shared bowl", topics: "aliasing · mutation · copy()",
     code: ['bowl = ["egg", "flour"]', "mixing = bowl", 'mixing.append("milk")', "side = bowl.copy()", 'side.append("salt")', "print(bowl, side)"] }, step => {
     step(1, ["Put an egg and flour in a mixing bowl labeled `bowl`", "create a list, bind bowl"],
-      [["Put each in its own jar", "two variables", "One list holds both items."],
-       ["Use a sealed jar", "a tuple", "Square brackets make a list, which can change."]],
+      [["Put each in its own jar", "two variables", "One list holds both items.", 'egg, flour = "egg", "flour"'],
+       ["Use a sealed jar", "a tuple", "Round brackets make a tuple. Square brackets make a list, which can change.", 'bowl = ("egg", "flour")']],
       "An [open bowl|mutable list] with spots counted from [0|index 0].",
       "A list is a mutable object.",
       st => { st.heap.o1 = { t: "list", items: [P("'egg'"), P("'flour'")] }; g(st).bowl = R("o1"); });
     step(2, ["Tie a `mixing` label to the same bowl", "mixing refers to the same list"],
-      [["Pour everything into a second bowl labeled `mixing`", "copy the list", "`=` never copies. This is aliasing: two names, one list."],
-       ["Move the `bowl` label to say `mixing`", "rename", "Both labels exist now."]],
+      [["Pour everything into a second bowl labeled `mixing`", "copy the list", "That needs `.copy()`. Plain `=` is aliasing: two names, one list.", "mixing = bowl.copy()"],
+       ["Move the `bowl` label to say `mixing`", "rename", "Both labels exist now; nothing is deleted.", "mixing = bowl; del bowl"]],
       "Two [labels|names] on one [bowl|list object].",
       "`mixing = bowl` is aliasing. No copy is made.",
       st => { g(st).mixing = R("o1"); });
     step(3, ["Pour milk into the bowl. Both labels see it", "the shared list is mutated"],
-      [["Pour milk only into the `mixing` side", "only mixing changes", "There's only one bowl. Both names see the milk."],
-       ["Make a new bowl with milk for `mixing`", "append returns a copy", "`.append()` changes the list in place."]],
+      [["Make a new bowl with milk, for `mixing` only", "build a new list", "That's what `+` does. `.append()` changes the one shared bowl, so `bowl` sees the milk too.", 'mixing = mixing + ["milk"]'],
+       ["Tie `mixing` to what append hands back", "keep append's result", "A classic bug: `.append()` returns `None`, so `mixing` would lose its bowl.", 'mixing = mixing.append("milk")']],
       "Milk goes into the [one shared bowl|same object].",
       "`.append()` mutates the list, so `bowl` and `mixing` both show `'milk'`.",
       st => { st.heap.o1.items.push(P("'milk'")); });
     step(4, ["Take a second bowl, add the same ingredients, label it `side`", "copy() makes a new list"],
-      [["Tie `side` to the same bowl", "copy() is aliasing", "`.copy()` builds a separate list."],
-       ["Take an empty bowl", "copy() is empty", "`.copy()` copies the items too."]],
+      [["Tie `side` to the same bowl", "alias it", "`.copy()` builds a separate list; plain `=` would alias.", "side = bowl"],
+       ["Take an empty bowl", "start a new empty list", "`.copy()` copies the items too.", "side = []"]],
       "A [second bowl|new list] with the same contents.",
       "`.copy()` returns a new list; `side` refers to a different object.",
       st => { st.heap.o2 = { t: "list", items: JSON.parse(JSON.stringify(st.heap.o1.items)) }; g(st).side = R("o2"); });
     step(5, ["Add salt to the side bowl only", "only the copy changes"],
-      [["Add salt to both bowls", "copies stay linked", "A copy is independent once it's made."],
-       ["Add salt to the first bowl", "side is bowl", "`side` refers to the copy."]],
+      [["Add salt to both bowls", "copies stay linked", "A copy is independent once it's made.", 'side.append("salt"); bowl.append("salt")'],
+       ["Add salt to the first bowl", "side is bowl", "`side` refers to the copy.", 'bowl.append("salt")']],
       "Salt goes in the [copy|second object] only.",
       "Mutating `side` leaves the original list alone.",
       st => { st.heap.o2.items.push(P("'salt'")); });
     step(6, ["Send both bowls: one with milk, one with milk and salt", "print outputs both lists"],
-      [["The first bowl has no milk", "mixing was separate", "`mixing` was the same bowl, so the milk is there."],
-       ["Both bowls have salt", "copy shares changes", "Salt only went into the copy."]],
+      [["The first bowl has no milk", "mixing was separate", "`mixing` was the same bowl, so the milk is there.", 'print(["egg", "flour"], side)'],
+       ["Both bowls have salt", "copy shares changes", "Salt only went into the copy.", "print(side, side)"]],
       "Serve both at [the pass|output].",
       "Prints `['egg', 'flour', 'milk'] ['egg', 'flour', 'milk', 'salt']`.",
       st => { st.out.push("['egg', 'flour', 'milk'] ['egg', 'flour', 'milk', 'salt']"); });
@@ -615,40 +624,41 @@ const DISHES = [
     code: ['spices = {"salt": 3}', 'spices["pepper"] = 2', 'spices["salt"] -= 1', "for name, qty in spices.items():", "    print(name, qty)"] }, step => {
     const spoons = n => P(n, { ico: "🥄", rep: n });
     step(1, ["Set up a spice cabinet with a salt drawer holding 3 spoons", "create a dict {'salt': 3}"],
-      [["Put salt and 3 in a mixing bowl", "make a list", "Curly braces with `key: value` make a dict."],
-       ["Label a jar `salt`", "salt is a variable", "\"salt\" is a key inside the dict, not a variable."]],
+      [["Put salt and 3 in a mixing bowl", "make a list", "Square brackets make a list. Curly braces with `key: value` make a dict.", 'spices = ["salt", 3]'],
+       ["Label a jar `salt`", "salt is a variable", "\"salt\" is a key inside the dict, not a variable.", "salt = 3"]],
       "A [spice cabinet|dict]: each drawer has a [name|key] and an [amount|value].",
       "A dict maps unique keys to values.",
       st => { st.heap.o1 = { t: "dict", items: [["'salt'", spoons(3)]] }; g(st).spices = R("o1"); });
     step(2, ["Fit a new pepper drawer with 2 spoons", "add the key 'pepper'"],
-      [["Error: there's no pepper drawer", "KeyError", "Assigning to a missing key creates it. Only reading a missing key fails."],
-       ["Replace the salt drawer with pepper", "overwrite the dict", "Other keys stay. A new one is added."]],
+      [["Error: there's no pepper drawer", "KeyError", "Assigning to a missing key creates it. Only reading a missing key, like this, fails.", 'spices["pepper"]'],
+       ["Replace the salt drawer with pepper", "overwrite the dict", "Other keys stay. A new one is added.", 'spices = {"pepper": 2}']],
       "A [new drawer|new key] is fitted.",
       "Assigning to a new key adds an entry.",
       st => { st.heap.o1.items.push(["'pepper'", spoons(2)]); });
     step(3, ["Take one spoon out of the salt drawer: 2 left", "spices['salt'] becomes 2"],
-      [["Fit a second salt drawer", "duplicate key", "Keys are unique. The existing value is updated."],
-       ["Take a spoon from every drawer", "updates all values", "Only the `\"salt\"` key is used."]],
+      [["Fit a second salt drawer", "add another key", "Keys are unique, and the ticket reuses `\"salt\"`. The existing value is updated.", 'spices["salt 2"] = 2'],
+       ["Take a spoon from every drawer", "update all values", "Only the `\"salt\"` key is used.", "for k in spices: spices[k] -= 1"]],
       "[Same drawer|same key], new [amount|value].",
       "`-=` reads 3 and writes 2 under the same key.",
       st => { st.heap.o1.items[0][1] = spoons(2); });
     [["'salt'", "salt"], ["'pepper'", "pepper"]].forEach(([key, word], k) => {
       step(4, [`Open the ${k ? "next" : "first"} drawer: copy \`${word}\` and 2 onto two labels`, `unpack the pair (${key}, 2) into name, qty`],
-        [[`Copy only the name \`${word}\``, "items() gives keys only", "`.items()` gives (key, value) pairs; both get unpacked."],
-         [k ? "Go back to the salt drawer" : "Start with the pepper drawer", "dicts are unordered", "Dicts keep insertion order: salt, then pepper."]],
+        [[`Copy only the name \`${word}\``, "loop over keys only", "Looping over a dict directly gives keys. `.items()` gives (key, value) pairs, and both get unpacked.", "for name in spices:"],
+         k ? ["Go back to the salt drawer", "repeat the first pair", "The loop moves forward through the pairs; salt is done.", 'name, qty = "salt", 2']
+           : ["Start with the pepper drawer", "sort the drawers first", "Dicts keep insertion order: salt, then pepper. Sorting would put pepper first.", "for name, qty in sorted(spices.items()):"]],
         `[Walk to the drawer|next pair from .items()] and copy its [name|key] and [amount|value].`,
         `The loop unpacks \`(${key}, 2)\` into \`name\` and \`qty\`.`,
         st => { st.heap.o1.hl = k; g(st).name = P(key, { ico: INGREDIENT[key] }); g(st).qty = P(2, { ico: "🥄" }); });
       step(5, [`Send "${word} 2" to the pass`, `print outputs ${word} 2`],
-        [[`Send "${key} 2" with quotes`, "print keeps quotes", "`print` shows strings without quotes."],
-         ["Send the whole cabinet", "print(spices)", "This line prints `name` and `qty`."]],
+        [[`Send "${key} 2" with quotes`, "print shows quotes", "`print` shows strings without quotes. You'd need `repr()` to see them.", "print(repr(name), qty)"],
+         ["Send the whole cabinet", "print the dict", "This line prints `name` and `qty`.", "print(spices)"]],
         "Call it out at [the pass|output].",
         `Prints \`${word} 2\`.`,
         st => { st.out.push(`${word} 2`); });
     });
     step(4, ["No more drawers: stop", "the loop ends"],
-      [["Open a third drawer", "loop runs again", "There are only two keys."],
-       ["Start over from salt", "loop restarts", "A for loop goes through the items once."]],
+      [["Open a third drawer", "add another pass", "There are only two keys, so there are only two passes.", 'spices["third"] = 0'],
+       ["Start over from salt", "loop again", "A for loop goes through the items once.", "for name, qty in spices.items():"]],
       "End of the cabinet. Drawers stay in the [order they were fitted|insertion order].",
       "`.items()` is exhausted; the loop ends.",
       st => { delete st.heap.o1.hl; });
@@ -658,51 +668,51 @@ const DISHES = [
   dish({ id: "cake", tier: 5, pic: "🎂", name: "Layer cake", topics: "recursion · the call stack",
     code: ["def cake(layers):", "    if layers == 1:", '        return "base"', '    return cake(layers - 1) + "+layer"', "", "print(cake(3))"] }, step => {
     step(1, ["Write the cake recipe card and put it on the rack", "def creates the function cake"],
-      [["Start baking 3 layers", "run the body", "`def` only defines the recipe."],
-       ["Write 3 recipe cards", "one function per layer", "One function; it will call itself."]],
+      [["Start baking 3 layers", "call it now", "`def` only defines the recipe. Calling it comes later, on line 6.", "cake(3)"],
+       ["Write a separate card for each layer", "one function per layer", "One function is enough; it will call itself.", 'def cake3(): return "base+layer+layer"']],
       "The [recipe card|function] says: make a smaller cake, then add a layer. It [uses itself|is recursive].",
       "Defines a recursive function, one that calls itself.",
       st => { st.heap.o1 = { t: "func", v: "cake(layers)" }; g(st).cake = R("o1"); });
     const open = [3, 2, 1];
     open.forEach((n, k) => {
       step(k === 0 ? 6 : 4, [`Get cutting board ${k + 1} for a ${n}-layer cake`, `call cake(${n}): a new frame with layers = ${n}`],
-        [k === 0 ? ["Print first, bake later", "print runs before cake(3)", "The argument `cake(3)` must be computed before `print` can run."]
-                 : [`Finish board ${k} first`, "the caller finishes before the call", `Board ${k} can't finish until it gets the smaller cake back.`],
-         [`Reuse board ${k || 1}, change \`layers\` to ${n}`, "calls share one frame", "Every call gets its own frame and its own `layers`."]],
+        [k === 0 ? ["Send the recipe card to the pass", "print without calling", "`print` needs the cake, so `cake(3)` must run first. Without `()` you'd print the card itself.", "print(cake)"]
+                 : [`Finish board ${k} first`, "skip the smaller cake", `Board ${k} can't finish until it gets the smaller cake back.`, 'return "+layer"'],
+         [`Reuse board ${k || 1}, change \`layers\` to ${n}`, "overwrite the local variable", "Every call gets its own frame and its own `layers`.", `layers = ${n}`]],
         k === 0 ? "The order is in. [Board 1|frame for cake(3)] comes out."
                 : `Board ${k} [waits|pauses mid-line] and [board ${k + 1}|a new frame] comes out.`,
         `\`cake(${n})\` is called, creating a frame with \`layers = ${n}\`.`,
         st => { st.frames.push({ name: "cake", vars: { layers: P(n) } }); });
       step(2, n === 1 ? ["Check: is it a 1-layer cake? Yes!", "1 == 1 is True: the base case"]
                       : [`Check: is it a 1-layer cake? No, it's ${n}`, `${n} == 1 is False`],
-        n === 1 ? [["No, make an even smaller cake", "call cake(0)", "`1 == 1` is True, so the recursion stops here."],
-                   ["Skip the check", "if is optional", "The check runs on every call."]]
-                : [["Yes, bake the base now", "the condition is True", `${n} is not 1.`],
-                   ["Skip the check", "if is optional", "The check runs on every call."]],
+        n === 1 ? [["No, make an even smaller cake", "recurse again", "`1 == 1` is True, so the recursion stops here. Recursing would call `cake(0)` forever.", "return cake(layers - 1)"],
+                   ["Skip the check", "remove the if", "The check runs on every call; without it there's no base case.", "# if layers == 1:"]]
+                : [["Yes, bake the base now", "treat it as True", `${n} is not 1, so the test is False.`, "if True:"],
+                   ["Skip the check", "remove the if", "The check runs on every call.", "# if layers == 1:"]],
         n === 1 ? "The [easy case|base case]: one layer, nothing smaller needed." : "[Check the order|if test]: not the easy case yet.",
         n === 1 ? "`1 == 1` is True. This base case stops the recursion." : `\`${n} == 1\` is False, so \`return "base"\` is skipped.`);
     });
     step(3, ["Bake a sponge base and set it on board 3's plate", "cake(1) returns 'base'"],
-      [["Send the base to the pass", "return prints", "`return` hands it back to board 2, not the pass."],
-       ["Add a layer on top first", "base case recurses", "The base case returns directly."]],
+      [["Send the base to the pass", "print it", "`return` hands it back to board 2, not the pass.", 'print("base")'],
+       ["Add a layer on top first", "recurse from the base case", "The base case returns directly.", 'return cake(0) + "+layer"']],
       "The base goes on the [plate|return value].",
       "`cake(1)` returns `\"base\"`.",
       st => { active(st).$ret = P("'base'", { cake: 1 }); });
     step(4, ["Put board 3 away; board 2 adds a layer and plates it", "frame 3 ends; cake(2) returns 'base+layer'"],
-      [["Board 3 adds the layer", "the callee continues", "Board 3 is done. Board 2 was waiting for that base."],
-       ["Board 1 takes the base", "returns skip a level", "Each return goes to the board that called it."]],
+      [["Board 3 adds the layer", "the base case adds it", "Board 3 is done. Board 2 was waiting for that base.", 'return "base+layer"'],
+       ["Board 1 takes the base", "skip a level", "Each return goes to the board that called it.", 'return cake(layers - 2) + "+layer"']],
       "Board 3 is [put away|frame destroyed]. Board 2 [resumes|continues its line].",
       "Back in the `layers = 2` frame: `\"base\" + \"+layer\"`.",
       st => { st.frames.pop(); active(st).$ret = P("'base+layer'", { cake: 2 }); });
     step(4, ["Put board 2 away; board 1 adds the last layer", "cake(3) returns 'base+layer+layer'"],
-      [["Board 2 adds two more layers", "one frame does all the work", "Each board adds just one layer."],
-       ["Send the 2-layer cake to the pass", "the return goes to print", "It returns to board 1, which still has a layer to add."]],
+      [["Board 2 adds two more layers", "one frame does all the work", "Each board adds just one layer.", 'return cake(layers - 1) + "+layer+layer"'],
+       ["Send the 2-layer cake to the pass", "print the middle result", "It returns to board 1, which still has a layer to add.", "print(cake(2))"]],
       "Board 2 is put away and board 1 finishes.",
       "Back in the `layers = 3` frame, which can now finish its line.",
       st => { st.frames.pop(); active(st).$ret = P("'base+layer+layer'", { cake: 3 }); });
     step(6, ["Put board 1 away and send the cake to the pass", "print outputs base+layer+layer"],
-      [["Send \"base\"", "only the base case returns", "Every level added a layer on the way back."],
-       ["Keep board 1 out", "frames persist", "The frame is discarded after returning."]],
+      [["Send \"base\"", "only the base case counts", "Every level added a layer on the way back.", "print(cake(1))"],
+       ["Send the recipe card", "print the function", "`cake` without `()` is the function object, not the cake.", "print(cake)"]],
       "All boards are put away; the cake goes to [the pass|output]. Without the 1-layer rule, boards would never stop coming out.",
       "The stack unwinds and `print` runs. With no base case, Python raises `RecursionError`.",
       st => { st.frames.pop(); st.out.push("base+layer+layer"); });
@@ -711,37 +721,37 @@ const DISHES = [
   dish({ id: "milk", tier: 5, pic: "🥛", name: "Missing milk", topics: "try / except · KeyError",
     code: ['fridge = {"egg": 6}', "try:", '    milk = fridge["milk"]', "except KeyError:", "    milk = 0", "print(milk)"] }, step => {
     step(1, ["Stock the fridge: an egg drawer holding 6", "create a dict {'egg': 6}"],
-      [["Stock eggs and milk", "the dict has two keys", "Only `\"egg\"` is on the ticket."],
-       ["Label a jar `egg`", "egg is a variable", "\"egg\" is a key in the dict."]],
+      [["Stock eggs and milk", "the dict has two keys", "Only `\"egg\"` is on the ticket.", 'fridge = {"egg": 6, "milk": 1}'],
+       ["Label a jar `egg`", "egg is a variable", "\"egg\" is a key in the dict, not a variable.", "egg = 6"]],
       "The [fridge|dict] has one drawer: [egg|key] → [6|value].",
       "`fridge` refers to a dict with one key.",
       st => { st.heap.o1 = { t: "dict", k: "Fridge", vessel: "fridge", items: [["'egg'", P(6, { ico: "🥚" })]] }; g(st).fridge = R("o1"); });
     step(2, ["Put on oven mitts: try the next step carefully", "enter the try block"],
-      [["Skip to the backup plan", "run except first", "`except` only runs if something goes wrong inside `try`."],
-       ["Skip the risky step", "try skips its body", "`try` runs its body; it just watches for errors."]],
+      [["Skip to the backup plan", "run the except block first", "`except` only runs if something goes wrong inside `try`.", "milk = 0"],
+       ["Skip the risky step", "do nothing", "`try` runs its body; it just watches for errors.", "pass"]],
       "[Oven mitts on|try:] means: attempt this, and have a backup plan ready.",
       "Python enters the `try` block.");
     step(3, ["Open the milk drawer. There isn't one! The alarm rings: KeyError", "fridge['milk'] raises KeyError"],
-      [["Take an empty glass and label it `milk`", "returns None", "A missing key raises an error; it doesn't quietly give you nothing."],
-       ["Fit a new milk drawer", "reading adds the key", "Reading a missing key never creates it."]],
+      [["Take an empty glass and label it `milk`", "quietly get None", "That's what `.get()` does. Square brackets raise an error for a missing key.", 'milk = fridge.get("milk")'],
+       ["Fit a new milk drawer", "create the key", "Reading a missing key never creates it; only assigning does.", 'fridge["milk"] = 0']],
       "No milk drawer, so the [alarm|exception] goes off. The `milk` [label|variable] is never made.",
       "Looking up a missing key raises `KeyError`. Line 3 stops before the assignment happens.",
       st => { g(st).$err = P("KeyError: 'milk'"); });
     step(4, ["It's a KeyError, so the backup plan kicks in", "except KeyError catches it"],
-      [["Abandon the dish", "the program crashes", "The `except KeyError` block catches exactly this error."],
-       ["Ignore the alarm and print", "errors are skipped", "Control jumps to the matching `except` block."]],
+      [["Abandon the dish", "re-raise the error", "The `except KeyError` block catches exactly this error; re-raising would crash.", "raise"],
+       ["Ignore the alarm and print", "carry on to print", "Control jumps to the matching `except` block. Printing now is a NameError: `milk` doesn't exist.", "print(milk)"]],
       "The [alarm is handled|exception is caught] by the matching backup plan.",
       "The error matches `except KeyError`, so that block runs and the program carries on.",
       st => { delete g(st).$err; });
     step(5, ["Write 0 on a `milk` label", "bind milk to 0"],
-      [["Still no `milk` label", "milk is undefined", "The except block creates it now."],
-       ["Write 6 on it", "uses the egg count", "The ticket says `milk = 0`."]],
+      [["Still no `milk` label", "do nothing", "The except block creates it now.", "pass"],
+       ["Write 6 on it", "use the egg count", "The ticket says `milk = 0`.", 'milk = fridge["egg"]']],
       "The [backup plan|except block] sets a sensible default.",
       "`milk = 0` runs in the except block.",
       st => { g(st).milk = P(0, { ico: "🥛" }); });
     step(6, ["Send \"0\" to the pass", "print outputs 0"],
-      [["Send the KeyError", "the error is printed", "The error was handled, so nothing about it is printed."],
-       ["Send \"6\"", "prints the egg count", "`milk` is 0."]],
+      [["Send the KeyError", "print the error", "The error was handled, so nothing about it is printed.", 'print(KeyError("milk"))'],
+       ["Send \"6\"", "print the egg count", "`milk` is 0.", 'print(fridge["egg"])']],
       "The order still goes out at [the pass|output].",
       "`print(milk)` outputs `0`.",
       st => { st.out.push("0"); });
@@ -1238,13 +1248,40 @@ function showBreakdown() {
   li.insertAdjacentHTML("afterend", `<li class="bd-row">${breakdownHTML(openLine)}</li>`);
 }
 
+/* code lines in the answer comparison, with words that differ from the ticket marked */
+const lexLine = s => s.match(/"[^"]*"|'[^']*'|#.*$|\w+|\s+|[^\s\w]/g) || [];
+const PYKW = new Set(["def", "return", "if", "else", "for", "in", "while", "try", "except", "del", "global", "pass", "break", "raise", "True", "False", "None"]);
+function tokClass(t) {
+  if (t[0] === "#") return "cm";
+  if (t[0] === '"' || t[0] === "'") return "st";
+  if (/^\d+$/.test(t)) return "nu";
+  if (PYKW.has(t)) return "kw";
+  if (/^(print|len|repr|sorted)$/.test(t)) return "bi";
+  return "";
+}
+function diffHTML(a, b) {
+  const A = lexLine(a), B = lexLine(b).filter(t => t.trim());
+  const As = A.map((t, k) => ({ t, k })).filter(x => x.t.trim());
+  const n = As.length, m = B.length;
+  const L = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+  for (let x = n - 1; x >= 0; x--) for (let y = m - 1; y >= 0; y--)
+    L[x][y] = As[x].t === B[y] ? L[x + 1][y + 1] + 1 : Math.max(L[x + 1][y], L[x][y + 1]);
+  const same = new Set();
+  for (let x = 0, y = 0; x < n && y < m;) {
+    if (As[x].t === B[y]) { same.add(As[x].k); x++; y++; }
+    else if (L[x + 1][y] >= L[x][y + 1]) x++; else y++;
+  }
+  return A.map((t, k) => t.trim() ? `<span class="${same.has(k) ? "" : "dif "}${tokClass(t)}">${esc(t)}</span>` : esc(t)).join("");
+}
+
 function render() {
   const cur = D.steps[i], next = D.steps[i + 1], prev = i > 0 ? D.steps[i - 1].st : null;
   document.querySelectorAll("#lines li.cl").forEach(li => li.classList.toggle("next", !!next && next.line === +li.dataset.n));
   showBreakdown();
   $("#kitchen").innerHTML = drawKitchen(cur.st, prev);
 
-  const last = i > 0 ? `<div class="fb ok"><span class="lbl">✓ Right. Here's what happened</span><p>${code(cur.py)}</p></div>
+  const last = i > 0 ? `<div class="fb ok"><span class="lbl">✓ Right. Here's what happened</span>
+      <code class="line">${diffHTML(D.code[cur.line - 1].trim(), D.code[cur.line - 1].trim())}</code><p>${code(cur.py)}</p></div>
       <div class="fb k"><span class="lbl">In the kitchen</span><p>${fmt(cur.k)}</p></div>` : "";
 
   if (!next) {
@@ -1260,15 +1297,18 @@ function render() {
     return;
   }
 
-  const opts = [{ k: next.right[0], p: next.right[1], ok: true }, ...next.wrong.map(([k, p, why]) => ({ k, p, why }))];
   const lineSrc = D.code[next.line - 1].trim();
+  const opts = [{ k: next.right[0], p: next.right[1], ok: true }, ...next.wrong.map(([k, p, why, c]) => ({ k, p, why, c }))];
   $("#move").innerHTML = `<div class="q"><div>${term(i === 0 ? "Your first move" : "Your next move", "which step does Python take?")}
       <h2 style="margin-top:6px">Line ${next.line}: <code style="font: 600 15px var(--mono)">${esc(lineSrc)}</code></h2></div>
       <div class="stat">step ${i + 1}/${D.steps.length - 1}<br>${mistakes} wrong</div></div>
     <div class="opts">${order.map(k => {
       const o = opts[k], wrong = wrongPicked.has(k);
       return `<button type="button" class="opt ${wrong ? "wrong" : ""} ${hinted && o.ok ? "hint" : ""}" data-k="${k}" ${wrong ? "disabled" : ""}>
-        <span>${code(o.k)}</span><span class="op">${esc(o.p)}</span>${wrong ? `<span class="why">✗ ${code(o.why)}</span>` : ""}</button>`;
+        <span>${code(o.k)}</span><span class="op">${esc(o.p)}</span>${wrong ? `
+        <span class="cmp"><span class="cmp-l">Your answer as code</span><code class="line bad">${diffHTML(o.c, lineSrc)}</code>
+        <span class="cmp-l">The ticket says</span><code class="line">${diffHTML(lineSrc, lineSrc)}</code></span>
+        <span class="why">✗ ${code(o.why)}</span>` : ""}</button>`;
     }).join("")}</div>
     <div class="tools"><button type="button" id="b-hint">Show me the right step</button><button type="button" id="b-restart">Restart dish</button></div>
     ${last || `<div class="fb k" style="margin-top:12px"><span class="lbl">In the kitchen</span><p>${fmt("The printer just printed your order [ticket|code]. Read the highlighted line and pick what the kitchen does first.")}</p></div>`}`;
