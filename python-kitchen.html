@@ -107,6 +107,40 @@ h1 { font: 800 clamp(26px, 4vw, 38px)/1.05 var(--display); margin: 0; }
 @keyframes print { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 @media (prefers-reduced-motion: reduce) { .ticket li.printing { animation: none; } }
 .ticket .kw { color: #7b3fb5; font-weight: 600; } .ticket .st { color: #2c7a4b; } .ticket .nu { color: #b4521a; } .ticket .bi { color: #2350c4; }
+.ticket .src { flex: 1 0 auto; }
+.peek { flex: none; margin-left: 8px; width: 26px; height: 22px; padding: 0; border-radius: 6px; border: 1px solid #d8d1bd; background: #f6f1e3;
+  cursor: pointer; font-size: 12px; line-height: 1; align-self: center; }
+.peek:hover, .peek[aria-expanded="true"] { background: #23211b; border-color: #23211b; }
+.ticket li.bd-row { display: block; white-space: normal; padding: 0; border: none; }
+.bd { margin: 6px 0 10px; border: 1.5px solid #23211b; border-radius: 8px; background: #fff; font: 13.5px/1.45 var(--body); color: #23211b; overflow: hidden; }
+.bd-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 10px; background: #23211b; color: #fffdf6; }
+.bd-close { font: 500 12px var(--body); padding: 4px 9px; border-radius: 6px; border: 1px solid #6b665a; background: transparent; color: #fffdf6; cursor: pointer; }
+.bd-lbl { display: block; font: 600 10.5px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: #6b665a; margin-bottom: 6px; }
+.bd-pat { padding: 10px; border-bottom: 1px dashed #d8d1bd; }
+.bd-pat code { font: 600 13px var(--mono); background: #f1ecdd; padding: 2px 6px; border-radius: 4px; }
+.bd-pat p { margin: 6px 0 0; }
+.bd-strip { display: flex; flex-wrap: wrap; gap: 4px; padding: 10px; border-bottom: 1px dashed #d8d1bd; }
+.tok { position: relative; display: inline-flex; align-items: center; gap: 4px; font: 600 13px var(--mono); padding: 3px 7px 3px 4px; border-radius: 5px; border: 1.5px solid; white-space: pre; }
+.tok i { font: 600 9.5px var(--body); font-style: normal; min-width: 15px; height: 15px; border-radius: 8px; display: grid; place-items: center; color: #fff; padding: 0 3px; }
+.c-kw { color: #6a32a3; border-color: #c9b0e6; background: #f6f0fc; } .c-kw i { background: #6a32a3; }
+.c-name { color: #1f4bb8; border-color: #b6c8f0; background: #eff4fe; } .c-name i { background: #1f4bb8; }
+.c-call { color: #0d6e74; border-color: #a7d8db; background: #ebf8f8; } .c-call i { background: #0d6e74; }
+.c-lit { color: #2c7a4b; border-color: #b4dcc2; background: #effaf2; } .c-lit i { background: #2c7a4b; }
+.c-op { color: #b4521a; border-color: #ecc5ad; background: #fdf3ec; } .c-op i { background: #b4521a; }
+.c-punc, .c-ws { color: #4d4a40; border-color: #d8d1bd; background: #f6f3ea; } .c-punc i, .c-ws i { background: #6b665a; }
+.bd-list { list-style: none; margin: 0; padding: 4px 14px 4px 10px; display: grid; }
+.bd-list li { white-space: normal; border-left: none; display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 10px; align-items: start; padding: 8px 0; border-bottom: 1px solid #efe9d8; }
+.bd-list li:last-child { border-bottom: none; }
+.bd-list p { margin: 2px 0 0; }
+.bd-list .tok { max-width: 100%; white-space: pre-wrap; overflow-wrap: anywhere; }
+.bd-role { font-size: 13px; }
+.bd-kit { color: #6e4a1f; }
+.bd code, .bd-kitchen code { font: 12.5px var(--mono); background: #f1ecdd; padding: 0 4px; border-radius: 4px; }
+.bd-kitchen { padding: 10px; background: #f6ead2; border-top: 1px dashed #d8d1bd; }
+.bd-kitchen p { margin: 2px 0; }
+.bd-py { font: 500 12px var(--mono); color: #1f4bb8; }
+.bd-note { color: #6b665a; font-size: 12.5px; }
+.bd summary { cursor: pointer; font-weight: 600; color: #6e4a1f; }
 .ticket .foot { margin-top: 8px; border-top: 1.5px dashed #c9c2ad; padding-top: 6px; font-size: 11px; color: #6b665a; display: flex; justify-content: space-between; gap: 8px; }
 
 /* your move */
@@ -1025,13 +1059,189 @@ function printTicket() {
   $("#ticket").innerHTML = `<div class="th"><span>Order #${orderNo}</span><span>Table ${1 + (orderNo % 9)}</span><span>${lvl}</span></div>
     <div class="dish">${D.pic} ${esc(D.name)}</div>
     <ol id="lines">${D.code.map((src, n) =>
-      `<li class="printing" style="animation-delay:${n * 0.14}s"><span class="ln">${n + 1}</span><span>${highlight(src) || " "}</span></li>`).join("")}</ol>
+      `<li class="cl printing" data-n="${n + 1}" style="animation-delay:${n * 0.14}s"><span class="ln">${n + 1}</span><span class="src">${highlight(src) || " "}</span>${src.trim()
+        ? `<button type="button" class="peek" data-n="${n + 1}" aria-expanded="false" aria-label="Break down line ${n + 1} word by word" title="Break this line down">🔍</button>` : ""}</li>`).join("")}</ol>
     <div class="foot"><span>${esc(D.topics)}</span><span>${D.steps.length - 1} steps</span></div>`;
+  openLine = null;
+  $("#lines").addEventListener("click", e => {
+    const b = e.target.closest(".peek");
+    if (b) { openLine = openLine === +b.dataset.n ? null : +b.dataset.n; showBreakdown(); }
+    if (e.target.closest(".bd-close")) { openLine = null; showBreakdown(); }
+  });
+}
+
+/* ------------------------------------------------------------------ line breakdown */
+
+let openLine = null;
+
+const KW = {
+  def:    ["keyword: def", "Starts a function definition: `def name(parameters):`. The indented lines below are the body, which only runs when the function is called.", "Writing a new recipe card."],
+  return: ["keyword: return", "Ends the function and hands the value after it back to whoever called the function.", "Putting the finished food on the plate to hand back."],
+  if:     ["keyword: if", "Starts a condition. The indented block below runs only when the test after `if` is True.", "Checking the order before choosing a path."],
+  else:   ["keyword: else", "The fallback block. It runs only when the `if` test was False.", "The other path, used when the check fails."],
+  for:    ["keyword: for", "Starts a loop that takes each item from a collection in turn and binds it to the loop variable.", "Picking ingredients off the tray one at a time."],
+  in:     ["keyword: in", "In a `for` loop, separates the loop variable from the collection being looped over.", "Which tray to take the items from."],
+  while:  ["keyword: while", "Starts a loop that repeats its block for as long as the test is True, re-checking before every pass.", "Keep heating while the thermometer is below the mark."],
+  try:    ["keyword: try", "Starts a block that Python attempts while watching for errors.", "Putting on oven mitts before a risky step."],
+  except: ["keyword: except", "Names the error type to catch. If that error happens inside `try`, this block runs instead of the program crashing.", "The backup plan for when the alarm goes off."],
+};
+const BUILTIN = {
+  print: ["built-in function: print", "Shows values as output. Several values are separated by spaces, and strings appear without their quotes.", "Calling the dish out at the pass."],
+  len:   ["built-in function: len", "Returns how many items a collection holds.", "Counting what's in the bowl."],
+};
+const METHOD = {
+  append: ["list method: append", "Adds one item to the end of the list. It changes the existing list in place and makes no copy.", "Pouring one more ingredient into the same bowl."],
+  copy:   ["method: copy", "Builds a new list (or dict) holding the same items. Later changes to one don't affect the other.", "Getting a second bowl and filling it the same way."],
+  items:  ["dict method: items", "Gives the dict's (key, value) pairs, one per entry, in insertion order.", "Walking along the drawers, reading each name and amount."],
+};
+
+function tokenize(src) {
+  const out = [], indent = src.match(/^ */)[0];
+  if (indent) out.push({ t: indent, k: "indent" });
+  const re = /("[^"]*"|'[^']*')|(\d+)|([A-Za-z_]\w*)|(\+=|-=|==|!=|<=|>=|[=+\-*\/<>])|([()\[\]{}:,.])|(\s+)/y;
+  re.lastIndex = indent.length;
+  let m;
+  while (re.lastIndex < src.length && (m = re.exec(src))) {
+    if (m[6]) continue;
+    out.push({ t: m[0], k: m[1] ? "str" : m[2] ? "num" : m[3] ? "id" : m[4] ? "op" : "punc" });
+  }
+  return out;
+}
+
+function explainTokens(src) {
+  const toks = tokenize(src);
+  const first = toks.findIndex(x => x.k !== "indent");
+  const hasAssign = toks.some(x => ["=", "+=", "-="].includes(x.t));
+  const assignAt = toks.findIndex(x => ["=", "+=", "-="].includes(x.t));
+  let inParams = false, afterFor = false, depth = 0;
+  toks.forEach((x, j) => {
+    const p = toks[j - 1], n = toks[j + 1];
+    const set = (cat, role, py, kit) => Object.assign(x, { cat, role, py, kit });
+    if (x.k === "indent") return set("ws", `indentation (${x.t.length} spaces)`, "Marks this line as part of the block above it (the `def`, `if`, `for`, `while` or `try`). Python uses indentation instead of braces to group lines.", "Sub-steps written under a heading in the recipe.");
+    if (x.k === "str") {
+      const ing = INGREDIENT[x.t.replace(/"/g, "'")];
+      return set("lit", "string literal (str)", `Text written directly in the code. The quotes mark where the text starts and ends; they aren't part of the value, which is ${x.t.slice(1, -1) ? `the text ${x.t.slice(1, -1)}` : "empty text"}.`,
+        ing ? `The ingredient itself, ${ing} ${x.t.slice(1, -1)}.` : "Words written out exactly, like a strip of text on the ticket.");
+    }
+    if (x.k === "num") return set("lit", "integer literal (int)", `The whole number ${x.t}, written directly in the code.`, `A fixed amount written on the ticket: ${x.t}.`);
+    if (x.k === "id") {
+      if (KW[x.t]) {
+        if (x.t === "for") afterFor = true;
+        if (x.t === "in") afterFor = false;
+        return set("kw", ...KW[x.t]);
+      }
+      if (p && p.t === "def") return set("name", "function name (being defined)", `The name the new function will be stored under. Later, \`${x.t}(...)\` runs it.`, "The title on the recipe card, which is also its label on the rack.");
+      if (inParams) return set("name", "parameter", `A name the function receives. Each call fills it with the argument passed in, inside that call's own frame.`, "The ingredient slot on the recipe card, filled in when an order comes.");
+      if (afterFor) return set("name", "loop variable", `Re-bound to the next item on every pass of the loop. After the loop ends it keeps the last item.`, "A label moved onto each ingredient as you pick it up.");
+      if (p && p.t === ".") return set("call", ...(METHOD[x.t] || [`method: ${x.t}`, "A function that belongs to the object before the dot.", "A tool that belongs to that container."]));
+      if (BUILTIN[x.t]) return set("call", ...BUILTIN[x.t]);
+      if (x.t === "KeyError") return set("name", "exception type: KeyError", "The error Python raises when you look up a dict key that doesn't exist.", "The alarm for a missing drawer.");
+      if (n && n.t === "(") return set("call", "function call", `Runs the function \`${x.t}\`. A fresh frame is created for this call.`, `Using the ${x.t} recipe card: a fresh cutting board comes out.`);
+      if (j === first && n && n.t === "=") return set("name", "variable (being assigned)", `The name on the left of \`=\`. It gets tied to whatever the right side produces. If it already existed, it's moved to the new object.`, "Writing a masking-tape label and tying it to the result.");
+      if (j === first && n && (n.t === "+=" || n.t === "-=")) return set("name", "variable (being updated)", "This name is read, combined with the right side, and then re-bound to the result.", "The scale or label whose reading is about to change.");
+      if (j === first && n && n.t === "[" && hasAssign) return set("name", "container (being changed)", "The dict or list whose entry is about to be set or updated.", "The cabinet whose drawer you're about to open.");
+      if (n && n.t === ".") return set("name", "variable (object used)", `Python follows \`${x.t}\` to its object, then uses the method after the dot on that object.`, "Following the label's twine to the container you'll work with.");
+      return set("name", "variable (being read)", `Python looks up \`${x.t}\` and follows its reference to the object it points to.`, "Reading a label and following its twine to the jar.");
+    }
+    if (x.k === "op") {
+      const strNear = (p && p.k === "str") || (n && n.k === "str") || (toks.slice(j + 1).some(y => y.k === "str") && x.t === "+" && p && p.t === ")");
+      const ops = {
+        "=":  ["assignment operator", "Works out the right side first, then binds the name on the left to the result. It never copies the object.", "Tying a label to something with twine."],
+        "==": ["comparison: equal to", "Asks whether the two sides are equal and gives True or False. One `=` assigns; two `==` compare.", "Checking whether the order matches."],
+        ">":  ["comparison: greater than", "Gives True if the left side is bigger than the right, otherwise False.", "Reading the timer against the mark."],
+        "<":  ["comparison: less than", "Gives True if the left side is smaller than the right. Equal values give False.", "Checking the thermometer is still below the mark."],
+        "+":  strNear ? ["operator: + (join)", "With strings, `+` joins them end to end into a brand-new string.", "Sticking two word strips together."]
+                      : ["operator: + (add)", "Adds two numbers and produces a new number.", "Adding amounts together."],
+        "-":  ["operator: - (subtract)", "Subtracts the right side from the left, producing a new number.", "Taking some away."],
+        "*":  ["operator: * (multiply)", "Multiplies two numbers, producing a new number.", "Scaling the amount up."],
+        "+=": ["augmented assignment: +=", "`x += y` is short for `x = x + y`. The name is re-bound to the new total.", "Adding to the running total on the scale."],
+        "-=": ["augmented assignment: -=", "`x -= y` is short for `x = x - y`.", "Taking some out and writing down the new amount."],
+      };
+      return set("op", ...(ops[x.t] || [`operator ${x.t}`, "An operator.", "A kitchen action."]));
+    }
+    // punctuation
+    if (x.t === ")" || x.t === "]" || x.t === "}") {
+      if (x.t === ")") inParams = false;
+      if (x.t === "}") depth -= 1;
+      return set("hide");
+    }
+    if (x.t === "(") {
+      if (toks[j - 2] && toks[j - 2].t === "def") { inParams = true; return set("punc", "parentheses: parameter list", "Lists the names the function expects, up to the matching `)`.", "The ingredients the recipe card asks for."); }
+      if (p && p.k === "id" && !KW[p.t]) return set("punc", "parentheses: call", "Runs the function now, passing it whatever is inside, up to the matching `)`.", "Starting the recipe with these ingredients.");
+      return set("punc", "parentheses: grouping", "Groups part of an expression so it's worked out first.", "Doing this part first.");
+    }
+    if (x.t === "[") {
+      if (p && ((p.k === "id" && !KW[p.t]) || p.t === ")")) return hasAssign && j < assignAt
+        ? set("punc", "square brackets: key to change", "Chooses which key (in a dict) or position (in a list) to store into, up to the matching `]`.", "Picking which drawer to open.")
+        : set("punc", "square brackets: lookup", "Gets the item stored under this key or position. A missing dict key raises KeyError.", "Opening the drawer with this name.");
+      return set("punc", "square brackets: list literal", "Builds a new list from the items inside, separated by commas, up to the matching `]`.", "A mixing bowl or tray holding these items in order.");
+    }
+    if (x.t === "{") { depth += 1; return set("punc", "curly braces: dict literal", "Builds a new dictionary of `key: value` pairs, up to the matching `}`.", "A spice cabinet or fridge with named drawers."); }
+    if (x.t === ":") return depth > 0
+      ? set("punc", "colon: key → value", "Inside a dict, separates a key from its value.", "Drawer name on the front, amount inside.")
+      : set("punc", "colon: start of a block", "Ends this header line. The indented lines below belong to it.", "\"…then do these sub-steps:\"");
+    if (x.t === ",") return afterFor
+      ? set("punc", "comma: unpacking", "Separates two loop variables. Each item (a pair) is split across them.", "Copying a drawer's name and amount onto two labels.")
+      : set("punc", "comma: separator", "Separates items, arguments or values.", "\"and\" between ingredients.");
+    if (x.t === ".") return set("punc", "dot: attribute access", "Reaches into the object on the left to use something that belongs to it, here a method.", "Using a tool that belongs to that container.");
+    return set("punc", `punctuation ${x.t}`, "", "");
+  });
+  return toks.filter(x => x.cat !== "hide");
+}
+
+const PATTERNS = [
+  [/^\s*def /, "def name(parameters):", "Define a new function. Nothing inside it runs until it's called."],
+  [/^\s*return /, "return value", "Finish the function and hand this value back to the caller."],
+  [/^\s*if /, "if condition:", "Run the indented block below only when the condition is True."],
+  [/^\s*else:/, "else:", "Run the indented block below only when the if condition was False."],
+  [/^\s*for /, "for name in collection:", "Run the indented block once per item, binding the name to each item in turn."],
+  [/^\s*while /, "while condition:", "Keep running the indented block for as long as the condition stays True."],
+  [/^\s*try:/, "try:", "Attempt the indented block while watching for errors."],
+  [/^\s*except/, "except ErrorType:", "If that kind of error happened in the try block, run this block instead of crashing."],
+  [/^\s*print\(/, "print(value, ...)", "Show the values as output, separated by spaces."],
+  [/\[[^\]]*\]\s*(=|\+=|-=)/, "container[key] = value", "Store a value in the dict or list at that key or position."],
+  [/^\s*\w+\s*(\+=|-=)/, "name += value", "Update a name with a new value worked out from its old one."],
+  [/^\s*[\w, ]+\s=\s/, "name = expression", "Work out the right side first, then tie the name on the left to the result."],
+  [/^\s*\w+\.\w+\(/, "object.method(arguments)", "Ask an object to do something to itself."],
+];
+
+function breakdownHTML(n) {
+  const src = D.code[n - 1];
+  const toks = explainTokens(src);
+  const pat = PATTERNS.find(([re]) => re.test(src));
+  const runs = D.steps.map((s, idx) => ({ s, idx })).filter(x => x.idx > 0 && x.s.line === n);
+  const done = runs.filter(x => x.idx <= i);
+  const show = (done[0] || runs[0]);
+  let kitchen;
+  if (!runs.length) kitchen = `<p class="bd-note">This line doesn't run in this dish. Python skips it because of the path the program takes (for example, an <code>else</code> block after an <code>if</code> that was True).</p>`;
+  else {
+    const body = `<p><b>${code(show.s.right[0])}</b></p><p class="bd-py">${code(show.s.right[1])}</p>
+      ${runs.length > 1 ? `<p class="bd-note">This line runs ${runs.length} times in this dish${done.length ? `; you've cooked it ${done.length} ${done.length === 1 ? "time" : "times"} so far` : ""}.</p>` : ""}`;
+    kitchen = done.length ? body : `<details><summary>Show the kitchen step (you haven't cooked this line yet)</summary>${body}</details>`;
+  }
+  return `<div class="bd">
+    <div class="bd-head"><span><b>Line ${n}, word by word</b></span><button type="button" class="bd-close" aria-label="Close breakdown">Close</button></div>
+    ${pat ? `<div class="bd-pat"><span class="bd-lbl">Pattern</span><code>${esc(pat[1])}</code><p>${esc(pat[2])}</p></div>` : ""}
+    <div class="bd-strip">${toks.map((x, k) => `<span class="tok c-${x.cat}"><i>${k + 1}</i>${x.k === "indent" ? "␣".repeat(x.t.length) : esc(x.t)}</span>`).join("")}</div>
+    <ol class="bd-list">${toks.map((x, k) => `<li>
+      <span class="tok c-${x.cat}"><i>${k + 1}</i>${x.k === "indent" ? "␣".repeat(x.t.length) : esc(x.t)}</span>
+      <div><b class="bd-role">${esc(x.role)}</b><p>${code(x.py)}</p><p class="bd-kit">🍳 ${esc(x.kit)}</p></div></li>`).join("")}</ol>
+    <div class="bd-kitchen"><span class="bd-lbl">The kitchen step for this line</span>${kitchen}</div>
+  </div>`;
+}
+
+function showBreakdown() {
+  document.querySelectorAll("#lines .bd-row").forEach(r => r.remove());
+  document.querySelectorAll("#lines .peek").forEach(b => b.setAttribute("aria-expanded", +b.dataset.n === openLine));
+  if (!openLine) return;
+  const li = document.querySelector(`#lines li.cl[data-n="${openLine}"]`);
+  li.insertAdjacentHTML("afterend", `<li class="bd-row">${breakdownHTML(openLine)}</li>`);
 }
 
 function render() {
   const cur = D.steps[i], next = D.steps[i + 1], prev = i > 0 ? D.steps[i - 1].st : null;
-  document.querySelectorAll("#lines li").forEach((li, n) => li.classList.toggle("next", !!next && next.line === n + 1));
+  document.querySelectorAll("#lines li.cl").forEach(li => li.classList.toggle("next", !!next && next.line === +li.dataset.n));
+  showBreakdown();
   $("#kitchen").innerHTML = drawKitchen(cur.st, prev);
 
   const last = i > 0 ? `<div class="fb ok"><span class="lbl">✓ Right. Here's what happened</span><p>${code(cur.py)}</p></div>
