@@ -414,7 +414,7 @@ const SAY_NAME = (name, val) => ANS(`Shout "${name}"`, "print the name as text",
 const EXTRA = {
   toast: [
     ANS("Label the bread `Slices`", "capital letters don't matter", "Names are case-sensitive: `Slices` and `slices` are two different labels.", "Slices = 2"),
-    ANS("Send \"2\" twice", "print repeats the value", "`print` shows each value it's given once.", "print(slices, slices)"),
+    ANS("Send \"2 2 slices of bread\"", "print repeats the value", "`print` shows each value it's given once.", 'print(slices, slices, "slices of bread")'),
   ],
   sugar: [
     ANS("Fill the jar with the word \"5\"", "a string, not a number", "Quotes make the text '5'. Text can't be added to like a number.", 'sugar = "5"'),
@@ -424,25 +424,25 @@ const EXTRA = {
   ],
   pizza: [
     ANS("Write the label in quotes: `\"pizza\"`", "a string as the name", "Quotes make a value, not a label. Assigning to a string is a SyntaxError.", '"pizza" = "margherita"'),
-    ANS("Shout \"One, margherita, please!\"", "commas get printed", "The commas only separate values in the code; `print` shows spaces.", 'print("One,", pizza + ",", "please!")'),
+    ANS("Send \"One, margherita, pizza\"", "commas get printed", "The commas only separate values in the code; `print` shows spaces.", 'print("One,", pizza + ",", "pizza")'),
   ],
   lemonade: [
     ANS("Put 3 lemons in a crate labeled `Lemons`", "names ignore case", "Names are case-sensitive; the ticket uses lowercase `lemons`.", "Lemons = 3"),
-    ANS("Set out 33 glasses", "* repeats like text", "`lemons` is a number, so `*` multiplies. Repeating only happens with strings.", "cups = int(str(lemons) * 2)"),
+    ANS("Set out 33 glasses", "* repeats like text", "`lemons` is a number, so `*` multiplies. Repeating only happens with strings.", "glasses = int(str(lemons) * 2)"),
     ANS("Pour \"ade\" first: \"adelemon\"", "+ order doesn't matter", "String `+` keeps the order you write: left side first.", 'drink = "ade" + "lemon"'),
-    ANS("Shout \"6lemonade\"", "no space between values", "`print` puts a space between values for you.", "print(str(cups) + drink)"),
+    ANS("Send \"6glasses oflemonade\"", "no space between values", "`print` puts a space between values for you.", 'print(str(glasses) + "glasses of" + drink)'),
   ],
   egg: [
     ANS("Set the timer to the text \"8\"", "a string", "Quotes make text; comparing `\"8\" > 6` is a TypeError.", 'minutes = "8"'),
     ANS("Check whether 8 equals 6", "== instead of >", "The ticket compares with `>`, greater than.", "if minutes == 6:"),
     ANS("Write \"hard\" on the timer label", "overwrite minutes", "The ticket assigns to `egg`, a new label. `minutes` stays 8.", 'minutes = "hard"'),
-    SAY_NAME("egg", "hard"),
+    ANS("Send \"egg boiled egg\"", "print the name as text", "With quotes it's just the word. Without them, the value (hard) is printed.", 'print("egg", "boiled egg")'),
   ],
   pancakes: [
     ANS("Mash flour and egg into one lump: \"flouregg\"", "join the strings", "The comma separates two items; nothing is joined.", 'batter = ["flour" + "egg"]'),
     ANS("Pour milk into a bowl of its own", "make a new list", "`append` adds to `batter`; nothing new is made.", 'milk = ["milk"]'),
     ANS("Count the letters in the bowl", "len counts characters", "`len` of a list counts its items, not letters.", 'size = len("flouregg" + "milk")'),
-    SAY_NAME("size", "3"),
+    ANS("Send \"Batter with size ingredients\"", "print the name as text", "With quotes it's just the word. Without them, the value (3) is printed.", 'print("Batter with", "size", "ingredients")'),
   ],
   cookies: [
     ANS("Write \"0\" as text on the scale", "a string", "Text can't be added to numbers: `\"0\" + 200` is a TypeError.", 'weight = "0"'),
@@ -453,7 +453,7 @@ const EXTRA = {
     ANS("Skip the chocolate", "the loop skips the last item", "A for loop visits every item, including the last.", "continue"),
     ANS("Write 50 after the total: \"35050\"", "join as text", "Both are numbers, so `+=` adds them: 350 + 50.", "weight = str(weight) + str(grams)"),
     ANS("Throw away the `grams` label", "the loop variable is deleted", "After a for loop, the loop variable keeps its last value.", "del grams"),
-    SAY_NAME("weight", "400"),
+    ANS("Send \"weight g of cookie dough\"", "print the name as text", "With quotes it's just the word. Without them, the value (400) is printed.", 'print("weight", "g of cookie dough")'),
   ],
   soup: [
     ANS("Write \"20\" as text", "a string", "`\"20\" < 100` is a TypeError: text can't be compared with numbers.", 'temp = "20"'),
@@ -462,7 +462,7 @@ const EXTRA = {
     ANS("Keep heating without checking", "the check only runs once", "A while loop re-checks before every pass.", "temp = temp + 40"),
     ANS("Heat it to 60 + 60 = 120°", "add temp to itself", "The ticket adds 40, not `temp`.", "temp = temp + temp"),
     ANS("Check: is it exactly 100°? Yes, keep heating", "== instead of <", "The test is `<`, not `==`.", "while temp == 100:"),
-    SAY_NAME("temp", "100"),
+    ANS("Send \"Soup at temp degrees\"", "print the name as text", "With quotes it's just the word. Without them, the value (100) is printed.", 'print("Soup at", "temp", "degrees")'),
   ],
   tea: [
     ANS("Write a card with no ingredient slot", "no parameter", "The card asks for `leaf`; without it, `make_tea(\"mint\")` fails with TypeError.", "def make_tea():"),
@@ -495,7 +495,7 @@ const EXTRA = {
     ANS("Look at the last item instead", "index 0 is the end", "`[0]` is the first item; the last is `[-1]`.", "top = stack[-1]"),
     ANS("Swap the cheese at spot 2", "index 1 is the third item", "Counting from 0, the ham is at 1.", 'stack[2] = "tomato"'),
     ANS("Eat the whole sandwich", "pop clears the list", "`pop()` removes one item.", "stack.clear()"),
-    ANS("Shout \"bread 5\"", "the tomato was added", "The tomato replaced the ham, and pop removed one: 3 items.", "print(top, 5)"),
+    ANS("Serve just the bottom bread", "print the first item", "`top` is one slice. The ticket prints the whole `stack`.", "print(top)"),
   ],
   cake: [
     ANS("Write a card that only ever makes 3 layers", "hard-code the answer", "The card takes any number of `layers`.", 'def cake(): return "base+layer+layer"'),
@@ -516,7 +516,7 @@ const EXTRA = {
     ANS("Open the egg drawer instead", "the wrong key", "The ticket asks for `\"milk\"`.", 'milk = fridge["egg"]'),
     ANS("Plan B for a different alarm", "catch another error", "The alarm is a KeyError, and that's the one this block catches.", "except ValueError:"),
     ANS("Write \"none\" on the label", "a string", "The ticket says `0`, a number.", 'milk = "none"'),
-    SAY_NAME("milk", "0"),
+    ANS("Send \"Coffee with milk milk\"", "print the name as text", "With quotes it's just the word. Without them, the value (0) is printed.", 'print("Coffee with", "milk", "milk")'),
   ],
   oven: [
     ANS("Pin a blueprint called `oven`, lowercase", "names ignore case", "Names are case-sensitive; the class is `Oven`.", "class oven:"),
@@ -526,29 +526,29 @@ const EXTRA = {
     ANS("Open a heat board with extra = 180", "pass the temperature", "The argument in the call is 20.", "oven.heat(180)"),
     ANS("Turn the dial down to 160", "-= instead of +=", "`+=` adds.", "self.temp -= extra"),
     ANS("Throw the oven away too", "the object is deleted", "`oven` still labels it, so it stays.", "del oven"),
-    SAY_NAME("oven.temp", "200"),
+    ANS("Send \"Oven at oven.temp degrees\"", "print the name as text", "With quotes it's just the word. Without them, the value (200) is printed.", 'print("Oven at", "oven.temp", "degrees")'),
   ],
 };
 
 const DISHES = [
   /* ---------- ★ starters ---------- */
-  dish({ id: "toast", tier: 1, pic: "🍞", name: "Buttered toast", topics: "variables · print()",
-    code: ["slices = 2", "print(slices)"] }, step => {
+  dish({ id: "toast", tier: 1, pic: "🍞", name: "Bread basket", topics: "variables · print()",
+    code: ["slices = 2", 'print(slices, "slices of bread")'] }, step => {
     step(1, ["Put 2 slices of bread in a bread basket and tie a `slices` label to it", "create the int 2, bind the name slices to it"],
       [["Wait: nothing happens until you print", "assignment is delayed", "Every line runs in order. `=` makes the value and attaches the name right away. Only a comment (`#`) is skipped.", "# slices = 2"],
        ["Put out 2 separate empty baskets", "create two objects", "`2` is one int object whose value is 2, not two containers.", "slices = [[], []]"]],
       "The bread goes on the rack in a [basket|object] and a [label|variable] called `slices` is tied to it with [twine|a reference].",
       "`slices = 2` creates the int object 2 and binds the name `slices` to it.",
       st => { st.heap.o1 = { t: "int", v: "2", fill: "🍞", count: 2, vessel: "basket", k: "Bread basket" }; g(st).slices = R("o1"); });
-    step(2, ["Follow the label to the basket and send \"2\" to the pass", "print looks up slices and outputs 2"],
-      [["Send the word \"slices\" to the pass", "prints the text slices", "That needs quotes. Without quotes, `slices` is a name, and `print` shows what it refers to.", 'print("slices")'],
-       ["Throw the bread away after serving", "print deletes the variable", "`print` only reads. Removing a name takes a separate `del`.", "print(slices); del slices"]],
+    step(2, ["Follow the label to the basket and send \"2 slices of bread\" to the pass", "print looks up slices: 2 slices of bread"],
+      [["Send \"slices slices of bread\"", "prints the text slices", "That needs quotes. Without quotes, `slices` is a name, and `print` shows what it refers to.", 'print("slices", "slices of bread")'],
+       ["Throw the bread away after serving", "print deletes the variable", "`print` only reads. Removing a name takes a separate `del`.", 'print(slices, "slices of bread"); del slices']],
       "Follow the [twine|reference] to the bread and call out the amount at [the pass|output].",
-      "`print(slices)` looks up the name and outputs `2`.",
-      st => { st.out.push("2"); });
+      "`print` looks up `slices` and serves `2 slices of bread`.",
+      st => { st.out.push("2 slices of bread"); });
   }),
 
-  dish({ id: "sugar", tier: 1, pic: "🍬", name: "Sugar swap", topics: "reassignment · immutable ints",
+  dish({ id: "sugar", tier: 1, pic: "🍬", name: "Two jars of sugar", topics: "reassignment · immutable ints",
     code: ["sugar = 5", "backup = sugar", "sugar = sugar + 1", "print(sugar, backup)"] }, step => {
     step(1, ["Fill a sealed jar with 5 cubes and label it `sugar`", "create the int 5, bind sugar"],
       [["Make an empty jar labeled `sugar`, fill it later", "create a name with no value", "The ticket gives the value right away: 5. An empty placeholder would be `None`.", "sugar = None"],
@@ -577,36 +577,36 @@ const DISHES = [
   }),
 
   /* ---------- ★★ easy ---------- */
-  dish({ id: "lemonade", tier: 2, pic: "🍋", name: "Lemonade", topics: "arithmetic · joining strings",
-    code: ["lemons = 3", "cups = lemons * 2", 'drink = "lemon" + "ade"', "print(cups, drink)"] }, step => {
+  dish({ id: "lemonade", tier: 2, pic: "🍋", name: "Six glasses of lemonade", topics: "arithmetic · joining strings",
+    code: ["lemons = 3", "glasses = lemons * 2", 'drink = "lemon" + "ade"', 'print(glasses, "glasses of", drink)'] }, step => {
     step(1, ["Put 3 lemons in a crate labeled `lemons`", "create the int 3, bind lemons"],
       [["Put 1 lemon in each of 3 crates", "create three objects", "`3` is a single int object, not a collection of three things.", "lemons = [1, 1, 1]"],
-       ["Squeeze the lemons first", "run line 2 early", "Lines run top to bottom. Running line 2 first fails with NameError because `lemons` doesn't exist yet.", "cups = lemons * 2"]],
+       ["Squeeze the lemons first", "run line 2 early", "Lines run top to bottom. Running line 2 first fails with NameError because `lemons` doesn't exist yet.", "glasses = lemons * 2"]],
       "The lemons go in a [crate|int object] with a `lemons` [label|variable].",
       "`lemons = 3` creates the int 3 and binds `lemons` to it.",
       st => { st.heap.o1 = { t: "int", v: "3", fill: "🍋", count: 3, vessel: "crate", k: "Lemon crate" }; g(st).lemons = R("o1"); });
-    step(2, ["Count the lemons, double it, and set out 6 glasses on a new tray labeled `cups`", "evaluate lemons * 2 = 6, bind cups"],
-      [["Double the lemons in the `lemons` crate", "lemons becomes 6", "The right side is only read. The ticket assigns to `cups`, so `lemons` stays 3.", "lemons = lemons * 2"],
-       ["Tie the `cups` label to the lemon crate", "cups refers to lemons", "`lemons * 2` computes a new value, 6. Without `* 2`, both names would share the 3.", "cups = lemons"]],
+    step(2, ["Each lemon makes 2 glasses: set out 6 glasses on a new tray labeled `glasses`", "evaluate lemons * 2 = 6, bind glasses"],
+      [["Double the lemons in the `lemons` crate", "lemons becomes 6", "The right side is only read. The ticket assigns to `glasses`, so `lemons` stays 3.", "lemons = lemons * 2"],
+       ["Tie the `glasses` label to the lemon crate", "glasses refers to lemons", "`lemons * 2` computes a new value, 6. Without `* 2`, both names would share the 3.", "glasses = lemons"]],
       "Read the lemon crate, do the sum, and set out a [new tray|new object] with the result.",
-      "Python evaluates `lemons * 2` to 6, creates that int, and binds `cups` to it.",
-      st => { st.heap.o2 = { t: "int", v: "6", fill: "🥤", count: 6, vessel: "glasses", k: "Tray of glasses" }; g(st).cups = R("o2"); });
+      "Python evaluates `lemons * 2` to 6, creates that int, and binds `glasses` to it.",
+      st => { st.heap.o2 = { t: "int", v: "6", fill: "🥤", count: 6, vessel: "glasses", k: "Tray of glasses" }; g(st).glasses = R("o2"); });
     step(3, ["Join the words \"lemon\" and \"ade\" and pour one new pitcher: \"lemonade\"", "concatenate two strings into 'lemonade'"],
       [["Join them with a space: \"lemon ade\"", "+ adds a space", "`+` joins strings exactly as they are. A space only appears if you add one.", 'drink = "lemon" + " " + "ade"'],
        ["Keep \"lemon\" and \"ade\" in two pitchers", "make a list of two strings", "`+` builds one new string; square brackets would make a list.", 'drink = ["lemon", "ade"]']],
       "Stick the two words together into a [new pitcher|new str object] labeled `drink`.",
       "`\"lemon\" + \"ade\"` concatenates into the new string `'lemonade'`, bound to `drink`.",
       st => { st.heap.o3 = { t: "str", v: "'lemonade'", vessel: "pitcher", k: "Pitcher" }; g(st).drink = R("o3"); });
-    step(4, ["Send \"6 lemonade\" to the pass", "print outputs 6 lemonade"],
-      [["Send \"6 'lemonade'\"", "print shows the quotes", "`print` shows text without its quotes. You'd need `repr()` to see them.", "print(cups, repr(drink))"],
-       ["Send \"cups drink\"", "prints the names", "That needs quotes. Without them, the names' values are printed.", 'print("cups", "drink")']],
-      "A tray and a pitcher, one call at [the pass|output].",
-      "`print(cups, drink)` outputs `6 lemonade`, separated by a space.",
-      st => { st.out.push("6 lemonade"); });
+    step(4, ["Pour the pitcher into the 6 glasses and send \"6 glasses of lemonade\" to the pass", "print outputs 6 glasses of lemonade"],
+      [["Send \"6 glasses of 'lemonade'\"", "print shows the quotes", "`print` shows text without its quotes. You'd need `repr()` to see them.", 'print(glasses, "glasses of", repr(drink))'],
+       ["Send \"glasses glasses of drink\"", "prints the names", "That needs quotes. Without them, the names' values are printed.", 'print("glasses", "glasses of", "drink")']],
+      "Pour the [pitcher|drink] into the [6 glasses|glasses] and serve them at [the pass|output].",
+      "`print` joins its three values with spaces: `6 glasses of lemonade`.",
+      st => { st.out.push("6 glasses of lemonade"); });
   }),
 
-  dish({ id: "egg", tier: 2, pic: "🥚", name: "Boiled egg", topics: "if / else · comparison",
-    code: ["minutes = 8", "if minutes > 6:", '    egg = "hard"', "else:", '    egg = "soft"', "print(egg)"] }, step => {
+  dish({ id: "egg", tier: 2, pic: "🥚", name: "Hard-boiled egg", topics: "if / else · comparison",
+    code: ["minutes = 8", "if minutes > 6:", '    egg = "hard"', "else:", '    egg = "soft"', 'print(egg, "boiled egg")'] }, step => {
     step(1, ["Set the timer: write 8 on a `minutes` label", "bind minutes to 8"],
       [["Set the timer to 6", "minutes is 6", "The ticket says 8. The 6 only appears in the check on line 2.", "minutes = 6"],
        ["Start the else steps", "jump to else", "Line 1 runs first; nothing has been checked yet.", 'egg = "soft"']],
@@ -624,16 +624,16 @@ const DISHES = [
       "The egg is ready and gets a `egg` [label|variable].",
       "`egg = \"hard\"` runs inside the if block.",
       st => { g(st).egg = P("'hard'", { ico: "🥚" }); });
-    step(6, ["Skip the soft-boil steps and send \"hard\" to the pass", "else is skipped, print outputs hard"],
+    step(6, ["Skip the soft-boil steps and send \"hard boiled egg\" to the pass", "else is skipped, print outputs hard boiled egg"],
       [["Do the soft-boil steps too", "run the else block", "Once the if block ran, the else block is skipped.", 'egg = "soft"'],
-       ["Send \"soft\"", "egg was overwritten", "Line 5 never ran, so `egg` is still 'hard'.", 'print("soft")']],
+       ["Send \"soft boiled egg\"", "egg was overwritten", "Line 5 never ran, so `egg` is still 'hard'.", 'print("soft", "boiled egg")']],
       "The [other path|else block] is skipped entirely. Serve at [the pass|output].",
-      "Python jumps past `else` to line 6 and prints `hard`.",
-      st => { st.out.push("hard"); });
+      "Python jumps past `else` to line 6 and prints `hard boiled egg`.",
+      st => { st.out.push("hard boiled egg"); });
   }),
 
   dish({ id: "pancakes", tier: 2, pic: "🥞", name: "Pancake batter", topics: "lists · append() · len()",
-    code: ['batter = ["flour", "egg"]', 'batter.append("milk")', "size = len(batter)", "print(size)"] }, step => {
+    code: ['batter = ["flour", "egg"]', 'batter.append("milk")', "size = len(batter)", 'print("Batter with", size, "ingredients")'] }, step => {
     step(1, ["Put flour and an egg in a mixing bowl labeled `batter`", "create a list of two strings"],
       [["Put flour and egg in two separate jars", "make two variables", "Square brackets make one list holding both items.", 'flour, egg = "flour", "egg"'],
        ["Put them in a sealed jar", "make a tuple", "Round brackets would make a tuple, which can't change. Square brackets mean a list: an open bowl.", 'batter = ("flour", "egg")']],
@@ -652,17 +652,17 @@ const DISHES = [
       "[Counting the bowl|len()] gives a number for a new [label|variable].",
       "`len(batter)` returns 3, which is bound to `size`.",
       st => { g(st).size = P(3, { ico: "🔢" }); });
-    step(4, ["Send \"3\" to the pass", "print outputs 3"],
+    step(4, ["Send \"Batter with 3 ingredients\" to the pass", "print outputs Batter with 3 ingredients"],
       [["Send the whole bowl", "print the list", "We print `size`, not `batter`.", "print(batter)"],
-       ["Send \"2\"", "len ignores appended items", "Appended items count like any other.", "print(len(batter) - 1)"]],
+       ["Send \"Batter with 2 ingredients\"", "len ignores appended items", "Appended items count like any other.", 'print("Batter with", len(batter) - 1, "ingredients")']],
       "Call out the count at [the pass|output].",
-      "`print(size)` outputs `3`.",
-      st => { st.out.push("3"); });
+      "`print` serves `Batter with 3 ingredients`.",
+      st => { st.out.push("Batter with 3 ingredients"); });
   }),
 
   /* ---------- ★★★ medium ---------- */
   dish({ id: "cookies", tier: 3, pic: "🍪", name: "Cookie dough", topics: "for loops · += ",
-    code: ["weight = 0", "for grams in [200, 150, 50]:", "    weight += grams", "print(weight)"] }, step => {
+    code: ["weight = 0", "for grams in [200, 150, 50]:", "    weight += grams", 'print(weight, "g of cookie dough")'] }, step => {
     const ing = [["flour", "🌾", 200], ["butter", "🧈", 150], ["chocolate", "🍫", 50]];
     step(1, ["Zero the scale: write 0 on a `weight` label", "bind weight to 0"],
       [["Put all three ingredients on the scale", "add them up now", "Line 1 only sets the starting total. The loop does the adding.", "weight = 200 + 150 + 50"],
@@ -675,7 +675,7 @@ const DISHES = [
       step(2, [`Pick up the ${k === 0 ? "first" : "next"} ingredient: ${gr} g of ${name}`, `the loop binds grams to ${gr}`],
         [k === 0 ? ["Weigh the whole tray at once", "grams is the whole list", "A for loop hands you one item per pass, not the whole list.", "grams = [200, 150, 50]"]
                  : ["Stop: you've already weighed something", "leave the loop early", "There are still items left on the tray. Leaving early needs `break`.", "break"],
-         ["Go straight to the pass", "skip the loop", "The loop runs its body for every item first.", "print(weight)"]],
+         ["Go straight to the pass", "skip the loop", "The loop runs its body for every item first.", 'print(weight, "g of cookie dough")']],
         `[Take the next item|next iteration] off the [prep tray|list]. The \`grams\` [tape|variable] reads ${gr}.`,
         `The \`for\` loop takes item ${k} and binds \`grams\` to ${gr}.`,
         st => { if (k === 0) st.heap.o1 = { t: "list", vessel: "tray", k: "Prep tray", hold: true, items: ing.map(([, i, n]) => P(n, { ico: i })) };
@@ -694,16 +694,16 @@ const DISHES = [
       "No more items, so [the repeating stops|the loop ends]. The empty tray goes to the [sink|garbage].",
       "The list is used up and the loop finishes. `grams` keeps its last value.",
       st => { delete st.heap.o1.hl; delete st.heap.o1.hold; });
-    step(4, ["Send \"400\" to the pass", "print outputs 400"],
-      [["Send \"50\"", "print the last item", "`grams` holds the last item; `weight` holds the total, 400.", "print(grams)"],
-       ["Send \"0\"", "print the starting value", "Nothing reset it. It holds 400.", "print(0)"]],
+    step(4, ["Send \"400 g of cookie dough\" to the pass", "print outputs 400 g of cookie dough"],
+      [["Send \"50 g of cookie dough\"", "print the last item", "`grams` holds the last item; `weight` holds the total, 400.", 'print(grams, "g of cookie dough")'],
+       ["Send \"0 g of cookie dough\"", "print the starting value", "Nothing reset it. It holds 400.", 'print(0, "g of cookie dough")']],
       "The sink is [washed|garbage-collected] and the total goes to [the pass|output].",
-      "`print(weight)` outputs 400.",
-      st => { delete st.heap.o1; st.out.push("400"); });
+      "`print` serves `400 g of cookie dough`.",
+      st => { delete st.heap.o1; st.out.push("400 g of cookie dough"); });
   }),
 
-  dish({ id: "soup", tier: 3, pic: "🍲", name: "Simmer the soup", topics: "while loops · conditions",
-    code: ["temp = 20", "while temp < 100:", "    temp = temp + 40", "print(temp)"] }, step => {
+  dish({ id: "soup", tier: 3, pic: "🍲", name: "Soup at a boil", topics: "while loops · conditions",
+    code: ["temp = 20", "while temp < 100:", "    temp = temp + 40", 'print("Soup at", temp, "degrees")'] }, step => {
     step(1, ["Put the pot on: write 20° on a `temp` label", "bind temp to 20"],
       [["Turn the heat straight to 100°", "temp is 100", "The ticket starts at 20.", "temp = 100"],
        ["Start checking before setting a temperature", "run line 2 first", "Line 1 runs first. Checking `temp` before it exists is a NameError.", "while temp < 100:"]],
@@ -728,12 +728,12 @@ const DISHES = [
        ["Restart from 20°", "the loop restarts", "A while loop never resets its variables.", "temp = 20"]],
       "[Check|test the condition] again: not below 100 any more, so [stop|exit the loop].",
       "`100 < 100` is `False`, so Python leaves the loop and goes to line 4.");
-    step(4, ["Send \"100\" to the pass", "print outputs 100"],
-      [["Send \"140\"", "the loop ran once more", "The check failed before a 4th pass.", "print(temp + 40)"],
-       ["Send \"60\"", "print the first loop value", "`temp` was updated twice, to 100.", "print(60)"]],
+    step(4, ["Send \"Soup at 100 degrees\" to the pass", "print outputs Soup at 100 degrees"],
+      [["Send \"Soup at 140 degrees\"", "the loop ran once more", "The check failed before a 4th pass.", 'print("Soup at", temp + 40, "degrees")'],
+       ["Send \"Soup at 60 degrees\"", "print the first loop value", "`temp` was updated twice, to 100.", 'print("Soup at", 60, "degrees")']],
       "Serve the soup at [the pass|output].",
-      "`print(temp)` outputs 100.",
-      st => { st.out.push("100"); });
+      "`print` serves `Soup at 100 degrees`.",
+      st => { st.out.push("Soup at 100 degrees"); });
   }),
 
   dish({ id: "tea", tier: 3, pic: "🍵", name: "Mint tea", topics: "functions · parameters · return",
@@ -777,7 +777,7 @@ const DISHES = [
   }),
 
   /* ---------- ★★★★ hard ---------- */
-  dish({ id: "bowls", tier: 4, pic: "🥣", name: "The shared bowl", topics: "aliasing · mutation · copy()",
+  dish({ id: "bowls", tier: 4, pic: "🥣", name: "Two bowls of batter", topics: "aliasing · mutation · copy()",
     code: ['bowl = ["egg", "flour"]', "mixing = bowl", 'mixing.append("milk")', "side = bowl.copy()", 'side.append("salt")', "print(bowl, side)"] }, step => {
     step(1, ["Put an egg and flour in a mixing bowl labeled `bowl`", "create a list, bind bowl"],
       [["Put each in its own jar", "two variables", "One list holds both items.", 'egg, flour = "egg", "flour"'],
@@ -862,7 +862,7 @@ const DISHES = [
   }),
 
   /* ---------- ★★★★★ chef's specials ---------- */
-  dish({ id: "cake", tier: 5, pic: "🎂", name: "Layer cake", topics: "recursion · the call stack",
+  dish({ id: "cake", tier: 5, pic: "🎂", name: "Three-layer cake", topics: "recursion · the call stack",
     code: ["def cake(layers):", "    if layers == 1:", '        return "base"', '    return cake(layers - 1) + "+layer"', "", "print(cake(3))"] }, step => {
     step(1, ["Write the cake recipe card and put it on the rack", "def creates the function cake"],
       [["Start baking 3 layers", "call it now", "`def` only defines the recipe. Calling it comes later, on line 6.", "cake(3)"],
@@ -915,8 +915,8 @@ const DISHES = [
       st => { st.frames.pop(); st.out.push("base+layer+layer"); });
   }),
 
-  dish({ id: "milk", tier: 5, pic: "🥛", name: "Missing milk", topics: "try / except · KeyError",
-    code: ['fridge = {"egg": 6}', "try:", '    milk = fridge["milk"]', "except KeyError:", "    milk = 0", "print(milk)"] }, step => {
+  dish({ id: "milk", tier: 5, pic: "☕", name: "Coffee with no milk", topics: "try / except · KeyError",
+    code: ['fridge = {"egg": 6}', "try:", '    milk = fridge["milk"]', "except KeyError:", "    milk = 0", 'print("Coffee with", milk, "milk")'] }, step => {
     step(1, ["Stock the fridge: an egg drawer holding 6", "create a dict {'egg': 6}"],
       [["Stock eggs and milk", "the dict has two keys", "Only `\"egg\"` is on the ticket.", 'fridge = {"egg": 6, "milk": 1}'],
        ["Label an egg carton `egg`", "egg is a variable", "\"egg\" is a key in the dict, not a variable.", "egg = 6"]],
@@ -936,7 +936,7 @@ const DISHES = [
       st => { g(st).$err = P("KeyError: 'milk'"); });
     step(4, ["It's a KeyError, so the backup plan kicks in", "except KeyError catches it"],
       [["Abandon the dish", "re-raise the error", "The `except KeyError` block catches exactly this error; re-raising would crash.", "raise"],
-       ["Ignore the alarm and print", "carry on to print", "Control jumps to the matching `except` block. Printing now is a NameError: `milk` doesn't exist.", "print(milk)"]],
+       ["Ignore the alarm and print", "carry on to print", "Control jumps to the matching `except` block. Printing now is a NameError: `milk` doesn't exist.", 'print("Coffee with", milk, "milk")']],
       "The [alarm is handled|exception is caught] by the matching backup plan.",
       "The error matches `except KeyError`, so that block runs and the program carries on.",
       st => { delete g(st).$err; });
@@ -946,32 +946,32 @@ const DISHES = [
       "The [backup plan|except block] sets a sensible default.",
       "`milk = 0` runs in the except block.",
       st => { g(st).milk = P(0, { ico: "🥛" }); });
-    step(6, ["Send \"0\" to the pass", "print outputs 0"],
+    step(6, ["Send \"Coffee with 0 milk\" to the pass", "print outputs Coffee with 0 milk"],
       [["Send the KeyError", "print the error", "The error was handled, so nothing about it is printed.", 'print(KeyError("milk"))'],
-       ["Send \"6\"", "print the egg count", "`milk` is 0.", 'print(fridge["egg"])']],
+       ["Send \"Coffee with 6 milk\"", "print the egg count", "`milk` is 0.", 'print("Coffee with", fridge["egg"], "milk")']],
       "The order still goes out at [the pass|output].",
-      "`print(milk)` outputs `0`.",
-      st => { st.out.push("0"); });
+      "`print` serves `Coffee with 0 milk`: the order still goes out, just without milk.",
+      st => { st.out.push("Coffee with 0 milk"); });
   }),
   /* ---------- added dishes ---------- */
-  dish({ id: "pizza", tier: 1, pic: "🍕", name: "Pizza order", topics: "strings · print() with several values",
-    code: ['pizza = "margherita"', 'print("One", pizza, "please!")'] }, step => {
+  dish({ id: "pizza", tier: 1, pic: "🍕", name: "Margherita pizza", topics: "strings · print() with several values",
+    code: ['pizza = "margherita"', 'print("One", pizza, "pizza")'] }, step => {
     step(1, ["Slide a margherita into a pizza box and tie a `pizza` label to it", "create the str 'margherita', bind pizza"],
       [["Write margherita on a label, with no pizza", "a name without quotes", "Without quotes Python reads `margherita` as a variable name, and none exists: NameError.", "pizza = margherita"],
        ["Box a pepperoni instead", "a different string", "The ticket says margherita. Strings are taken exactly as written.", 'pizza = "pepperoni"']],
       "The pizza goes on the rack in a [pizza box|str object] labeled `pizza`. The [quotes|string delimiters] on the ticket say it's food, not a label.",
       "`\"margherita\"` is a string: text inside quotes. `pizza` is bound to it.",
       st => { st.heap.o1 = { t: "str", v: "'margherita'", vessel: "pizzabox", k: "Pizza box" }; g(st).pizza = R("o1"); });
-    step(2, ["Shout \"One margherita please!\" through the pass", "print joins its three values with spaces"],
-      [["Shout \"Onemargheritaplease!\"", "no spaces", "That's what `+` does. `print` puts a space between each value it's given.", 'print("One" + pizza + "please!")'],
-       ["Shout \"One pizza please!\"", "print the word pizza", "In the print, `pizza` has no quotes, so its value is used.", 'print("One", "pizza", "please!")']],
+    step(2, ["Send \"One margherita pizza\" through the pass", "print joins its three values with spaces"],
+      [["Send \"Onemargheritapizza\"", "no spaces", "That's what `+` does. `print` puts a space between each value it's given.", 'print("One" + pizza + "pizza")'],
+       ["Send \"One pizza pizza\"", "print the word pizza", "In the print, `pizza` has no quotes, so its value is used.", 'print("One", "pizza", "pizza")']],
       "Three pieces, read out at [the pass|output] with a space between each.",
-      "`print` with several values separates them with spaces: `One margherita please!`.",
-      st => { st.out.push("One margherita please!"); });
+      "`print` with several values separates them with spaces: `One margherita pizza`.",
+      st => { st.out.push("One margherita pizza"); });
   }),
 
-  dish({ id: "sandwich", tier: 4, pic: "🥪", name: "Sandwich stack", topics: "indexes · item assignment · pop()",
-    code: ['stack = ["bread", "ham", "cheese", "bread"]', "top = stack[0]", 'stack[1] = "tomato"', "bite = stack.pop()", "print(top, len(stack))"] }, step => {
+  dish({ id: "sandwich", tier: 4, pic: "🥪", name: "Open-faced sandwich", topics: "indexes · item assignment · pop()",
+    code: ['stack = ["bread", "ham", "cheese", "bread"]', "top = stack[0]", 'stack[1] = "tomato"', "bite = stack.pop()", "print(stack)"] }, step => {
     const items = names => names.map(n => P(`'${n}'`));
     step(1, ["Lay bread, ham, cheese and bread on a plate labeled `stack`", "create a list of 4 strings"],
       [["Pack them in a sealed lunchbox", "make a tuple", "Round brackets make a tuple, which can't change. Square brackets make a list.", 'stack = ("bread", "ham", "cheese", "bread")'],
@@ -997,16 +997,16 @@ const DISHES = [
       "Lift the [last item|index -1] off the plate. The plate now holds 3.",
       "`stack.pop()` removes `'bread'` from the end and returns it, so `bite` is bound to it.",
       st => { delete st.heap.o1.hl; st.heap.o1.items.pop(); g(st).bite = P("'bread'"); });
-    step(5, ["Shout \"bread 3\" through the pass", "print outputs bread 3"],
-      [["Shout \"bread 4\"", "pop didn't shrink the list", "`pop()` removed an item, leaving 3.", "print(top, 4)"],
-       ["Shout \"ham 3\"", "top followed the swap", "`top` was read before the swap and still refers to 'bread'.", 'print("ham", len(stack))']],
-      "Call out the label and the [count|len()] at [the pass|output].",
-      "`print(top, len(stack))` outputs `bread 3`.",
-      st => { st.out.push("bread 3"); });
+    step(5, ["Serve the plate at the pass: bread, tomato, cheese", "print shows the list"],
+      [["Serve it with the top bread put back", "pop didn't remove it", "`pop()` took the top bread off the plate; it's labeled `bite` now.", "print(stack + [bite])"],
+       ["Serve it with ham instead of tomato", "the swap didn't happen", "Line 3 replaced the ham with a tomato.", 'print(["bread", "ham", "cheese"])']],
+      "Serve what's left on the [plate|list] at [the pass|output]: an open-faced sandwich.",
+      "`print(stack)` shows the list: `['bread', 'tomato', 'cheese']`.",
+      st => { st.out.push("['bread', 'tomato', 'cheese']"); });
   }),
 
-  dish({ id: "oven", tier: 5, pic: "🔥", name: "Smart oven", topics: "classes · __init__ · self · methods",
-    code: ["class Oven:", "    def __init__(self, temp):", "        self.temp = temp", "    def heat(self, extra):", "        self.temp += extra", "", "oven = Oven(180)", "oven.heat(20)", "print(oven.temp)"] }, step => {
+  dish({ id: "oven", tier: 5, pic: "🔥", name: "Preheated oven", topics: "classes · __init__ · self · methods",
+    code: ["class Oven:", "    def __init__(self, temp):", "        self.temp = temp", "    def heat(self, extra):", "        self.temp += extra", "", "oven = Oven(180)", "oven.heat(20)", 'print("Oven at", oven.temp, "degrees")'] }, step => {
     step(1, ["Pin an oven blueprint called `Oven` to the rack", "class creates a class object with two methods"],
       [["Build an oven right away", "class makes an oven", "A class is only the blueprint. `Oven(180)` builds one later.", "oven = Oven(180)"],
        ["Write a recipe card called `Oven`", "class is a function", "`def` makes a function. `class` makes a blueprint that bundles data and methods.", "def Oven(temp): ..."]],
@@ -1049,12 +1049,12 @@ const DISHES = [
       "The [board|frame] goes, but [the oven|the object] keeps its dial at 200.",
       "The method ends; the attribute change stays on the instance.",
       st => { st.frames.pop(); });
-    step(9, ["Read the oven's dial and shout \"200\"", "print outputs 200"],
-      [["Shout \"180\"", "the original value", "`heat()` changed the dial to 200.", "print(180)"],
-       ["Shout \"20\"", "print extra", "`extra` belonged to the heat board, which is gone: NameError.", "print(extra)"]],
+    step(9, ["Read the oven's dial and send \"Oven at 200 degrees\"", "print outputs Oven at 200 degrees"],
+      [["Send \"Oven at 180 degrees\"", "the original value", "`heat()` changed the dial to 200.", 'print("Oven at", 180, "degrees")'],
+       ["Send \"Oven at 20 degrees\"", "print extra", "`extra` belonged to the heat board, which is gone: NameError.", 'print("Oven at", extra, "degrees")']],
       "Read [the oven's dial|oven.temp] at [the pass|output].",
-      "`oven.temp` looks up the attribute: `200`.",
-      st => { st.out.push("200"); });
+      "`oven.temp` looks up the attribute, so `print` serves `Oven at 200 degrees`.",
+      st => { st.out.push("Oven at 200 degrees"); });
   }),
 ];
 
