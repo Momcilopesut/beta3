@@ -149,12 +149,30 @@ h1 { font: 800 clamp(26px, 4vw, 38px)/1.05 var(--display); margin: 0; }
 .move .q { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
 .move .stat { font: 12px var(--mono); color: var(--muted); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .opts { display: grid; gap: 8px; }
-.opt { display: grid; gap: 3px; text-align: left; width: 100%; padding: 11px 13px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--panel);
-  color: var(--ink); cursor: pointer; font: 500 14.5px/1.35 var(--body); }
-.opt:hover:not(:disabled) { border-color: var(--ink); }
+/* each answer is a flash card: the front is the kitchen action, the back is the line of code it produces */
+.opt-card { position: relative; perspective: 1000px; }
+.opt { display: grid; width: 100%; padding: 0; border: none; background: none; color: var(--ink); cursor: pointer; text-align: left;
+  font: 500 14.5px/1.35 var(--body); transform-style: preserve-3d; transition: transform .55s cubic-bezier(.3,1.35,.5,1); border-radius: 10px; }
+.opt-card.flipped .opt { transform: rotateY(180deg); }
+.face { grid-area: 1 / 1; display: grid; gap: 3px; align-content: start; padding: 11px 48px 11px 13px; border-radius: 10px;
+  border: 1.5px solid var(--line); background: var(--panel); backface-visibility: hidden; -webkit-backface-visibility: hidden; min-width: 0; }
+.face.back { transform: rotateY(180deg); background: var(--board); border-color: var(--board-edge); color: var(--board-ink); align-content: center; }
+.face.back .cmp-l { color: var(--board-ink); opacity: .8; margin-top: 0; }
+.face.back .tap { font-size: 12px; opacity: .75; }
+.opt .face code.line { background: #fffdf6; color: #23211b; padding: 5px 9px; font-size: 13.5px; border-color: #d8d1bd; }
+.opt .face code.line.bad { border-color: var(--bad); }
+.face.back .op { color: var(--board-ink); opacity: .85; }
+.opt:hover:not(:disabled) .face { border-color: var(--ink); }
+.opt:focus-visible { outline: none; }
+.opt:focus-visible .face { outline: 3px solid var(--hl-edge); outline-offset: 2px; }
 .opt .op { font: 500 12px/1.3 var(--mono); color: var(--py); }
-.opt.wrong { border-color: var(--bad); background: var(--bad-bg); cursor: default; }
+.opt.wrong { cursor: default; }
+.opt.wrong .face.front { border-color: var(--bad); background: var(--bad-bg); }
 .opt.wrong .why { color: var(--bad); font-size: 13px; font-weight: 500; }
+.flip { position: absolute; top: 8px; right: 8px; z-index: 2; width: 34px; height: 26px; padding: 0; border-radius: 7px; cursor: pointer;
+  border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); font: 700 11px/1 var(--mono); }
+.flip:hover, .flip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .opt { transition: none; } }
 .cmp { display: grid; gap: 3px; margin-top: 6px; }
 .cmp-l { font: 600 10.5px/1.2 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
 code.line { display: block; font: 500 13px/1.5 var(--mono); background: #fffdf6; color: #23211b; border: 1px solid #d8d1bd; border-radius: 6px;
@@ -164,7 +182,7 @@ code.line .kw { color: #7b3fb5; font-weight: 600; } code.line .st { color: #2c7a
 code.line .bi { color: #2350c4; } code.line .cm { color: #8f8a7a; font-style: italic; }
 code.line .dif { background: #fbd9d3; box-shadow: 0 0 0 1px #b8382a; border-radius: 3px; }
 .fb.ok code.line { margin: 2px 0; }
-.opt.hint { border-color: var(--good); box-shadow: 0 0 0 3px color-mix(in srgb, var(--good) 30%, transparent); }
+.opt.hint .face { border-color: var(--good); box-shadow: 0 0 0 3px color-mix(in srgb, var(--good) 30%, transparent); }
 .opt code, .fb code { font: 12.5px var(--mono); background: color-mix(in srgb, currentColor 11%, transparent); padding: 0 4px; border-radius: 4px; }
 .shake { animation: shake .35s; }
 @keyframes shake { 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-3px); } }
@@ -384,8 +402,133 @@ function dish(meta, script) {
   };
   steps.push({ line: null, st: JSON.parse(JSON.stringify(st)) });
   script(step);
+  // a fourth answer for every step: one more wrong move, in step order
+  (EXTRA[meta.id] || []).forEach((w, j) => { if (steps[j + 1]) steps[j + 1].wrong.push(w); });
   return { ...meta, steps };
 }
+
+/* The third wrong answer for each step, listed in the order the steps happen.
+   Each is [kitchen action, Python meaning, why it's wrong, the line of code it would be]. */
+const ANS = (k, p, why, c) => [k, p, why, c];
+const SAY_NAME = (name, val) => ANS(`Shout "${name}"`, "print the name as text", `With quotes it's just the word. Without them, the value (${val}) is printed.`, `print("${name}")`);
+const EXTRA = {
+  toast: [
+    ANS("Label the bread `Slices`", "capital letters don't matter", "Names are case-sensitive: `Slices` and `slices` are two different labels.", "Slices = 2"),
+    ANS("Send \"2\" twice", "print repeats the value", "`print` shows each value it's given once.", "print(slices, slices)"),
+  ],
+  sugar: [
+    ANS("Fill the jar with the word \"5\"", "a string, not a number", "Quotes make the text '5'. Text can't be added to like a number.", 'sugar = "5"'),
+    ANS("Tie `backup` to an empty jar", "backup starts empty", "`backup = sugar` ties it to whatever `sugar` points at: the 5.", "backup = None"),
+    ANS("Fill the new jar with \"51\"", "+ joins like text", "`sugar` is a number, so `+ 1` adds. Joining only happens with strings.", 'sugar = str(sugar) + "1"'),
+    SAY_NAME("sugar backup", "6 5"),
+  ],
+  pizza: [
+    ANS("Write the label in quotes: `\"pizza\"`", "a string as the name", "Quotes make a value, not a label. Assigning to a string is a SyntaxError.", '"pizza" = "margherita"'),
+    ANS("Shout \"One, margherita, please!\"", "commas get printed", "The commas only separate values in the code; `print` shows spaces.", 'print("One,", pizza + ",", "please!")'),
+  ],
+  lemonade: [
+    ANS("Put 3 lemons in a crate labeled `Lemons`", "names ignore case", "Names are case-sensitive; the ticket uses lowercase `lemons`.", "Lemons = 3"),
+    ANS("Set out 33 glasses", "* repeats like text", "`lemons` is a number, so `*` multiplies. Repeating only happens with strings.", "cups = int(str(lemons) * 2)"),
+    ANS("Pour \"ade\" first: \"adelemon\"", "+ order doesn't matter", "String `+` keeps the order you write: left side first.", 'drink = "ade" + "lemon"'),
+    ANS("Shout \"6lemonade\"", "no space between values", "`print` puts a space between values for you.", "print(str(cups) + drink)"),
+  ],
+  egg: [
+    ANS("Set the timer to the text \"8\"", "a string", "Quotes make text; comparing `\"8\" > 6` is a TypeError.", 'minutes = "8"'),
+    ANS("Check whether 8 equals 6", "== instead of >", "The ticket compares with `>`, greater than.", "if minutes == 6:"),
+    ANS("Write \"hard\" on the timer label", "overwrite minutes", "The ticket assigns to `egg`, a new label. `minutes` stays 8.", 'minutes = "hard"'),
+    SAY_NAME("egg", "hard"),
+  ],
+  pancakes: [
+    ANS("Mash flour and egg into one lump: \"flouregg\"", "join the strings", "The comma separates two items; nothing is joined.", 'batter = ["flour" + "egg"]'),
+    ANS("Pour milk into a bowl of its own", "make a new list", "`append` adds to `batter`; nothing new is made.", 'milk = ["milk"]'),
+    ANS("Count the letters in the bowl", "len counts characters", "`len` of a list counts its items, not letters.", 'size = len("flouregg" + "milk")'),
+    SAY_NAME("size", "3"),
+  ],
+  cookies: [
+    ANS("Write \"0\" as text on the scale", "a string", "Text can't be added to numbers: `\"0\" + 200` is a TypeError.", 'weight = "0"'),
+    ANS("Pick up the chocolate first", "loops go backwards", "A for loop goes from the first item to the last.", "grams = 50"),
+    ANS("Add the flour twice", "double it", "One pass adds the item once.", "weight += grams * 2"),
+    ANS("Pick up the flour again", "the loop repeats an item", "Each pass moves on to the next item.", "grams = 200"),
+    ANS("Take the butter off the scale", "-= instead of +=", "`+=` adds.", "weight -= grams"),
+    ANS("Skip the chocolate", "the loop skips the last item", "A for loop visits every item, including the last.", "continue"),
+    ANS("Write 50 after the total: \"35050\"", "join as text", "Both are numbers, so `+=` adds them: 350 + 50.", "weight = str(weight) + str(grams)"),
+    ANS("Throw away the `grams` label", "the loop variable is deleted", "After a for loop, the loop variable keeps its last value.", "del grams"),
+    SAY_NAME("weight", "400"),
+  ],
+  soup: [
+    ANS("Write \"20\" as text", "a string", "`\"20\" < 100` is a TypeError: text can't be compared with numbers.", 'temp = "20"'),
+    ANS("Check: is 20° above 100°?", "> instead of <", "The ticket checks `<`: below.", "while temp > 100:"),
+    ANS("Cool it to -20°", "subtract", "`+` adds 40: 20 + 40 = 60.", "temp = temp - 40"),
+    ANS("Keep heating without checking", "the check only runs once", "A while loop re-checks before every pass.", "temp = temp + 40"),
+    ANS("Heat it to 60 + 60 = 120°", "add temp to itself", "The ticket adds 40, not `temp`.", "temp = temp + temp"),
+    ANS("Check: is it exactly 100°? Yes, keep heating", "== instead of <", "The test is `<`, not `==`.", "while temp == 100:"),
+    SAY_NAME("temp", "100"),
+  ],
+  tea: [
+    ANS("Write a card with no ingredient slot", "no parameter", "The card asks for `leaf`; without it, `make_tea(\"mint\")` fails with TypeError.", "def make_tea():"),
+    ANS("Open the board but label the mint `mint`", "name the parameter after the value", "The parameter's name comes from the card: `leaf`.", 'mint = "mint"'),
+    ANS("Brew \"minttea\" with no space", "drop the space", "The ticket's string is `\" tea\"`, with a leading space.", 'cup = leaf + "tea"'),
+    ANS("Put the mint on the plate instead", "return the argument", "The ticket returns `cup`, the tea.", "return leaf"),
+    ANS("Label the returned tea `cup` on the main board", "keep the local name", "Local names vanish with the board. The ticket names it `order`.", 'cup = make_tea("mint")'),
+    SAY_NAME("order", "mint tea"),
+  ],
+  bowls: [
+    ANS("Put egg and flour in a spice cabinet", "a dict", "Curly braces with keys make a dict; square brackets make a list.", 'bowl = {"egg": 1, "flour": 1}'),
+    ANS("Tie `mixing` to the egg only", "alias the first item", "`mixing = bowl` ties it to the whole bowl.", "mixing = bowl[0]"),
+    ANS("Pour the milk in at the front", "insert at 0", "`append` adds at the end.", 'mixing.insert(0, "milk")'),
+    ANS("Copy only the egg into a new bowl", "copy part of it", "`.copy()` copies every item.", "side = bowl[:1]"),
+    ANS("Add salt to the `mixing` bowl", "mixing is the copy", "`mixing` is still the original bowl; `side` is the copy.", 'mixing.append("salt")'),
+    ANS("Serve three bowls", "mixing is printed too", "The ticket prints `bowl` and `side` only.", "print(bowl, mixing, side)"),
+  ],
+  spices: [
+    ANS("Put salt and 3 in a sealed jar", "a tuple", "Round brackets make a tuple; `{\"salt\": 3}` makes a dict.", 'spices = ("salt", 3)'),
+    ANS("Fit a drawer named 2 holding pepper", "key and value swapped", "The key goes in the brackets; the value after `=`.", 'spices[2] = "pepper"'),
+    ANS("Add a spoon of salt: 4", "+= instead of -=", "`-=` takes one away.", 'spices["salt"] += 1'),
+    ANS("Copy only the amount, 2", "loop over values", "`.items()` gives both the name and the amount.", "for qty in spices.values():"),
+    SAY_NAME("name qty", "salt 2"),
+    ANS("Copy `salt` and 2 again", "pairs repeat", "The loop moves on to the next pair: pepper.", 'name, qty = "salt", 2'),
+    ANS("Shout \"pepper2\"", "no space", "`print` puts a space between values.", "print(name + str(qty))"),
+    ANS("Empty every drawer", "looping clears the dict", "Looping only reads the dict.", "spices.clear()"),
+  ],
+  sandwich: [
+    ANS("Lay them out in a different order", "lists sort themselves", "A list keeps the order you wrote.", 'stack = ["bread", "cheese", "ham", "bread"]'),
+    ANS("Look at the last item instead", "index 0 is the end", "`[0]` is the first item; the last is `[-1]`.", "top = stack[-1]"),
+    ANS("Swap the cheese at spot 2", "index 1 is the third item", "Counting from 0, the ham is at 1.", 'stack[2] = "tomato"'),
+    ANS("Eat the whole sandwich", "pop clears the list", "`pop()` removes one item.", "stack.clear()"),
+    ANS("Shout \"bread 5\"", "the tomato was added", "The tomato replaced the ham, and pop removed one: 3 items.", "print(top, 5)"),
+  ],
+  cake: [
+    ANS("Write a card that only ever makes 3 layers", "hard-code the answer", "The card takes any number of `layers`.", 'def cake(): return "base+layer+layer"'),
+    ANS("Get a board for a 1-layer cake", "start with the base case", "The call is `cake(3)`: it starts at 3 layers.", "cake(1)"),
+    ANS("Check: is it a 3-layer cake?", "compare with 3", "The ticket compares with 1.", "if layers == 3:"),
+    ANS("Get a board for a 3-layer cake again", "same argument again", "The call passes `layers - 1`: 2.", "cake(layers)"),
+    ANS("Check: is it a 0-layer cake?", "compare with 0", "The test is `layers == 1`.", "if layers == 0:"),
+    ANS("Get a board for a 0-layer cake", "subtract 2", "`layers - 1` is 1.", "cake(layers - 2)"),
+    ANS("No: 1 isn't the base case", "1 == 1 is False", "`1 == 1` is True.", "if layers != 1:"),
+    ANS("Hand back an empty plate", "return nothing", "The base case returns `\"base\"`.", "return"),
+    ANS("Board 2 plates just \"+layer\"", "drop the returned base", "Board 2 adds its layer to what it got back.", 'return "+layer"'),
+    ANS("Board 1 puts its layer underneath", "+ joins the other way", "The ticket writes `cake(...) + \"+layer\"`: the new layer goes after.", 'return "+layer" + cake(layers - 1)'),
+    SAY_NAME("cake(3)", "base+layer+layer"),
+  ],
+  milk: [
+    ANS("Stock the fridge with a list", "a list", "Curly braces with `key: value` make a dict.", 'fridge = ["egg", 6]'),
+    ANS("Hand the fridge to the oven mitts", "try is a function", "`try:` starts a block; it isn't called.", "try(fridge)"),
+    ANS("Open the egg drawer instead", "the wrong key", "The ticket asks for `\"milk\"`.", 'milk = fridge["egg"]'),
+    ANS("Plan B for a different alarm", "catch another error", "The alarm is a KeyError, and that's the one this block catches.", "except ValueError:"),
+    ANS("Write \"none\" on the label", "a string", "The ticket says `0`, a number.", 'milk = "none"'),
+    SAY_NAME("milk", "0"),
+  ],
+  oven: [
+    ANS("Pin a blueprint called `oven`, lowercase", "names ignore case", "Names are case-sensitive; the class is `Oven`.", "class oven:"),
+    ANS("Build an oven set to 0", "ignore the argument", "The 180 is passed in as `temp`.", "oven = Oven(0)"),
+    ANS("Set the dial to the word \"temp\"", "a string", "No quotes on the ticket: the value of `temp`, 180, is stored.", 'self.temp = "temp"'),
+    ANS("Tie `oven` to `self`", "self is still around", "`self` vanished with the setup board. `Oven(180)` hands back the oven.", "oven = self"),
+    ANS("Open a heat board with extra = 180", "pass the temperature", "The argument in the call is 20.", "oven.heat(180)"),
+    ANS("Turn the dial down to 160", "-= instead of +=", "`+=` adds.", "self.temp -= extra"),
+    ANS("Throw the oven away too", "the object is deleted", "`oven` still labels it, so it stays.", "del oven"),
+    SAY_NAME("oven.temp", "200"),
+  ],
+};
 
 const DISHES = [
   /* ---------- ★ starters ---------- */
@@ -1311,14 +1454,14 @@ const load = () => { try { return JSON.parse(localStorage.getItem("pk-best") || 
 let best = load();
 const save = () => { try { localStorage.setItem("pk-best", JSON.stringify(best)); } catch (e) {} };
 
-let fx = null, D = null, i = 0, mistakes = 0, order = [], wrongPicked = new Set(), hinted = false, orderNo = 40;
+let flipped = new Set(), fx = null, D = null, i = 0, mistakes = 0, order = [], wrongPicked = new Set(), hinted = false, orderNo = 40;
 const starsFor = m => m === 0 ? 3 : m <= 2 ? 2 : 1;
 const starRow = n => "★★★".split("").map((c, k) => `<span class="${k < n ? "" : "off"}">⭐</span>`).join("");
 
 function shuffle(n) { const a = [...Array(n).keys()]; for (let k = n - 1; k > 0; k--) { const j = Math.floor(Math.random() * (k + 1)); [a[k], a[j]] = [a[j], a[k]]; } return a; }
 
 function enterStep() {
-  wrongPicked = new Set(); hinted = false;
+  wrongPicked = new Set(); hinted = false; flipped = new Set();
   const next = D.steps[i + 1];
   order = next ? shuffle(next.wrong.length + 1) : [];
 }
@@ -1575,17 +1718,23 @@ function render() {
   }
 
   const lineSrc = D.code[next.line - 1].trim();
-  const opts = [{ k: next.right[0], p: next.right[1], ok: true }, ...next.wrong.map(([k, p, why, c]) => ({ k, p, why, c }))];
+  const opts = [{ k: next.right[0], p: next.right[1], ok: true, c: lineSrc }, ...next.wrong.map(([k, p, why, c]) => ({ k, p, why, c }))];
   $("#move").innerHTML = `<div class="q"><div>${term(i === 0 ? "Your first move" : "Your next move", "which step does Python take?")}
       <h2 style="margin-top:6px">Line ${next.line}: <code style="font: 600 15px var(--mono)">${esc(lineSrc)}</code></h2></div>
       <div class="stat">step ${i + 1}/${D.steps.length - 1}<br>${mistakes} wrong</div></div>
     <div class="opts">${order.map(k => {
       const o = opts[k], wrong = wrongPicked.has(k);
-      return `<button type="button" class="opt ${wrong ? "wrong" : ""} ${hinted && o.ok ? "hint" : ""}" data-k="${k}" ${wrong ? "disabled" : ""}>
-        <span>${code(o.k)}</span><span class="op">${esc(o.p)}</span>${wrong ? `
+      return `<div class="opt-card ${flipped.has(k) ? "flipped" : ""}">
+        <button type="button" class="opt ${wrong ? "wrong" : ""} ${hinted && o.ok ? "hint" : ""}" data-k="${k}" ${wrong ? "disabled" : ""}>
+        <span class="face front"><span>${code(o.k)}</span><span class="op">${esc(o.p)}</span>${wrong ? `
         <span class="cmp"><span class="cmp-l">Your answer as code</span><code class="line bad">${diffHTML(o.c, lineSrc)}</code>
         <span class="cmp-l">The ticket says</span><code class="line">${diffHTML(lineSrc, lineSrc)}</code></span>
-        <span class="why">✗ ${code(o.why)}</span>` : ""}</button>`;
+        <span class="why">✗ ${code(o.why)}</span>` : ""}</span>
+        <span class="face back"><span class="cmp-l">This answer as code</span><code class="line">${diffHTML(o.c, o.c)}</code>
+          <span class="op">${esc(o.p)}</span>${wrong ? `<span class="why">✗ already tried</span>` : `<span class="tap">Tap the card to pick this answer</span>`}</span>
+        </button>
+        <button type="button" class="flip" data-flip="${k}" aria-pressed="${flipped.has(k)}" aria-label="Flip the card to see this answer as code" title="Flip: see this answer as code">&lt;/&gt;</button>
+      </div>`;
     }).join("")}</div>
     <div class="tools"><button type="button" id="b-hint">Show me the right step</button><button type="button" id="b-restart">Restart dish</button></div>
     ${last || `<div class="fb k" style="margin-top:12px"><span class="lbl">In the kitchen</span><p>${fmt("The printer just printed your order [ticket|code]. Read the highlighted line and pick what the kitchen does first.")}</p></div>`}`;
@@ -1594,10 +1743,17 @@ function render() {
     const k = +btn.dataset.k;
     if (opts[k].ok) { i += 1; fx = "right"; enterStep(); render(); return; }
     if (!wrongPicked.has(k)) { wrongPicked.add(k); mistakes += 1; }
+    flipped.delete(k); // show the front, where the comparison and the reason are
     fx = "wrong";
     render();
     const again = $(`#move .opt[data-k="${k}"]`);
-    if (again) again.classList.add("shake");
+    if (again) again.closest(".opt-card").classList.add("shake");
+  });
+  $("#move").querySelectorAll(".flip").forEach(btn => btn.onclick = () => {
+    const k = +btn.dataset.flip, card = btn.closest(".opt-card");
+    if (flipped.has(k)) flipped.delete(k); else flipped.add(k);
+    card.classList.toggle("flipped", flipped.has(k));
+    btn.setAttribute("aria-pressed", flipped.has(k));
   });
   $("#b-hint").onclick = () => { if (!hinted) { hinted = true; mistakes += 1; } render(); };
   $("#b-restart").onclick = () => startDish(D.id);
