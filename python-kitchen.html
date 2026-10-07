@@ -3,60 +3,69 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Kalam:wght@700&display=swap">
 <style>
-/* Layout: a narrow left column (recipe = code, step controls, the two explanations) beside one large 2D kitchen drawing.
-   The kitchen is a single SVG: tiled back wall with two shelves and a serving hatch, a stone countertop with cutting boards
-   and a sink, cabinets below. Every drawn thing carries its Python name in blue underneath. */
+/* Layout: left column = ticket printer (the code) + "your move" choices; right = a 2D restaurant kitchen drawn in SVG
+   (steel racks = memory, prep counter with cutting boards = frames, dish sink = garbage collection, the pass = output).
+   A recipe book overlay lists the dishes by difficulty. Every kitchen word carries its Python word underneath in blue. */
 :root {
-  --bg: #e3e9e7; --panel: #ffffff; --ink: #1d2a2a; --muted: #5d6c6b; --line: #cdd9d6;
+  --bg: #e2e7e8; --panel: #ffffff; --ink: #1c2629; --muted: #5b6a6e; --line: #ccd6d8;
   --py: #2350c4;
+  --good: #23824a; --good-bg: #e3f4e8; --bad: #b8382a; --bad-bg: #fbe7e4;
   --hl-bg: #fff2b8; --hl-edge: #e0b414;
-  --wall: #f4f6f2; --grout: #d9dfd9;
-  --plank: #c99a62; --plank-dark: #8e6436;
-  --stone: #c3c8c6; --stone-edge: #9ea5a3; --stone-fleck: #b3b9b7;
-  --cab: #5f7f78; --cab-edge: #4a6660; --handle: #d6dcdc;
+  --wall: #f6f8f8; --grout: #dbe2e3;
+  --steel: #d5dcdf; --steel-mid: #b9c3c7; --steel-dark: #84929a; --steel-hi: #eef2f3;
   --board: #e2bf8c; --board-edge: #a87a45; --board-ink: #3b2610;
   --glass: rgba(205, 228, 242, .55); --glass-edge: #86a7bf;
   --lid: #c4503b; --lid-dark: #93372a;
   --paper: #fffdf5; --paper-edge: #d8d2bf;
-  --china: #ffffff; --china-edge: #b9c3c8;
-  --tea: #a46d2a;
-  --steel: #d3dade; --steel-dark: #8f9ca5; --basin: #a9b4bb;
-  --opening: #3b3530; --opening-ink: #e9e1d4;
-  --tape: #f1dfa8; --tape-ink: #3d3214;
-  --twine: #8f5a1e;
+  --china: #ffffff; --china-edge: #b9c3c8; --tea: #a46d2a;
+  --wood: #c99a62; --wood-dark: #8e6436;
+  --basin: #a3afb5; --opening: #34302c; --opening-ink: #e9e1d4;
+  --lamp: #c4503b; --glow: rgba(255, 170, 60, .35);
+  --tape: #f1dfa8; --tape-ink: #3d3214; --twine: #8f5a1e;
   --sponge: #e8b66c; --cream: #f6d8e2;
+  --alarm: #d6402f;
+  --printer: #2d3337; --printer-ink: #cfd7da;
   --flash: rgba(240, 196, 30, .55);
+  --book: #7b2d26; --book-page: #fbf6ea; --book-ink: #2a2118; --book-line: #e3d8bf;
   --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
   --hand: "Kalam", "Segoe Print", "Comic Sans MS", cursive;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #0f1615; --panel: #172120; --ink: #e4edeb; --muted: #98a9a7; --line: #2b3a38; --py: #8cb0ff;
+  --bg: #0f1517; --panel: #172024; --ink: #e3ebed; --muted: #97a7ab; --line: #2b383c; --py: #8cb0ff;
+  --good: #5fd08a; --good-bg: #173726; --bad: #ff8a7a; --bad-bg: #3d1d19;
   --hl-bg: #3b3313; --hl-edge: #f0c93c;
-  --wall: #1f2826; --grout: #2a3533; --plank: #7d5a32; --plank-dark: #563c1f;
-  --stone: #3a4140; --stone-edge: #2b3130; --stone-fleck: #444c4a; --cab: #2c3d3a; --cab-edge: #1f2c2a; --handle: #8c9998;
+  --wall: #1e2729; --grout: #283336; --steel: #4b575d; --steel-mid: #3d484d; --steel-dark: #2a3337; --steel-hi: #5d6a70;
   --board: #8a6639; --board-edge: #5e4322; --board-ink: #fbeedb;
   --glass: rgba(140, 180, 210, .2); --glass-edge: #6488a3; --lid: #d4614b; --lid-dark: #9c3f2f;
   --paper: #f3eedf; --paper-edge: #b9b29c; --china: #e9eef0; --china-edge: #9aa6ad; --tea: #b67c35;
-  --steel: #5c6970; --steel-dark: #3c474e; --basin: #2c353b; --opening: #0b0a09; --opening-ink: #d8d0c2;
-  --tape: #dcc88f; --tape-ink: #2b2208; --twine: #e2ad66; --flash: rgba(240, 201, 60, .4); color-scheme: dark;
+  --wood: #7d5a32; --wood-dark: #563c1f; --basin: #2a3439; --opening: #0b0a09; --opening-ink: #d8d0c2;
+  --lamp: #d4614b; --glow: rgba(255, 170, 60, .22);
+  --tape: #dcc88f; --tape-ink: #2b2208; --twine: #e2ad66; --flash: rgba(240, 201, 60, .4);
+  --printer: #0c1012; --printer-ink: #a9b4b8;
+  --book: #5c1f1a; --book-page: #f1ead9; --book-ink: #2a2118; --book-line: #d9ccb0;
+  color-scheme: dark;
 } }
 :root[data-theme="dark"] {
-  --bg: #0f1615; --panel: #172120; --ink: #e4edeb; --muted: #98a9a7; --line: #2b3a38; --py: #8cb0ff;
+  --bg: #0f1517; --panel: #172024; --ink: #e3ebed; --muted: #97a7ab; --line: #2b383c; --py: #8cb0ff;
+  --good: #5fd08a; --good-bg: #173726; --bad: #ff8a7a; --bad-bg: #3d1d19;
   --hl-bg: #3b3313; --hl-edge: #f0c93c;
-  --wall: #1f2826; --grout: #2a3533; --plank: #7d5a32; --plank-dark: #563c1f;
-  --stone: #3a4140; --stone-edge: #2b3130; --stone-fleck: #444c4a; --cab: #2c3d3a; --cab-edge: #1f2c2a; --handle: #8c9998;
+  --wall: #1e2729; --grout: #283336; --steel: #4b575d; --steel-mid: #3d484d; --steel-dark: #2a3337; --steel-hi: #5d6a70;
   --board: #8a6639; --board-edge: #5e4322; --board-ink: #fbeedb;
   --glass: rgba(140, 180, 210, .2); --glass-edge: #6488a3; --lid: #d4614b; --lid-dark: #9c3f2f;
   --paper: #f3eedf; --paper-edge: #b9b29c; --china: #e9eef0; --china-edge: #9aa6ad; --tea: #b67c35;
-  --steel: #5c6970; --steel-dark: #3c474e; --basin: #2c353b; --opening: #0b0a09; --opening-ink: #d8d0c2;
-  --tape: #dcc88f; --tape-ink: #2b2208; --twine: #e2ad66; --flash: rgba(240, 201, 60, .4); color-scheme: dark;
+  --wood: #7d5a32; --wood-dark: #563c1f; --basin: #2a3439; --opening: #0b0a09; --opening-ink: #d8d0c2;
+  --lamp: #d4614b; --glow: rgba(255, 170, 60, .22);
+  --tape: #dcc88f; --tape-ink: #2b2208; --twine: #e2ad66; --flash: rgba(240, 201, 60, .4);
+  --printer: #0c1012; --printer-ink: #a9b4b8;
+  --book: #5c1f1a; --book-page: #f1ead9; --book-ink: #2a2118; --book-line: #d9ccb0;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
 body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
-.wrap { max-width: 1440px; margin: 0 auto; padding-inline: 18px; padding-block: 24px 48px; display: grid; gap: 16px; }
+.wrap { max-width: 1480px; margin: 0 auto; padding-inline: 18px; padding-block: 20px 48px; display: grid; gap: 14px; }
 
 .term { display: inline-flex; flex-direction: column; line-height: 1.15; vertical-align: middle; }
 .term .tk { font-weight: 600; }
@@ -64,52 +73,76 @@ body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
 ruby { ruby-position: under; }
 rt { font: 500 10.5px var(--mono); color: var(--py); padding-top: 1px; }
 
-header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
-h1 { font: 800 clamp(28px, 4.4vw, 40px)/1.05 var(--display); margin: 0; }
-.sub { margin: 0; color: var(--muted); max-width: 70ch; }
+header.top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+h1 { font: 800 clamp(26px, 4vw, 38px)/1.05 var(--display); margin: 0; }
+.sub { margin: 0; color: var(--muted); flex: 1 1 340px; }
+.book-btn { display: inline-flex; align-items: center; gap: 10px; padding: 9px 16px 9px 12px; border-radius: 10px; cursor: pointer;
+  background: var(--book); color: #fbefe0; border: none; font: 600 14px/1.2 var(--body); text-align: left; }
+.book-btn .tp { color: #f6cdbf; }
+.book-btn .ico { font-size: 22px; }
 
-nav.lessons { display: flex; flex-wrap: wrap; gap: 8px; }
-nav.lessons button { display: flex; align-items: center; gap: 10px; text-align: left; font: 500 14px/1.2 var(--body); color: var(--ink);
-  background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px 8px 10px; cursor: pointer; }
-nav.lessons .n { font: 600 12px var(--mono); width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; background: var(--bg); }
-nav.lessons button[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
-nav.lessons button[aria-pressed="true"] .n { background: var(--ink); color: var(--bg); }
-
-.stage { display: grid; grid-template-columns: minmax(290px, 340px) minmax(0, 1fr); gap: 16px; align-items: start; }
-@media (max-width: 1000px) { .stage { grid-template-columns: minmax(0, 1fr); } .stage .scene-wrap { order: -1; } }
+.stage { display: grid; grid-template-columns: minmax(320px, 400px) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 1040px) { .stage { grid-template-columns: minmax(0, 1fr); } }
 .col { display: grid; gap: 12px; min-width: 0; }
 .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; min-width: 0; }
-.head .term .tk { font: 600 12px var(--body); text-transform: uppercase; letter-spacing: .1em; }
-h2 { font: 600 20px/1.2 var(--display); margin: 8px 0 2px; text-wrap: balance; }
-.blurb { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
 
-.recipe { background: var(--paper); color: #24221c; border: 1px solid var(--paper-edge); border-top: 4px solid var(--lid); border-radius: 4px; overflow-x: auto;
-  background-image: repeating-linear-gradient(to bottom, transparent 0 27px, var(--paper-edge) 27px 28px); background-position: 0 8px; }
-.recipe ol { list-style: none; margin: 0; padding: 8px 0; font: 13px/28px var(--mono); }
-.recipe li { display: flex; white-space: pre; border-left: 4px solid transparent; padding-right: 12px; }
-.recipe .ln { width: 32px; flex: none; text-align: right; padding-right: 10px; color: #7a7564; font-variant-numeric: tabular-nums; }
-.recipe li.cur { background: #fff0a8; border-left-color: #e0b414; }
-.recipe li.cur .ln { color: #24221c; font-weight: 600; }
-.recipe .kw { color: #7b3fb5; font-weight: 600; } .recipe .st { color: #2c7a4b; } .recipe .nu { color: #b4521a; } .recipe .bi { color: #2350c4; }
+/* ticket printer = code */
+.printer { background: var(--printer); color: var(--printer-ink); border-radius: 16px 16px 8px 8px; padding: 12px 14px 0; }
+.printer-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 12px; }
+.printer-top .term .tp { color: #9fbaff; }
+.led { width: 9px; height: 9px; border-radius: 50%; background: #3ad16b; box-shadow: 0 0 8px #3ad16b; display: inline-block; margin-right: 6px; }
+.slot { height: 10px; margin: 10px 4px 0; border-radius: 5px 5px 0 0; background: #000; }
+.ticket { margin: 0 18px; background: #fffdf6; color: #23211b; padding: 12px 14px 22px; font: 13px/1.5 var(--mono);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), 95% 100%, 90% calc(100% - 8px), 85% 100%, 80% calc(100% - 8px), 75% 100%, 70% calc(100% - 8px), 65% 100%, 60% calc(100% - 8px), 55% 100%, 50% calc(100% - 8px), 45% 100%, 40% calc(100% - 8px), 35% 100%, 30% calc(100% - 8px), 25% 100%, 20% calc(100% - 8px), 15% 100%, 10% calc(100% - 8px), 5% 100%, 0 calc(100% - 8px));
+  box-shadow: 0 4px 10px rgba(0,0,0,.15); overflow-x: auto; }
+.ticket .th { display: flex; justify-content: space-between; gap: 8px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #6b665a;
+  border-bottom: 1.5px dashed #c9c2ad; padding-bottom: 6px; margin-bottom: 6px; }
+.ticket .dish { font: 700 15px/1.3 var(--body); color: #23211b; margin: 2px 0 8px; }
+.ticket ol { list-style: none; margin: 0; padding: 0; }
+.ticket li { display: flex; white-space: pre; padding: 1px 6px 1px 0; border-left: 4px solid transparent; }
+.ticket li .ln { width: 28px; flex: none; text-align: right; padding-right: 8px; color: #8f8a7a; }
+.ticket li.next { background: #fff0a8; border-left-color: #e0b414; }
+.ticket li.next .ln { color: #23211b; font-weight: 700; }
+.ticket li.printing { animation: print .3s steps(4) both; }
+@keyframes print { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@media (prefers-reduced-motion: reduce) { .ticket li.printing { animation: none; } }
+.ticket .kw { color: #7b3fb5; font-weight: 600; } .ticket .st { color: #2c7a4b; } .ticket .nu { color: #b4521a; } .ticket .bi { color: #2350c4; }
+.ticket .foot { margin-top: 8px; border-top: 1.5px dashed #c9c2ad; padding-top: 6px; font-size: 11px; color: #6b665a; display: flex; justify-content: space-between; gap: 8px; }
 
-.note { border-radius: 10px; padding: 12px 14px; min-width: 0; }
-.note.k { background: var(--board); border: 1px solid var(--board-edge); color: var(--board-ink); }
-.note.py { background: var(--panel); border: 1px solid var(--line); }
-.note h3 { font: 600 11px/1 var(--body); text-transform: uppercase; letter-spacing: .12em; margin: 0 0 8px; opacity: .75; }
-.note p { margin: 0; }
-.note.k p { line-height: 2.3; }
-.note.k rt { color: var(--board-ink); opacity: .85; font-weight: 600; }
-.note code { font: 12.5px var(--mono); background: color-mix(in srgb, currentColor 11%, transparent); padding: 1px 5px; border-radius: 4px; }
+/* your move */
+.move h2 { font: 600 19px/1.2 var(--display); margin: 0; }
+.move .q { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+.move .stat { font: 12px var(--mono); color: var(--muted); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.opts { display: grid; gap: 8px; }
+.opt { display: grid; gap: 3px; text-align: left; width: 100%; padding: 11px 13px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--panel);
+  color: var(--ink); cursor: pointer; font: 500 14.5px/1.35 var(--body); }
+.opt:hover:not(:disabled) { border-color: var(--ink); }
+.opt .op { font: 500 12px/1.3 var(--mono); color: var(--py); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-bg); cursor: default; }
+.opt.wrong .why { color: var(--bad); font-size: 13px; font-weight: 500; }
+.opt.hint { border-color: var(--good); box-shadow: 0 0 0 3px color-mix(in srgb, var(--good) 30%, transparent); }
+.opt code, .fb code { font: 12.5px var(--mono); background: color-mix(in srgb, currentColor 11%, transparent); padding: 0 4px; border-radius: 4px; }
+.shake { animation: shake .35s; }
+@keyframes shake { 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-3px); } }
+@media (prefers-reduced-motion: reduce) { .shake { animation: none; } }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.tools button, .done button { font: 500 13.5px/1 var(--body); padding: 9px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+.done button.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); font-weight: 600; }
+button:focus-visible { outline: 3px solid var(--hl-edge); outline-offset: 2px; }
 
-.controls { display: grid; gap: 10px; }
-.btns { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.btns button { font: 500 14px/1 var(--body); padding: 10px 13px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
-.btns button.primary { background: var(--ink); border-color: var(--ink); color: var(--bg); font-weight: 600; }
-.btns button:disabled { opacity: .4; cursor: default; }
-.count { margin-left: auto; font: 13px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
-input[type=range] { width: 100%; accent-color: var(--ink); }
-.hint { font-size: 12px; color: var(--muted); margin: 0; }
-button:focus-visible, input:focus-visible { outline: 3px solid var(--hl-edge); outline-offset: 2px; }
+.fb { border-radius: 10px; padding: 11px 13px; display: grid; gap: 8px; }
+.fb.k { background: var(--board); color: var(--board-ink); border: 1px solid var(--board-edge); }
+.fb.k p { line-height: 2.25; margin: 0; }
+.fb.k rt { color: var(--board-ink); opacity: .85; font-weight: 600; }
+.fb .lbl { font: 600 11px/1 var(--body); text-transform: uppercase; letter-spacing: .12em; opacity: .75; }
+.fb.ok { background: var(--good-bg); border: 1px solid var(--good); }
+.fb.ok .lbl { color: var(--good); opacity: 1; }
+.fb p { margin: 0; }
+
+.done { text-align: center; display: grid; gap: 10px; justify-items: center; }
+.done .stars { font-size: 34px; letter-spacing: 4px; }
+.done .stars .off { opacity: .2; }
+.done .row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
 
 .scene-wrap { min-width: 0; overflow-x: auto; border-radius: 14px; border: 1px solid var(--line); background: var(--wall); }
 #kitchen { display: block; width: 100%; min-width: 760px; height: auto; }
@@ -117,10 +150,12 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--hl-edge); o
 /* ---- SVG kitchen ---- */
 #kitchen text { font-family: var(--body); }
 .wall { fill: var(--wall); } .grout { stroke: var(--grout); stroke-width: 1.5; fill: none; }
-.plank { fill: var(--plank); } .plank-dark { fill: var(--plank-dark); }
-.stone { fill: var(--stone); } .stone-edge { fill: var(--stone-edge); } .fleck { fill: var(--stone-fleck); }
-.cab { fill: var(--cab); } .cab-door { fill: none; stroke: var(--cab-edge); stroke-width: 3; } .handle { fill: var(--handle); }
-.board { fill: var(--board); stroke: var(--board-edge); stroke-width: 2.5; } .hole { fill: var(--stone); stroke: var(--board-edge); stroke-width: 2; }
+.rack { fill: var(--steel); stroke: var(--steel-dark); stroke-width: 1.5; } .wire { stroke: var(--steel-dark); stroke-width: 1; opacity: .45; }
+.post { fill: var(--steel-mid); stroke: var(--steel-dark); stroke-width: 1; }
+.counter-top { fill: url(#brushed); } .brush { stroke: var(--steel-hi); stroke-width: 1; opacity: .6; }
+.counter-edge { fill: var(--steel-dark); } .under { fill: var(--steel-mid); } .door { fill: var(--steel); stroke: var(--steel-dark); stroke-width: 2; }
+.handle { fill: var(--steel-dark); }
+.board { fill: var(--board); stroke: var(--board-edge); stroke-width: 2.5; } .hole { fill: var(--steel); stroke: var(--board-edge); stroke-width: 2; }
 .board-grain { stroke: var(--board-edge); stroke-width: 1; opacity: .25; fill: none; }
 .ring { fill: none; stroke: var(--hl-edge); stroke-width: 5; }
 .waiting { opacity: .62; }
@@ -132,10 +167,12 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--hl-edge); o
 .tea { fill: var(--tea); } .steam { fill: none; stroke: var(--china-edge); stroke-width: 2; stroke-linecap: round; opacity: .7; }
 .steel { fill: var(--steel); stroke: var(--steel-dark); stroke-width: 2; } .steel-dark { fill: var(--steel-dark); }
 .basin { fill: var(--basin); stroke: var(--steel-dark); stroke-width: 4; } .drain { fill: var(--steel-dark); }
-.wood { fill: var(--plank); stroke: var(--plank-dark); stroke-width: 3; } .drawer { fill: var(--board); stroke: var(--plank-dark); stroke-width: 1.5; }
-.knob { fill: var(--plank-dark); }
+.wood { fill: var(--wood); stroke: var(--wood-dark); stroke-width: 3; } .drawer { fill: var(--board); stroke: var(--wood-dark); stroke-width: 1.5; }
+.fridge { fill: var(--steel-hi); stroke: var(--steel-dark); stroke-width: 3; }
+.knob { fill: var(--wood-dark); }
 .cube { fill: #fbfbf6; stroke: #bdbcae; stroke-width: 1; }
-.opening { fill: var(--opening); } .frame { fill: var(--plank); stroke: var(--plank-dark); stroke-width: 2; }
+.opening { fill: var(--opening); } .pass-frame { fill: var(--steel); stroke: var(--steel-dark); stroke-width: 2; }
+.lamp { fill: var(--lamp); } .glow { fill: url(#glow); }
 .rail { stroke: var(--steel-dark); stroke-width: 3; }
 .tape { fill: var(--tape); }
 .knot { fill: var(--twine); stroke: var(--paper); stroke-width: 2; }
@@ -143,6 +180,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--hl-edge); o
 .twine.new { stroke-width: 3.6; }
 .sponge { fill: var(--sponge); stroke: #a8743a; stroke-width: 1; } .creamy { fill: var(--cream); stroke: #c48a9c; stroke-width: 1; }
 .hl { fill: var(--hl-bg); stroke: var(--hl-edge); stroke-width: 2; }
+.alarm { fill: var(--alarm); }
 .flash { fill: var(--flash); animation: fade 1.4s ease-out forwards; }
 @keyframes fade { from { opacity: 1; } to { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .flash { animation: none; opacity: 0; } }
@@ -153,46 +191,69 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--hl-edge); o
 .t-muted { fill: var(--muted); font: italic 15px var(--body); }
 .t-hand { fill: var(--tape-ink); font: 700 20px var(--hand); }
 .t-val { fill: #24221c; font: 600 13px var(--mono); }
+.t-white { fill: #fff; font: 700 13px var(--mono); }
 .t-tiny { fill: #7a7564; font: 600 10px var(--body); letter-spacing: .12em; }
 .t-ticket { fill: #24221c; font: 500 13px var(--mono); }
 .t-open { fill: var(--opening-ink); font: italic 15px var(--body); }
 .t-recipe { fill: #24221c; font: 600 14px var(--mono); }
 .emoji { font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
+
+/* recipe book */
+.overlay { position: fixed; inset: 0; z-index: 50; background: rgba(10, 14, 16, .6); display: grid; place-items: start center; overflow-y: auto;
+  padding: calc(env(safe-area-inset-top, 0px) + 24px) 16px calc(env(safe-area-inset-bottom, 0px) + 24px); }
+.overlay[hidden] { display: none; }
+.book { width: min(1060px, 100%); background: var(--book); border-radius: 14px; padding: 14px; box-shadow: 0 20px 50px rgba(0,0,0,.4); }
+.book-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: #fbefe0; padding: 4px 8px 12px; }
+.book-head h2 { font: 800 26px/1.1 var(--display); margin: 0; }
+.book-head .tp { color: #f6cdbf; }
+.book-head button { font: 500 14px var(--body); padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,.4); background: transparent; color: #fbefe0; cursor: pointer; }
+.pages { display: grid; grid-template-columns: 1fr 1fr; gap: 0; background: var(--book-page); border-radius: 8px; color: var(--book-ink); }
+@media (max-width: 760px) { .pages { grid-template-columns: 1fr; } }
+.page { padding: 18px 22px 22px; display: grid; gap: 16px; align-content: start; min-width: 0; }
+.page + .page { border-left: 2px solid var(--book-line); }
+@media (max-width: 760px) { .page + .page { border-left: none; border-top: 2px solid var(--book-line); } }
+.tier h3 { margin: 0 0 6px; font: 700 13px/1.2 var(--body); text-transform: uppercase; letter-spacing: .12em; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.tier h3 .lvl { color: #b4521a; letter-spacing: 2px; }
+.tier h3 .tp { font: 500 11px var(--mono); color: #2350c4; text-transform: none; letter-spacing: 0; }
+.dish-btn { display: flex; gap: 12px; align-items: center; width: 100%; text-align: left; padding: 10px 8px; border: none; border-bottom: 1px dotted var(--book-line);
+  background: transparent; color: var(--book-ink); cursor: pointer; border-radius: 6px; font: inherit; }
+.dish-btn:hover { background: rgba(123, 45, 38, .07); }
+.dish-btn .pic { font-size: 30px; line-height: 1; width: 38px; text-align: center; flex: none; }
+.dish-btn .info { flex: 1; min-width: 0; display: grid; gap: 1px; }
+.dish-btn .name { font: 700 16px/1.25 var(--display); }
+.dish-btn .topics { font: 500 12px/1.3 var(--mono); color: #2350c4; }
+.dish-btn .best { font-size: 13px; white-space: nowrap; color: #6b665a; }
 </style>
 
 <div class="wrap">
-  <header>
+  <header class="top">
     <h1>Python Kitchen</h1>
-    <p class="sub">Step through short programs and watch them cook. Every object in the kitchen has its Python name written underneath in blue.</p>
+    <p class="sub">Pick a dish from the recipe book. The printer prints its ticket, which is the code. Cook it one step at a time by choosing what Python does next.</p>
+    <button class="book-btn" id="open-book" type="button"><span class="ico">📕</span><span class="term"><span class="tk">Recipe book</span><span class="tp">choose a program</span></span></button>
   </header>
-
-  <nav class="lessons" id="lessons" aria-label="Lessons"></nav>
 
   <div class="stage">
     <div class="col">
-      <section class="panel">
-        <div class="head" id="recipe-head"></div>
-        <h2 id="ltitle"></h2>
-        <p class="blurb" id="lblurb"></p>
-        <div class="recipe"><ol id="code"></ol></div>
+      <section class="printer" aria-label="Ticket printer">
+        <div class="printer-top"><span><span class="led"></span><span class="term"><span class="tk">Ticket printer</span><span class="tp">prints your code</span></span></span><span id="order-no"></span></div>
+        <div class="slot"></div>
+        <div class="ticket" id="ticket"></div>
       </section>
-      <section class="panel controls">
-        <div class="btns">
-          <button id="b-prev" type="button">Back</button>
-          <button id="b-next" type="button" class="primary">Next step</button>
-          <button id="b-play" type="button">Play</button>
-          <button id="b-first" type="button">Restart</button>
-          <span class="count" id="count"></span>
-        </div>
-        <input type="range" id="scrub" min="0" value="0" aria-label="Jump to step">
-        <p class="hint">Tip: use the ← and → keys to step.</p>
-      </section>
-      <section class="note k" aria-live="polite"><h3>In the kitchen</h3><p id="nk"></p></section>
-      <section class="note py"><h3>In Python</h3><p id="npy"></p></section>
+      <section class="panel move" id="move" aria-live="polite"></section>
     </div>
     <div class="scene-wrap">
-      <svg id="kitchen" viewBox="0 0 1200 780" role="img" aria-label="Illustrated kitchen showing the program's memory"></svg>
+      <svg id="kitchen" viewBox="0 0 1200 780" role="img" aria-label="Restaurant kitchen showing the program's memory"></svg>
     </div>
+  </div>
+</div>
+
+<div class="overlay" id="book" hidden>
+  <div class="book" role="dialog" aria-modal="true" aria-labelledby="book-title">
+    <div class="book-head">
+      <span class="term"><h2 id="book-title">Recipe book</h2><span class="tp">every dish is a Python program</span></span>
+      <button type="button" id="close-book">Back to the kitchen</button>
+    </div>
+    <div class="pages" id="pages"></div>
   </div>
 </div>
 
@@ -200,7 +261,8 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--hl-edge); o
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const term = (k, py) => `<span class="term"><span class="tk">${k}</span><span class="tp">${py}</span></span>`;
-const fmt = s => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\[([^\]|]+)\|([^\]]+)\]/g, "<ruby>$1<rt>$2</rt></ruby>");
+const code = s => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>");
+const fmt = s => code(s).replace(/\[([^\]|]+)\|([^\]]+)\]/g, "<ruby>$1<rt>$2</rt></ruby>");
 
 const INGREDIENT = { "'egg'": "🥚", "'flour'": "🌾", "'milk'": "🥛", "'salt'": "🧂", "'mint'": "🌿", "'pepper'": "🌶️" };
 const P = (v, opt = {}) => ({ p: String(v), ...opt });
@@ -213,192 +275,458 @@ const KIND = {
   dict: ["Spice cabinet", "dict object"], func: ["Recipe card", "function object"],
 };
 
-function lesson(meta, script) {
+/* A dish is a program. Each step: the line it runs, the right action [kitchen, python], wrong actions [kitchen, python, why],
+   then the explanation shown once you get it right (kitchen with [word|python] notes, then Python). */
+function dish(meta, script) {
   const steps = [];
   let st = { frames: [{ name: "global", vars: {} }], heap: {}, out: [] };
-  const step = (line, k, py, fn) => {
+  const step = (line, right, wrong, k, py, fn) => {
     st = JSON.parse(JSON.stringify(st));
     if (fn) fn(st);
-    steps.push({ line, k, py, st });
+    steps.push({ line, right, wrong, k, py, st });
   };
-  step(null, "A clean kitchen. The [shelves|memory] are empty and there's no [masking tape|variables] on the [main board|global frame] yet.",
-    "Nothing has run. The global frame has no names and no objects exist.");
+  steps.push({ line: null, st: JSON.parse(JSON.stringify(st)) });
   script(step);
   return { ...meta, steps };
 }
 
-const LESSONS = [
-  lesson({ id: "labels", title: "Labels and jars", topic: "variables",
-    blurb: "A variable is a label tied to something on the shelf, not a box that holds it.",
-    code: ['sugar = 5', 'backup = sugar', 'sugar = sugar + 1', 'print(sugar, backup)'] }, step => {
-    step(1, "Fill a [jar|object] with 5 sugar cubes and seal it. Write `sugar` on [masking tape|a variable name] and tie it to the jar with [twine|a reference].",
+const DISHES = [
+  /* ---------- ★ starters ---------- */
+  dish({ id: "toast", tier: 1, pic: "🍞", name: "Buttered toast", topics: "variables · print()",
+    code: ["slices = 2", "print(slices)"] }, step => {
+    step(1, ["Put 2 slices of bread in a jar and tie a `slices` label to it", "create the int 2, bind the name slices to it"],
+      [["Wait: nothing happens until you print", "assignment is delayed", "Every line runs in order. `=` makes the value and attaches the name right away."],
+       ["Put out 2 separate empty jars", "create two objects", "`2` is one int object whose value is 2."]],
+      "The bread goes on the rack in a [jar|object] and a [label|variable] called `slices` is tied to it with [twine|a reference].",
+      "`slices = 2` creates the int object 2 and binds the name `slices` to it.",
+      st => { st.heap.o1 = { t: "int", v: "2", fill: "🍞", count: 2 }; g(st).slices = R("o1"); });
+    step(2, ["Follow the label to the jar and send \"2\" to the pass", "print looks up slices and outputs 2"],
+      [["Send the word \"slices\" to the pass", "prints the text slices", "`slices` has no quotes, so it's a name. `print` shows what it refers to."],
+       ["Throw the bread away after serving", "print deletes the variable", "`print` only reads. Nothing is removed."]],
+      "Follow the [twine|reference] to the bread and call out the amount at [the pass|output].",
+      "`print(slices)` looks up the name and outputs `2`.",
+      st => { st.out.push("2"); });
+  }),
+
+  dish({ id: "sugar", tier: 1, pic: "🍬", name: "Sugar swap", topics: "reassignment · immutable ints",
+    code: ["sugar = 5", "backup = sugar", "sugar = sugar + 1", "print(sugar, backup)"] }, step => {
+    step(1, ["Fill a sealed jar with 5 cubes and label it `sugar`", "create the int 5, bind sugar"],
+      [["Make an empty jar labeled `sugar`, fill it later", "create a name with no value", "Python makes the value 5 first, then ties the name to it."],
+       ["Write 5 on the label itself", "the name stores the value", "Names don't hold values. They point to objects."]],
+      "Fill a [jar|object] with 5 cubes and [seal|make immutable] it. Tie the `sugar` [label|name] on with [twine|a reference].",
       "`sugar = 5` creates an int object 5, then binds the name `sugar` to it.",
       st => { st.heap.o1 = { t: "int", v: "5", cubes: 5 }; g(st).sugar = R("o1"); });
-    step(2, "Tie a second [label|name], `backup`, to the same [jar|object]. Still one jar of sugar, now with two labels.",
+    step(2, ["Tie a second label, `backup`, to the same jar", "backup refers to the same object"],
+      [["Fill a second jar with 5 cubes for `backup`", "copy the int", "`=` never copies. It ties another label to the same object."],
+       ["Peel off `sugar` and write `backup` instead", "rename the variable", "`sugar` keeps its label. `backup` is an extra name."]],
+      "Two [labels|names] on one [jar|object]. There's still only one jar of sugar.",
       "`backup = sugar` copies the reference, not the object. Both names refer to the same 5.",
       st => { g(st).backup = R("o1"); });
-    step(3, "The jar is [sealed|immutable], so you can't drop in another cube. You fill a [new jar|new object] with 6 cubes and move the `sugar` [label|name] onto it. `backup` stays on the old jar.",
-      "Ints are immutable. `sugar + 1` creates a new object 6 and `sugar` is rebound to it. `backup` still refers to 5.",
+    step(3, ["Fill a new jar with 6 cubes and move the `sugar` label to it", "create the int 6, rebind sugar"],
+      [["Open the jar and drop in one more cube", "change 5 into 6 in place", "Int jars are sealed (immutable). Python makes a new 6 instead."],
+       ["Make the 6 jar and move both labels", "backup changes too", "Only `sugar` is on the left of `=`, so only that label moves."]],
+      "The jar is [sealed|immutable], so a [new jar|new object] of 6 is made and only the `sugar` [label|name] moves. `backup` stays on 5.",
+      "`sugar + 1` creates a new object 6 and `sugar` is rebound to it. `backup` still refers to 5.",
       st => { st.heap.o2 = { t: "int", v: "6", cubes: 6 }; g(st).sugar = R("o2"); });
-    step(4, "Follow each [twine|reference] to its jar and send what you find out through the [serving hatch|output].",
+    step(4, ["Send \"6 5\" to the pass", "print outputs 6 5"],
+      [["Send \"6 6\"", "both names changed", "`backup` was still tied to the old jar of 5."],
+       ["Send \"5 5\"", "nothing changed", "`sugar` was moved to the new jar of 6."]],
+      "Follow each [twine|reference] and call out what's in the jars at [the pass|output].",
       "`print` follows each reference and outputs `6 5`.",
       st => { st.out.push("6 5"); });
   }),
 
-  lesson({ id: "bowls", title: "One bowl, two labels", topic: "lists and aliasing",
-    blurb: "A bowl can be added to, so two labels on one bowl both see every change.",
-    code: ['bowl = ["egg", "flour"]', 'mixing = bowl', 'mixing.append("milk")', 'side = bowl.copy()', 'side.append("salt")', 'print(bowl, side)'] }, step => {
-    step(1, "Crack an egg into a [mixing bowl|list] and add flour. Label it `bowl`. A bowl is [open|mutable]: you can keep adding things. Spots in the bowl are counted from [0|index 0].",
-      "A list is a mutable object. Its items are numbered from 0.",
-      st => { st.heap.o1 = { t: "list", items: [P("'egg'"), P("'flour'")] }; g(st).bowl = R("o1"); });
-    step(2, "Tie a `mixing` [label|name] to that same [bowl|list object]. There is still only one bowl on the shelf.",
-      "`mixing = bowl` is aliasing: two names, one list. No copy is made.",
-      st => { g(st).mixing = R("o1"); });
-    step(3, "Pour milk into the bowl labeled `mixing`. Now look in the bowl labeled `bowl`: the milk is there, because it's the [same bowl|same object].",
-      "`.append()` changes the list in place, so every name that refers to it sees the change.",
-      st => { st.heap.o1.items.push(P("'milk'")); });
-    step(4, "Take a [second bowl|new list], put the same ingredients in it, and label it `side`.",
-      "`.copy()` builds a new list with the same items. `side` refers to a different object.",
-      st => { st.heap.o2 = { t: "list", items: JSON.parse(JSON.stringify(st.heap.o1.items)) }; g(st).side = R("o2"); });
-    step(5, "Salt goes into the side bowl only.",
-      "Changing the copy leaves the original list alone.",
-      st => { st.heap.o2.items.push(P("'salt'")); });
-    step(6, "[Serve|print] both bowls. Moving a [label|name] never moves food. Only a second bowl gives you a separate batch.",
-      "`=` never copies a list. Use `.copy()`, `list(x)` or `x[:]` when you need an independent one.",
-      st => { st.out.push("['egg', 'flour', 'milk'] ['egg', 'flour', 'milk', 'salt']"); });
+  /* ---------- ★★ easy ---------- */
+  dish({ id: "lemonade", tier: 2, pic: "🍋", name: "Lemonade", topics: "arithmetic · joining strings",
+    code: ["lemons = 3", "cups = lemons * 2", 'drink = "lemon" + "ade"', "print(cups, drink)"] }, step => {
+    step(1, ["Put 3 lemons in a jar labeled `lemons`", "create the int 3, bind lemons"],
+      [["Put 1 lemon in each of 3 jars", "create three objects", "`3` is a single int object."],
+       ["Squeeze the lemons first", "run line 2 early", "Lines run top to bottom. Line 1 only makes the value."]],
+      "The lemons go in a [jar|int object] with a `lemons` [label|variable].",
+      "`lemons = 3` creates the int 3 and binds `lemons` to it.",
+      st => { st.heap.o1 = { t: "int", v: "3", fill: "🍋", count: 3 }; g(st).lemons = R("o1"); });
+    step(2, ["Count the lemons, double it, and put 6 cups in a new jar labeled `cups`", "evaluate lemons * 2 = 6, bind cups"],
+      [["Double the lemons inside the `lemons` jar", "lemons becomes 6", "The right side is only read. `lemons` stays 3."],
+       ["Tie the `cups` label to the lemon jar", "cups refers to lemons", "`lemons * 2` computes a new value, 6."]],
+      "Read the lemon jar, do the sum, and fill a [new jar|new object] with the result.",
+      "Python evaluates `lemons * 2` to 6, creates that int, and binds `cups` to it.",
+      st => { st.heap.o2 = { t: "int", v: "6", fill: "🥤", count: 6 }; g(st).cups = R("o2"); });
+    step(3, ["Join the words \"lemon\" and \"ade\" into one new jar: \"lemonade\"", "concatenate two strings into 'lemonade'"],
+      [["Add them like numbers", "arithmetic on text", "`+` on two strings joins them end to end."],
+       ["Keep \"lemon\" and \"ade\" in two jars", "make a list of two strings", "`+` builds one new string."]],
+      "Stick the two words together into a [new sealed jar|new str object] labeled `drink`.",
+      "`\"lemon\" + \"ade\"` concatenates into the new string `'lemonade'`, bound to `drink`.",
+      st => { st.heap.o3 = { t: "str", v: "'lemonade'", fill: "🍋" }; g(st).drink = R("o3"); });
+    step(4, ["Send \"6 lemonade\" to the pass", "print outputs 6 lemonade"],
+      [["Send \"6 'lemonade'\"", "print shows the quotes", "`print` shows text without its quotes."],
+       ["Send \"cups drink\"", "prints the names", "No quotes means names. Their values are printed."]],
+      "Two jars, one call at [the pass|output].",
+      "`print(cups, drink)` outputs `6 lemonade`, separated by a space.",
+      st => { st.out.push("6 lemonade"); });
   }),
 
-  lesson({ id: "loops", title: "Weigh each ingredient", topic: "for loops",
-    blurb: "A for loop does the same steps once for every item, like weighing ingredients one at a time.",
-    code: ['weight = 0', 'for grams in [200, 150, 50]:', '    weight += grams', 'print(weight)'] }, step => {
-    step(1, "Zero the kitchen scale and write 0 on [masking tape|a variable] called `weight`. Small numbers are written straight on the tape, so they don't need a jar.",
-      "`weight` is bound to 0. Small values are drawn inline to keep the picture readable.",
+  dish({ id: "egg", tier: 2, pic: "🥚", name: "Boiled egg", topics: "if / else · comparison",
+    code: ["minutes = 8", "if minutes > 6:", '    egg = "hard"', "else:", '    egg = "soft"', "print(egg)"] }, step => {
+    step(1, ["Set the timer: write 8 on a `minutes` label", "bind minutes to 8"],
+      [["Set the timer to 6", "minutes is 6", "The ticket says 8. The 6 only appears in the check on line 2."],
+       ["Start the else steps", "jump to else", "Line 1 runs first; nothing has been checked yet."]],
+      "Small numbers are written straight on the [tape|variable], no jar needed.",
+      "`minutes` is bound to 8.",
+      st => { g(st).minutes = P(8, { ico: "⏲️" }); });
+    step(2, ["Check: is 8 more than 6? Yes, take the first path", "condition is True, run the if block"],
+      [["Take the else path", "condition is False", "8 > 6 is True."],
+       ["Do both paths, just in case", "run both blocks", "Only one branch of an if/else ever runs."]],
+      "[Check the timer|evaluate the condition] and pick [one path|one branch].",
+      "`minutes > 6` is `True`, so Python enters the indented `if` block.");
+    step(3, ["Boil it hard and label the egg `egg` = \"hard\"", "bind egg to 'hard'"],
+      [["Label it \"soft\"", "run the else line", "We're inside the `if` block; the else block is skipped."],
+       ["Label it \"hard\" and \"soft\"", "egg holds two values", "A name refers to one object at a time."]],
+      "The egg is ready and gets a `egg` [label|variable].",
+      "`egg = \"hard\"` runs inside the if block.",
+      st => { g(st).egg = P("'hard'", { ico: "🥚" }); });
+    step(6, ["Skip the soft-boil steps and send \"hard\" to the pass", "else is skipped, print outputs hard"],
+      [["Do the soft-boil steps too", "run the else block", "Once the if block ran, the else block is skipped."],
+       ["Send \"soft\"", "egg was overwritten", "Line 5 never ran, so `egg` is still 'hard'."]],
+      "The [other path|else block] is skipped entirely. Serve at [the pass|output].",
+      "Python jumps past `else` to line 6 and prints `hard`.",
+      st => { st.out.push("hard"); });
+  }),
+
+  dish({ id: "pancakes", tier: 2, pic: "🥞", name: "Pancake batter", topics: "lists · append() · len()",
+    code: ['batter = ["flour", "egg"]', 'batter.append("milk")', "size = len(batter)", "print(size)"] }, step => {
+    step(1, ["Put flour and an egg in a mixing bowl labeled `batter`", "create a list of two strings"],
+      [["Put flour and egg in two separate jars", "make two variables", "Square brackets make one list holding both items."],
+       ["Put them in a sealed jar", "make a tuple", "Square brackets mean a list: an open bowl you can change."]],
+      "A [mixing bowl|list] holds several things in order, counted from [spot 0|index 0].",
+      "`[\"flour\", \"egg\"]` creates a list with indexes 0 and 1.",
+      st => { st.heap.o1 = { t: "list", items: [P("'flour'"), P("'egg'")] }; g(st).batter = R("o1"); });
+    step(2, ["Pour milk into the same bowl, at the end", "append adds 'milk' at index 2"],
+      [["Get a new bowl with all three", "append returns a new list", "`.append()` changes the existing bowl in place."],
+       ["Pour the milk in first, at spot 0", "insert at index 0", "`.append()` always adds to the end."]],
+      "The bowl is [open|mutable], so the milk goes [straight in|in place].",
+      "`batter.append(\"milk\")` modifies the list; it now has 3 items.",
+      st => { st.heap.o1.items.push(P("'milk'")); });
+    step(3, ["Count what's in the bowl (3) and write it on a `size` label", "len returns 3, bind size"],
+      [["Write 2 on the label", "count the original items", "The milk is already in. There are 3 items."],
+       ["Write \"milk\" on the label", "len returns the last item", "`len` counts items; it doesn't return one."]],
+      "[Counting the bowl|len()] gives a number for a new [label|variable].",
+      "`len(batter)` returns 3, which is bound to `size`.",
+      st => { g(st).size = P(3, { ico: "🔢" }); });
+    step(4, ["Send \"3\" to the pass", "print outputs 3"],
+      [["Send the whole bowl", "print the list", "We print `size`, not `batter`."],
+       ["Send \"2\"", "len ignores appended items", "Appended items count like any other."]],
+      "Call out the count at [the pass|output].",
+      "`print(size)` outputs `3`.",
+      st => { st.out.push("3"); });
+  }),
+
+  /* ---------- ★★★ medium ---------- */
+  dish({ id: "cookies", tier: 3, pic: "🍪", name: "Cookie dough", topics: "for loops · += ",
+    code: ["weight = 0", "for grams in [200, 150, 50]:", "    weight += grams", "print(weight)"] }, step => {
+    const ing = [["flour", "🌾", 200], ["butter", "🧈", 150], ["chocolate", "🍫", 50]];
+    step(1, ["Zero the scale: write 0 on a `weight` label", "bind weight to 0"],
+      [["Put all three ingredients on the scale", "run the loop now", "Line 1 only sets the starting total."],
+       ["Leave the scale blank", "weight is undefined", "`weight = 0` gives it a value right away."]],
+      "Zero the scale. The [tape|variable] `weight` reads 0.",
+      "`weight` is bound to 0.",
       st => { g(st).weight = P(0, { ico: "⚖️" }); });
-    step(2, "Line up flour, butter and chocolate on a [prep tray|list]. [Pick up|the loop takes] the first one: 200 g of flour. The `grams` tape now reads 200.",
-      "The `for` loop takes item 0 from the list and binds `grams` to it.",
-      st => { st.heap.o1 = { t: "list", vessel: "tray", k: "Prep tray", hold: true, hl: 0,
-                items: [P(200, { ico: "🌾" }), P(150, { ico: "🧈" }), P(50, { ico: "🍫" })] };
-              g(st).grams = P(200, { ico: "🌾" }); });
-    step(3, "Put it on the scale: 0 + 200 = 200.",
-      "`weight += grams` is shorthand for `weight = weight + grams`.",
-      st => { g(st).weight = P(200, { ico: "⚖️" }); });
-    step(2, "[Repeat|next iteration] with the next ingredient: 150 g of butter.",
-      "Back to the loop header: `grams` is rebound to item 1.",
-      st => { st.heap.o1.hl = 1; g(st).grams = P(150, { ico: "🧈" }); });
-    step(3, "200 + 150 = 350.",
-      "The indented body runs once per item.",
-      st => { g(st).weight = P(350, { ico: "⚖️" }); });
-    step(2, "The last ingredient: 50 g of chocolate.",
-      "Item 2, the final one.",
-      st => { st.heap.o1.hl = 2; g(st).grams = P(50, { ico: "🍫" }); });
-    step(3, "350 + 50 = 400.",
-      "The body runs for the third time.",
-      st => { g(st).weight = P(400, { ico: "⚖️" }); });
-    step(2, "Nothing left on the tray, so you [stop repeating|the loop ends]. `grams` still shows the last thing you weighed. Nobody needs the tray now, so it goes in the [sink|garbage].",
-      "The loop ends when the list runs out. Loop variables keep their last value afterwards. Nothing refers to the list any more.",
+    let total = 0;
+    ing.forEach(([name, ico, gr], k) => {
+      step(2, [`Pick up the ${k === 0 ? "first" : "next"} ingredient: ${gr} g of ${name}`, `the loop binds grams to ${gr}`],
+        [k === 0 ? ["Weigh the whole tray at once", "the body runs once for the list", "A for loop handles one item per pass."]
+                 : ["Stop: you've already weighed something", "the loop ends", "There are still items left on the tray."],
+         ["Go straight to the pass", "skip the loop", "The loop runs its body for every item first."]],
+        `[Take the next item|next iteration] off the [prep tray|list]. The \`grams\` [tape|variable] reads ${gr}.`,
+        `The \`for\` loop takes item ${k} and binds \`grams\` to ${gr}.`,
+        st => { if (k === 0) st.heap.o1 = { t: "list", vessel: "tray", k: "Prep tray", hold: true, items: ing.map(([, i, n]) => P(n, { ico: i })) };
+                st.heap.o1.hl = k; g(st).grams = P(gr, { ico }); });
+      const before = total; total += gr;
+      step(3, [`Add it to the scale: ${before} + ${gr} = ${total}`, `weight += grams gives ${total}`],
+        [[`Set the scale to ${gr}`, "weight = grams", "`+=` adds to the running total; it doesn't replace it."],
+         ["Skip weighing this one", "the body is optional", "The indented line runs on every pass."]],
+        `The scale now reads ${total}.`,
+        `\`weight += grams\` means \`weight = weight + grams\`, so \`weight\` becomes ${total}.`,
+        st => { g(st).weight = P(total, { ico: "⚖️" }); });
+    });
+    step(2, ["The tray is empty: stop repeating", "the loop ends"],
+      [["Start the tray again from the flour", "the loop restarts", "A for loop goes through the list once."],
+       ["Weigh one more time", "the loop runs 4 times", "There were exactly 3 items."]],
+      "No more items, so [the repeating stops|the loop ends]. The empty tray goes to the [sink|garbage].",
+      "The list is used up and the loop finishes. `grams` keeps its last value.",
       st => { delete st.heap.o1.hl; delete st.heap.o1.hold; });
-    step(4, "The sink is [washed up|garbage-collected] and the total weight goes out on an [order ticket|print output].",
-      "`print(weight)` outputs 400. The unused list has been garbage-collected.",
+    step(4, ["Send \"400\" to the pass", "print outputs 400"],
+      [["Send \"50\"", "prints the last item", "`weight` holds the total, 400."],
+       ["Send \"0\"", "weight was reset", "Nothing reset it. It holds 400."]],
+      "The sink is [washed|garbage-collected] and the total goes to [the pass|output].",
+      "`print(weight)` outputs 400.",
       st => { delete st.heap.o1; st.out.push("400"); });
   }),
 
-  lesson({ id: "recipes", title: "Recipe cards", topic: "functions",
-    blurb: "A function is a recipe card. Each time you use it, a fresh cutting board comes out, gets used, and is put away.",
-    code: ['def make_tea(leaf):', '    cup = leaf + " tea"', '    return cup', '', 'order = make_tea("mint")', 'print(order)'] }, step => {
-    step(1, "Write a [recipe card|function] and stand it on the shelf, labeled `make_tea`. Writing the card doesn't brew anything yet.",
-      "`def` creates a function object and binds the name `make_tea` to it. The body does not run yet.",
+  dish({ id: "soup", tier: 3, pic: "🍲", name: "Simmer the soup", topics: "while loops · conditions",
+    code: ["temp = 20", "while temp < 100:", "    temp = temp + 40", "print(temp)"] }, step => {
+    step(1, ["Put the pot on: write 20° on a `temp` label", "bind temp to 20"],
+      [["Turn the heat straight to 100°", "temp is 100", "The ticket starts at 20."],
+       ["Start checking before setting a temperature", "run line 2 first", "Line 1 runs first."]],
+      "The thermometer [tape|variable] reads 20.",
+      "`temp` is bound to 20.",
+      st => { g(st).temp = P(20, { ico: "🌡️" }); });
+    [[20, 60], [60, 100]].forEach(([a, b]) => {
+      step(2, [`Check: is ${a}° below 100°? Yes, keep heating`, "the condition is True, enter the loop"],
+        [["Stop heating", "the condition is False", `${a} < 100 is True.`],
+         ["Heat until it boils without checking again", "the condition is checked once", "A while loop re-checks before every pass."]],
+        `[Check the thermometer|test the condition]: ${a} is still below 100.`,
+        `\`${a} < 100\` is \`True\`, so the loop body runs.`);
+      step(3, [`Heat it: ${a} + 40 = ${b}°`, `temp is rebound to ${b}`],
+        [["Jump straight to 100°", "skip to the end", "Each pass only adds 40."],
+         [`Heat it to ${a + 20}°`, "add 20", "The ticket says `temp + 40`."]],
+        `The [thermometer label|variable] now reads ${b}.`,
+        `\`temp + 40\` is ${b}; \`temp\` is rebound to it.`,
+        st => { g(st).temp = P(b, { ico: "🌡️" }); });
+    });
+    step(2, ["Check: is 100° below 100°? No, turn off the heat", "the condition is False, the loop ends"],
+      [["Yes, heat again to 140°", "100 < 100 is True", "100 is not less than 100. `<` excludes equal."],
+       ["Restart from 20°", "the loop restarts", "A while loop never resets its variables."]],
+      "[Check|test the condition] again: not below 100 any more, so [stop|exit the loop].",
+      "`100 < 100` is `False`, so Python leaves the loop and goes to line 4.");
+    step(4, ["Send \"100\" to the pass", "print outputs 100"],
+      [["Send \"140\"", "the loop ran once more", "The check failed before a 4th pass."],
+       ["Send \"60\"", "prints the first loop value", "`temp` was updated twice to 100."]],
+      "Serve the soup at [the pass|output].",
+      "`print(temp)` outputs 100.",
+      st => { st.out.push("100"); });
+  }),
+
+  dish({ id: "tea", tier: 3, pic: "🍵", name: "Mint tea", topics: "functions · parameters · return",
+    code: ["def make_tea(leaf):", '    cup = leaf + " tea"', "    return cup", "", 'order = make_tea("mint")', "print(order)"] }, step => {
+    step(1, ["Write a recipe card, put it on the rack, and label it `make_tea`", "def creates a function object"],
+      [["Brew a cup of tea right now", "def runs the body", "`def` only saves the recipe. The body runs when it's called."],
+       ["Skip the card entirely", "def is ignored", "`def` runs: it creates the function and binds its name."]],
+      "A [recipe card|function] goes on the rack. Nothing is brewed yet.",
+      "`def` creates a function object bound to `make_tea`; its body does not run yet.",
       st => { st.heap.o1 = { t: "func", v: "make_tea(leaf)" }; g(st).make_tea = R("o1"); });
-    step(5, "An order comes in. A cook takes out a fresh [cutting board|frame] for this recipe and labels the jar of mint you handed over `leaf`, the [ingredient the card asks for|parameter].",
-      "Calling `make_tea(\"mint\")` creates a new frame. The parameter `leaf` is bound to the argument.",
+    step(5, ["Get a fresh cutting board for the recipe and label the mint `leaf` on it", "call make_tea: new frame, leaf = 'mint'"],
+      [["Put the `leaf` label on the main board", "leaf is global", "Parameters live in the new frame, not the global one."],
+       ["Label the mint `order`", "assign order first", "The right side (the call) must finish before `order` exists."]],
+      "A [fresh cutting board|new frame] comes out. The mint you handed over is labeled `leaf`, the [ingredient the card asks for|parameter].",
+      "Calling `make_tea(\"mint\")` creates a new frame and binds the parameter `leaf` to `'mint'`.",
       st => { st.heap.o2 = { t: "str", v: "'mint'", fill: "🌿" }; st.frames.push({ name: "make_tea", vars: { leaf: R("o2") } }); });
-    step(2, "On that board, brew a cup and label it `cup`. This [tape|local variable] only exists on this board; the main board can't see it.",
-      "`cup` is a local variable. It lives in the function's frame, not the global frame.",
+    step(2, ["Brew a cup of mint tea and label it `cup` on this board", "local variable cup = 'mint tea'"],
+      [["Label the tea `cup` on the main board", "cup is global", "Variables made inside a function are local to its frame."],
+       ["Add \" tea\" into the mint jar", "change the string in place", "Strings are sealed. `+` makes a new one."]],
+      "This [label|local variable] only exists on this board.",
+      "`cup` is a local variable in the function's frame.",
       st => { st.heap.o3 = { t: "str", v: "'mint tea'", vessel: "cup", k: "Teacup" }; active(st).cup = R("o3"); });
-    step(3, "Put the cup on the [plate|return value] to hand back.",
+    step(3, ["Put the cup on the plate to hand back", "return cup"],
+      [["Send it straight to the pass", "return prints", "`return` hands the value back to the caller. It doesn't print."],
+       ["Keep it on the board", "return does nothing", "`return` sends the value back and ends the function."]],
+      "The cup goes on the [plate|return value].",
       "`return cup` sets the return value to the object `cup` refers to.",
       st => { active(st).$ret = R("o3"); });
-    step(5, "The board is [put away|frame destroyed] and its tape is thrown out. The tea is handed back and gets a new label, `order`. The mint jar has no label left, so it goes in the [sink|garbage].",
-      "The frame is destroyed, so `leaf` and `cup` disappear. The returned object survives as `order`. The 'mint' string has no references left.",
+    step(5, ["Put the board away, and label the returned tea `order`", "the frame is discarded, order = 'mint tea'"],
+      [["Keep the board out in case", "the frame stays", "When a function returns, its frame is discarded."],
+       ["Label the mint jar `order`", "order = leaf", "The function returned the tea, not the mint."]],
+      "The board is [put away|frame destroyed]. The tea gets an `order` [label|variable]. The mint has no label left, so it goes in the [sink|garbage].",
+      "`leaf` and `cup` disappear with the frame. The returned object survives as `order`.",
       st => { st.frames.pop(); g(st).order = R("o3"); });
-    step(6, "The sink is [washed up|garbage-collected] and the tea goes out on an [order ticket|print output].",
-      "Unreferenced objects are garbage-collected. `print` outputs `mint tea`.",
+    step(6, ["Send \"mint tea\" to the pass", "print outputs mint tea"],
+      [["Send \"mint\"", "prints the argument", "`order` refers to the returned tea."],
+       ["Send \"cup\"", "prints the local name", "`cup` no longer exists; `order` is printed."]],
+      "The sink is [washed|garbage-collected] and the tea is served at [the pass|output].",
+      "`print(order)` outputs `mint tea`.",
       st => { delete st.heap.o2; st.out.push("mint tea"); });
   }),
 
-  lesson({ id: "layers", title: "A cake that makes cakes", topic: "recursion",
-    blurb: "A recipe that uses itself on a smaller job, until the job is simple enough to do directly.",
-    code: ['def cake(layers):', '    if layers == 1:', '        return "base"', '    return cake(layers - 1) + "+layer"', '', 'print(cake(3))'] }, step => {
-    step(1, "Write the cake [recipe card|function]. Its last line says: make a cake with one fewer layer, then add a layer on top. The recipe [uses itself|recursion].",
+  /* ---------- ★★★★ hard ---------- */
+  dish({ id: "bowls", tier: 4, pic: "🥣", name: "The shared bowl", topics: "aliasing · mutation · copy()",
+    code: ['bowl = ["egg", "flour"]', "mixing = bowl", 'mixing.append("milk")', "side = bowl.copy()", 'side.append("salt")', "print(bowl, side)"] }, step => {
+    step(1, ["Put an egg and flour in a mixing bowl labeled `bowl`", "create a list, bind bowl"],
+      [["Put each in its own jar", "two variables", "One list holds both items."],
+       ["Use a sealed jar", "a tuple", "Square brackets make a list, which can change."]],
+      "An [open bowl|mutable list] with spots counted from [0|index 0].",
+      "A list is a mutable object.",
+      st => { st.heap.o1 = { t: "list", items: [P("'egg'"), P("'flour'")] }; g(st).bowl = R("o1"); });
+    step(2, ["Tie a `mixing` label to the same bowl", "mixing refers to the same list"],
+      [["Pour everything into a second bowl labeled `mixing`", "copy the list", "`=` never copies. This is aliasing: two names, one list."],
+       ["Move the `bowl` label to say `mixing`", "rename", "Both labels exist now."]],
+      "Two [labels|names] on one [bowl|list object].",
+      "`mixing = bowl` is aliasing. No copy is made.",
+      st => { g(st).mixing = R("o1"); });
+    step(3, ["Pour milk into the bowl. Both labels see it", "the shared list is mutated"],
+      [["Pour milk only into the `mixing` side", "only mixing changes", "There's only one bowl. Both names see the milk."],
+       ["Make a new bowl with milk for `mixing`", "append returns a copy", "`.append()` changes the list in place."]],
+      "Milk goes into the [one shared bowl|same object].",
+      "`.append()` mutates the list, so `bowl` and `mixing` both show `'milk'`.",
+      st => { st.heap.o1.items.push(P("'milk'")); });
+    step(4, ["Take a second bowl, add the same ingredients, label it `side`", "copy() makes a new list"],
+      [["Tie `side` to the same bowl", "copy() is aliasing", "`.copy()` builds a separate list."],
+       ["Take an empty bowl", "copy() is empty", "`.copy()` copies the items too."]],
+      "A [second bowl|new list] with the same contents.",
+      "`.copy()` returns a new list; `side` refers to a different object.",
+      st => { st.heap.o2 = { t: "list", items: JSON.parse(JSON.stringify(st.heap.o1.items)) }; g(st).side = R("o2"); });
+    step(5, ["Add salt to the side bowl only", "only the copy changes"],
+      [["Add salt to both bowls", "copies stay linked", "A copy is independent once it's made."],
+       ["Add salt to the first bowl", "side is bowl", "`side` refers to the copy."]],
+      "Salt goes in the [copy|second object] only.",
+      "Mutating `side` leaves the original list alone.",
+      st => { st.heap.o2.items.push(P("'salt'")); });
+    step(6, ["Send both bowls: one with milk, one with milk and salt", "print outputs both lists"],
+      [["The first bowl has no milk", "mixing was separate", "`mixing` was the same bowl, so the milk is there."],
+       ["Both bowls have salt", "copy shares changes", "Salt only went into the copy."]],
+      "Serve both at [the pass|output].",
+      "Prints `['egg', 'flour', 'milk'] ['egg', 'flour', 'milk', 'salt']`.",
+      st => { st.out.push("['egg', 'flour', 'milk'] ['egg', 'flour', 'milk', 'salt']"); });
+  }),
+
+  dish({ id: "spices", tier: 4, pic: "🌶️", name: "Spice inventory", topics: "dicts · keys · .items()",
+    code: ['spices = {"salt": 3}', 'spices["pepper"] = 2', 'spices["salt"] -= 1', "for name, qty in spices.items():", "    print(name, qty)"] }, step => {
+    const spoons = n => P(n, { ico: "🥄", rep: n });
+    step(1, ["Set up a spice cabinet with a salt drawer holding 3 spoons", "create a dict {'salt': 3}"],
+      [["Put salt and 3 in a mixing bowl", "make a list", "Curly braces with `key: value` make a dict."],
+       ["Label a jar `salt`", "salt is a variable", "\"salt\" is a key inside the dict, not a variable."]],
+      "A [spice cabinet|dict]: each drawer has a [name|key] and an [amount|value].",
+      "A dict maps unique keys to values.",
+      st => { st.heap.o1 = { t: "dict", items: [["'salt'", spoons(3)]] }; g(st).spices = R("o1"); });
+    step(2, ["Fit a new pepper drawer with 2 spoons", "add the key 'pepper'"],
+      [["Error: there's no pepper drawer", "KeyError", "Assigning to a missing key creates it. Only reading a missing key fails."],
+       ["Replace the salt drawer with pepper", "overwrite the dict", "Other keys stay. A new one is added."]],
+      "A [new drawer|new key] is fitted.",
+      "Assigning to a new key adds an entry.",
+      st => { st.heap.o1.items.push(["'pepper'", spoons(2)]); });
+    step(3, ["Take one spoon out of the salt drawer: 2 left", "spices['salt'] becomes 2"],
+      [["Fit a second salt drawer", "duplicate key", "Keys are unique. The existing value is updated."],
+       ["Take a spoon from every drawer", "updates all values", "Only the `\"salt\"` key is used."]],
+      "[Same drawer|same key], new [amount|value].",
+      "`-=` reads 3 and writes 2 under the same key.",
+      st => { st.heap.o1.items[0][1] = spoons(2); });
+    [["'salt'", "salt"], ["'pepper'", "pepper"]].forEach(([key, word], k) => {
+      step(4, [`Open the ${k ? "next" : "first"} drawer: copy \`${word}\` and 2 onto two labels`, `unpack the pair (${key}, 2) into name, qty`],
+        [[`Copy only the name \`${word}\``, "items() gives keys only", "`.items()` gives (key, value) pairs; both get unpacked."],
+         [k ? "Go back to the salt drawer" : "Start with the pepper drawer", "dicts are unordered", "Dicts keep insertion order: salt, then pepper."]],
+        `[Walk to the drawer|next pair from .items()] and copy its [name|key] and [amount|value].`,
+        `The loop unpacks \`(${key}, 2)\` into \`name\` and \`qty\`.`,
+        st => { st.heap.o1.hl = k; g(st).name = P(key, { ico: INGREDIENT[key] }); g(st).qty = P(2, { ico: "🥄" }); });
+      step(5, [`Send "${word} 2" to the pass`, `print outputs ${word} 2`],
+        [[`Send "${key} 2" with quotes`, "print keeps quotes", "`print` shows strings without quotes."],
+         ["Send the whole cabinet", "print(spices)", "This line prints `name` and `qty`."]],
+        "Call it out at [the pass|output].",
+        `Prints \`${word} 2\`.`,
+        st => { st.out.push(`${word} 2`); });
+    });
+    step(4, ["No more drawers: stop", "the loop ends"],
+      [["Open a third drawer", "loop runs again", "There are only two keys."],
+       ["Start over from salt", "loop restarts", "A for loop goes through the items once."]],
+      "End of the cabinet. Drawers stay in the [order they were fitted|insertion order].",
+      "`.items()` is exhausted; the loop ends.",
+      st => { delete st.heap.o1.hl; });
+  }),
+
+  /* ---------- ★★★★★ chef's specials ---------- */
+  dish({ id: "cake", tier: 5, pic: "🎂", name: "Layer cake", topics: "recursion · the call stack",
+    code: ["def cake(layers):", "    if layers == 1:", '        return "base"', '    return cake(layers - 1) + "+layer"', "", "print(cake(3))"] }, step => {
+    step(1, ["Write the cake recipe card and put it on the rack", "def creates the function cake"],
+      [["Start baking 3 layers", "run the body", "`def` only defines the recipe."],
+       ["Write 3 recipe cards", "one function per layer", "One function; it will call itself."]],
+      "The [recipe card|function] says: make a smaller cake, then add a layer. It [uses itself|is recursive].",
       "Defines a recursive function, one that calls itself.",
       st => { st.heap.o1 = { t: "func", v: "cake(layers)" }; g(st).cake = R("o1"); });
-    step(6, "Order in: a 3-layer cake. [Cutting board 1|frame for cake(3)] comes out.",
-      "`cake(3)` is called, creating a frame with `layers = 3`.",
-      st => { st.frames.push({ name: "cake", vars: { layers: P(3) } }); });
-    step(2, "[Check the order|if test]: is this a 1-layer cake? No.",
-      "`3 == 1` is False, so `return \"base\"` is skipped.");
-    step(4, "Board 1 can't finish until it has a 2-layer cake. It [waits|pauses] and a [second board|new frame] comes out.",
-      "`cake(2)` is called. The first frame pauses mid-line and stays on the call stack.",
-      st => { st.frames.push({ name: "cake", vars: { layers: P(2) } }); });
-    step(2, "Is this a 1-layer cake? Still no.",
-      "`2 == 1` is False.");
-    step(4, "Board 2 waits too and a third board comes out. Three boards are busy at once, each with its own `layers` [tape|local variable].",
-      "A third frame. Every call has its own local variables.",
-      st => { st.frames.push({ name: "cake", vars: { layers: P(1) } }); });
-    step(2, "Board 3 only needs one layer. This is the [easy case|base case].",
-      "`1 == 1` is True. This is the base case that stops the recursion.");
-    step(3, "Board 3 bakes a sponge base and sets it on its [plate|return value].",
+    const open = [3, 2, 1];
+    open.forEach((n, k) => {
+      step(k === 0 ? 6 : 4, [`Get cutting board ${k + 1} for a ${n}-layer cake`, `call cake(${n}): a new frame with layers = ${n}`],
+        [k === 0 ? ["Print first, bake later", "print runs before cake(3)", "The argument `cake(3)` must be computed before `print` can run."]
+                 : [`Finish board ${k} first`, "the caller finishes before the call", `Board ${k} can't finish until it gets the smaller cake back.`],
+         [`Reuse board ${k || 1}, change \`layers\` to ${n}`, "calls share one frame", "Every call gets its own frame and its own `layers`."]],
+        k === 0 ? "The order is in. [Board 1|frame for cake(3)] comes out."
+                : `Board ${k} [waits|pauses mid-line] and [board ${k + 1}|a new frame] comes out.`,
+        `\`cake(${n})\` is called, creating a frame with \`layers = ${n}\`.`,
+        st => { st.frames.push({ name: "cake", vars: { layers: P(n) } }); });
+      step(2, n === 1 ? ["Check: is it a 1-layer cake? Yes!", "1 == 1 is True: the base case"]
+                      : [`Check: is it a 1-layer cake? No, it's ${n}`, `${n} == 1 is False`],
+        n === 1 ? [["No, make an even smaller cake", "call cake(0)", "`1 == 1` is True, so the recursion stops here."],
+                   ["Skip the check", "if is optional", "The check runs on every call."]]
+                : [["Yes, bake the base now", "the condition is True", `${n} is not 1.`],
+                   ["Skip the check", "if is optional", "The check runs on every call."]],
+        n === 1 ? "The [easy case|base case]: one layer, nothing smaller needed." : "[Check the order|if test]: not the easy case yet.",
+        n === 1 ? "`1 == 1` is True. This base case stops the recursion." : `\`${n} == 1\` is False, so \`return "base"\` is skipped.`);
+    });
+    step(3, ["Bake a sponge base and set it on board 3's plate", "cake(1) returns 'base'"],
+      [["Send the base to the pass", "return prints", "`return` hands it back to board 2, not the pass."],
+       ["Add a layer on top first", "base case recurses", "The base case returns directly."]],
+      "The base goes on the [plate|return value].",
       "`cake(1)` returns `\"base\"`.",
       st => { active(st).$ret = P("'base'", { cake: 1 }); });
-    step(4, "Board 3 is [put away|frame destroyed]. Board 2 takes the base, adds a layer of cream, and plates it.",
+    step(4, ["Put board 3 away; board 2 adds a layer and plates it", "frame 3 ends; cake(2) returns 'base+layer'"],
+      [["Board 3 adds the layer", "the callee continues", "Board 3 is done. Board 2 was waiting for that base."],
+       ["Board 1 takes the base", "returns skip a level", "Each return goes to the board that called it."]],
+      "Board 3 is [put away|frame destroyed]. Board 2 [resumes|continues its line].",
       "Back in the `layers = 2` frame: `\"base\" + \"+layer\"`.",
       st => { st.frames.pop(); active(st).$ret = P("'base+layer'", { cake: 2 }); });
-    step(4, "Board 2 is put away. Board 1 adds the final layer.",
-      "Back in the `layers = 3` frame, which can finally finish its line.",
+    step(4, ["Put board 2 away; board 1 adds the last layer", "cake(3) returns 'base+layer+layer'"],
+      [["Board 2 adds two more layers", "one frame does all the work", "Each board adds just one layer."],
+       ["Send the 2-layer cake to the pass", "the return goes to print", "It returns to board 1, which still has a layer to add."]],
+      "Board 2 is put away and board 1 finishes.",
+      "Back in the `layers = 3` frame, which can now finish its line.",
       st => { st.frames.pop(); active(st).$ret = P("'base+layer+layer'", { cake: 3 }); });
-    step(6, "Every board is put away and the cake goes out on an [order ticket|print output]. Without the 1-layer rule, boards would keep coming out until the counter ran out of room.",
-      "The stack unwinds and `print` runs. With no base case, Python would stop with `RecursionError`.",
+    step(6, ["Put board 1 away and send the cake to the pass", "print outputs base+layer+layer"],
+      [["Send \"base\"", "only the base case returns", "Every level added a layer on the way back."],
+       ["Keep board 1 out", "frames persist", "The frame is discarded after returning."]],
+      "All boards are put away; the cake goes to [the pass|output]. Without the 1-layer rule, boards would never stop coming out.",
+      "The stack unwinds and `print` runs. With no base case, Python raises `RecursionError`.",
       st => { st.frames.pop(); st.out.push("base+layer+layer"); });
   }),
 
-  lesson({ id: "drawers", title: "The spice cabinet", topic: "dictionaries",
-    blurb: "A dictionary looks things up by name instead of by position.",
-    code: ['spices = {"salt": 3}', 'spices["pepper"] = 2', 'spices["salt"] -= 1', 'for name, qty in spices.items():', '    print(name, qty)'] }, step => {
-    const spoons = n => P(n, { ico: "🥄", rep: n });
-    step(1, "A [spice cabinet|dict]. Each drawer has a [name on the front|key] and an [amount inside|value]. No two drawers share a name.",
-      "A dict maps unique keys to values.",
-      st => { st.heap.o1 = { t: "dict", items: [["'salt'", spoons(3)]] }; g(st).spices = R("o1"); });
-    step(2, "Fit a [new drawer|new key] for pepper and put 2 spoons in it.",
-      "Assigning to a new key adds an entry.",
-      st => { st.heap.o1.items.push(["'pepper'", spoons(2)]); });
-    step(3, "Use a spoon of salt. [Same drawer|same key], new amount.",
-      "Assigning to an existing key replaces its value. `-=` reads 3 and writes 2.",
-      st => { st.heap.o1.items[0][1] = spoons(2); });
-    step(4, "[Walk along the drawers|loop over .items()]. At each one, copy the [name|key] and the [amount|value] onto two pieces of tape.",
-      "`.items()` gives (key, value) pairs. The loop unpacks each pair into `name` and `qty`.",
-      st => { st.heap.o1.hl = 0; g(st).name = P("'salt'"); g(st).qty = P(2, { ico: "🥄" }); });
-    step(5, "Send it out on an [order ticket|print output].",
-      "Prints the first pair.",
-      st => { st.out.push("salt 2"); });
-    step(4, "Next drawer.",
-      "The second pair.",
-      st => { st.heap.o1.hl = 1; g(st).name = P("'pepper'"); g(st).qty = P(2, { ico: "🥄" }); });
-    step(5, "Send it out.",
-      "Prints the second pair.",
-      st => { st.out.push("pepper 2"); });
-    step(4, "End of the cabinet. Drawers stay in the [order you fitted them|insertion order].",
-      "Dicts keep insertion order, so `salt` came before `pepper`.",
-      st => { delete st.heap.o1.hl; });
+  dish({ id: "milk", tier: 5, pic: "🥛", name: "Missing milk", topics: "try / except · KeyError",
+    code: ['fridge = {"egg": 6}', "try:", '    milk = fridge["milk"]', "except KeyError:", "    milk = 0", "print(milk)"] }, step => {
+    step(1, ["Stock the fridge: an egg drawer holding 6", "create a dict {'egg': 6}"],
+      [["Stock eggs and milk", "the dict has two keys", "Only `\"egg\"` is on the ticket."],
+       ["Label a jar `egg`", "egg is a variable", "\"egg\" is a key in the dict."]],
+      "The [fridge|dict] has one drawer: [egg|key] → [6|value].",
+      "`fridge` refers to a dict with one key.",
+      st => { st.heap.o1 = { t: "dict", k: "Fridge", vessel: "fridge", items: [["'egg'", P(6, { ico: "🥚" })]] }; g(st).fridge = R("o1"); });
+    step(2, ["Put on oven mitts: try the next step carefully", "enter the try block"],
+      [["Skip to the backup plan", "run except first", "`except` only runs if something goes wrong inside `try`."],
+       ["Skip the risky step", "try skips its body", "`try` runs its body; it just watches for errors."]],
+      "[Oven mitts on|try:] means: attempt this, and have a backup plan ready.",
+      "Python enters the `try` block.");
+    step(3, ["Open the milk drawer. There isn't one! The alarm rings: KeyError", "fridge['milk'] raises KeyError"],
+      [["Take an empty glass and label it `milk`", "returns None", "A missing key raises an error; it doesn't quietly give you nothing."],
+       ["Fit a new milk drawer", "reading adds the key", "Reading a missing key never creates it."]],
+      "No milk drawer, so the [alarm|exception] goes off. The `milk` [label|variable] is never made.",
+      "Looking up a missing key raises `KeyError`. Line 3 stops before the assignment happens.",
+      st => { g(st).$err = P("KeyError: 'milk'"); });
+    step(4, ["It's a KeyError, so the backup plan kicks in", "except KeyError catches it"],
+      [["Abandon the dish", "the program crashes", "The `except KeyError` block catches exactly this error."],
+       ["Ignore the alarm and print", "errors are skipped", "Control jumps to the matching `except` block."]],
+      "The [alarm is handled|exception is caught] by the matching backup plan.",
+      "The error matches `except KeyError`, so that block runs and the program carries on.",
+      st => { delete g(st).$err; });
+    step(5, ["Write 0 on a `milk` label", "bind milk to 0"],
+      [["Still no `milk` label", "milk is undefined", "The except block creates it now."],
+       ["Write 6 on it", "uses the egg count", "The ticket says `milk = 0`."]],
+      "The [backup plan|except block] sets a sensible default.",
+      "`milk = 0` runs in the except block.",
+      st => { g(st).milk = P(0, { ico: "🥛" }); });
+    step(6, ["Send \"0\" to the pass", "print outputs 0"],
+      [["Send the KeyError", "the error is printed", "The error was handled, so nothing about it is printed."],
+       ["Send \"6\"", "prints the egg count", "`milk` is 0."]],
+      "The order still goes out at [the pass|output].",
+      "`print(milk)` outputs `0`.",
+      st => { st.out.push("0"); });
   }),
+];
+
+const TIERS = [
+  [1, "Starters", "variables & print"], [2, "Easy", "values, ifs & lists"], [3, "Mains", "loops & functions"],
+  [4, "Hard", "mutation & dicts"], [5, "Chef's specials", "recursion & errors"],
 ];
 
 /* ------------------------------------------------------------------ drawing */
 
 const W = 1200, H = 780;
-const SHELF_LOW = 372, SHELF_HIGH = 196, PLANK = 14, SHELF_X0 = 30, SHELF_X1 = 870;
-const COUNTER = 462, COUNTER_END = 700, EDGE = 14;
+const SHELF_LOW = 372, SHELF_HIGH = 196, PLANK = 12, SHELF_X0 = 30, SHELF_X1 = 870;
+const COUNTER = 462, COUNTER_END = 700, EDGE = 12;
 const BOARD_X0 = 30, BOARD_X1 = 880, BOARD_Y = 516, BOARD_MAXH = 176;
 const SINK = { x: 930, y: 520, w: 240, h: 110 };
-const HATCH = { x: 905, y: 30, w: 270, h: 262 };
+const PASS = { x: 905, y: 40, w: 270, h: 252 };
 
 const ingOf = v => v.ico || INGREDIENT[v.p] || "";
 const txt = (x, y, cls, s, anchor = "start", extra = "") => `<text x="${x}" y="${y}" class="${cls}" text-anchor="${anchor}" ${extra}>${s}</text>`;
@@ -410,11 +738,7 @@ function cakeSVG(x, bottom, n) {
   for (let k = 0; k < n; k++) s += `<rect x="${x + (k ? 2 : 0)}" y="${bottom - 9 - k * 9}" width="${k ? 30 : 34}" height="9" rx="2" class="${k ? "creamy" : "sponge"}"/>`;
   return s;
 }
-
-/* a value written on a paper chip, right-aligned at xr */
-function chipW(v) {
-  return (ingOf(v) ? 22 * (v.rep || 1) + 4 : 0) + (v.cake ? 42 : 0) + v.p.length * 7.9 + 18;
-}
+function chipW(v) { return (ingOf(v) ? 22 * (v.rep || 1) + 4 : 0) + (v.cake ? 42 : 0) + v.p.length * 7.9 + 18; }
 function chipSVG(xr, cy, v) {
   const w = chipW(v), x = xr - w;
   let s = `<rect x="${x}" y="${cy - 14}" width="${w}" height="28" rx="5" class="paper"/>`, cx = x + 9;
@@ -423,18 +747,18 @@ function chipSVG(xr, cy, v) {
   return s + txt(cx, cy + 5, "t-val", esc(v.p));
 }
 
-/* vessels: drawn in local coords, x from 0..w, sitting on y = 0 */
 function vessel(o) {
   const kind = o.vessel || { int: "jar", str: "jar", list: "bowl", dict: "cabinet", func: "card" }[o.t];
   if (kind === "jar") {
     let fill = "";
     if (o.cubes) for (let k = 0; k < o.cubes; k++) fill += `<rect class="cube" x="${19 + (k % 3) * 20}" y="${-24 - Math.floor(k / 3) * 19}" width="16" height="16" rx="2"/>`;
-    else fill = emoji(48, -14, 34, o.fill) + emoji(30, -18, 26, o.fill) + emoji(66, -20, 26, o.fill);
+    else if (o.count) for (let k = 0; k < o.count; k++) fill += emoji(30 + (k % 2) * 36, -10 - Math.floor(k / 2) * 22, 24, o.fill);
+    else fill = emoji(48, -14, 34, o.fill) + emoji(28, -20, 24, o.fill) + emoji(68, -22, 24, o.fill);
     return { w: 96, h: 128, svg:
       `<rect x="4" y="-112" width="88" height="112" rx="16" class="glass"/>${fill}
        <rect x="10" y="-126" width="76" height="17" rx="4" class="lid"/><rect x="10" y="-113" width="76" height="4" class="lid-dark"/>
-       <rect x="14" y="-100" width="68" height="28" rx="3" class="paper"/>${txt(48, -81, "t-val", esc(trunc(o.v, 8)), "middle")}
-       <path d="M16,-62 L16,-20" class="glass-shine"/>` };
+       <rect x="12" y="-102" width="72" height="26" rx="3" class="paper"/>${txt(48, -84, "t-val", esc(trunc(o.v, 9)), "middle")}
+       <path d="M14,-66 L14,-20" class="glass-shine"/>` };
   }
   if (kind === "cup") {
     return { w: 132, h: 98, svg:
@@ -451,16 +775,17 @@ function vessel(o) {
        ${txt(18, -90, "t-tiny", "RECIPE")}${txt(18, -68, "t-recipe", esc(o.v))}
        <path d="M18,-50 H160 M18,-36 H160 M18,-22 H130" stroke="var(--paper-edge)" stroke-width="1.5"/></g>` };
   }
-  if (kind === "cabinet") {
-    const n = o.items.length, w = 270, h = 20 + n * 50;
-    let s = `<rect x="0" y="${-h}" width="${w}" height="${h}" rx="6" class="wood"/>`;
+  if (kind === "cabinet" || kind === "fridge") {
+    const n = o.items.length, w = 270, h = 20 + n * 50 + (kind === "fridge" ? 20 : 0);
+    let s = `<rect x="0" y="${-h}" width="${w}" height="${h}" rx="${kind === "fridge" ? 12 : 6}" class="${kind === "fridge" ? "fridge" : "wood"}"/>`;
+    if (kind === "fridge") s += `<rect x="${w - 16}" y="${-h + 16}" width="6" height="${h - 32}" rx="3" class="handle"/>`;
     o.items.forEach(([k, v], i) => {
       const y = -h + 10 + i * 50;
-      s += `<rect x="10" y="${y}" width="${w - 20}" height="42" rx="4" class="${o.hl === i ? "hl" : "drawer"}"/>
+      s += `<rect x="10" y="${y}" width="${w - 36}" height="42" rx="4" class="${o.hl === i ? "hl" : "drawer"}"/>
         <circle cx="26" cy="${y + 21}" r="5" class="knob"/>${emoji(48, y + 29, 22, INGREDIENT[k])}
         ${txt(66, y + 19, "t-val", esc(k))}${txt(66, y + 34, "t-py", "key")}
-        ${emoji(w - 90 - ((v.rep || 1) - 1) * 9, y + 28, 17, "🥄".repeat(v.rep || 1))}
-        ${txt(w - 22, y + 19, "t-val", esc(v.p), "end")}${txt(w - 22, y + 34, "t-py", "value", "end")}`;
+        ${emoji(w - 106 - ((v.rep || 1) - 1) * 9, y + 28, 17, (v.ico || "").repeat(v.rep || 1))}
+        ${txt(w - 38, y + 19, "t-val", esc(v.p), "end")}${txt(w - 38, y + 34, "t-py", "value", "end")}`;
     });
     return { w, h, svg: s };
   }
@@ -468,30 +793,25 @@ function vessel(o) {
     const n = o.items.length, w = n * 78 + 24;
     let s = "";
     o.items.forEach((v, i) => {
-      const cx = 12 + 39 + i * 78;
+      const cx = 51 + i * 78;
       if (o.hl === i) s += `<rect x="${cx - 34}" y="-78" width="68" height="50" rx="8" class="hl"/>`;
       s += emoji(cx, -36, 34, ingOf(v));
     });
     s += `<rect x="0" y="-30" width="${w}" height="30" rx="5" class="steel"/><rect x="-4" y="-34" width="${w + 8}" height="7" rx="3" class="steel-dark"/>`;
     o.items.forEach((v, i) => {
-      const cx = 12 + 39 + i * 78;
-      s += `<text x="${cx}" y="-10" text-anchor="middle"><tspan class="t-val">${esc(v.p)} g </tspan><tspan class="t-py">[${i}]</tspan></text>`;
+      s += `<text x="${51 + i * 78}" y="-10" text-anchor="middle"><tspan class="t-val">${esc(v.p)} g </tspan><tspan class="t-py">[${i}]</tspan></text>`;
     });
     return { w, h: 80, svg: s };
   }
-  // bowl
   const n = o.items.length, w = Math.max(150, n * 66 + 36);
   let s = "";
   o.items.forEach((v, i) => {
-    const cx = 18 + 33 + i * 66;
+    const cx = 51 + i * 66;
     if (o.hl === i) s += `<rect x="${cx - 30}" y="-90" width="60" height="80" rx="8" class="hl"/>`;
     s += emoji(cx, -52, 32, ingOf(v));
   });
   s += `<path d="M0,-70 C0,-16 ${w * .25},0 ${w / 2},0 C${w * .75},0 ${w},-16 ${w},-70 Z" class="glass"/>`;
-  o.items.forEach((v, i) => {
-    const cx = 18 + 33 + i * 66;
-    s += txt(cx, -34, "t-val", esc(v.p), "middle") + txt(cx, -19, "t-py", `[${i}]`, "middle");
-  });
+  o.items.forEach((v, i) => { s += txt(51 + i * 66, -34, "t-val", esc(v.p), "middle") + txt(51 + i * 66, -19, "t-py", `[${i}]`, "middle"); });
   s += `<rect x="-5" y="-74" width="${w + 10}" height="8" rx="4" class="glass"/><path d="M14,-58 Q16,-34 30,-22" class="glass-shine"/>`;
   return { w, h: 104, svg: s };
 }
@@ -512,74 +832,75 @@ function reachable(st) {
 function backdrop() {
   let s = `<defs>
     <pattern id="tiles" width="56" height="56" patternUnits="userSpaceOnUse">
-      <rect width="56" height="56" class="wall"/>
-      <path d="M0,0.75 H56 M0,28.75 H56 M0.75,0 V28 M28.75,28 V56" class="grout"/>
+      <rect width="56" height="56" class="wall"/><path d="M0,0.75 H56 M0,28.75 H56 M0.75,0 V28 M28.75,28 V56" class="grout"/>
     </pattern>
-    <marker id="tie" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="var(--twine)"/></marker>
+    <linearGradient id="brushed" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" style="stop-color: var(--steel-hi)"/><stop offset=".25" style="stop-color: var(--steel)"/><stop offset="1" style="stop-color: var(--steel-mid)"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".5" cy="0" r="1"><stop offset="0" style="stop-color: var(--glow)"/><stop offset="1" stop-color="rgba(255,170,60,0)"/></radialGradient>
+    <marker id="tie" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--twine)"/></marker>
   </defs>
   <rect width="${W}" height="${COUNTER}" fill="url(#tiles)"/>`;
+  // wire racks with posts
+  s += `<rect x="${SHELF_X0}" y="${SHELF_HIGH - 120}" width="8" height="${COUNTER - SHELF_HIGH + 120}" class="post"/>
+        <rect x="${SHELF_X1 - 8}" y="${SHELF_HIGH - 120}" width="8" height="${COUNTER - SHELF_HIGH + 120}" class="post"/>`;
   for (const y of [SHELF_HIGH, SHELF_LOW]) {
-    s += `<rect x="${SHELF_X0}" y="${y}" width="${SHELF_X1 - SHELF_X0}" height="${PLANK}" rx="2" class="plank"/>
-      <rect x="${SHELF_X0}" y="${y + PLANK - 4}" width="${SHELF_X1 - SHELF_X0}" height="4" class="plank-dark"/>
-      <path d="M${SHELF_X0 + 50},${y + PLANK} h14 l-14,26 z M${SHELF_X1 - 64},${y + PLANK} h14 v26 z" class="plank-dark"/>`;
+    s += `<rect x="${SHELF_X0}" y="${y}" width="${SHELF_X1 - SHELF_X0}" height="${PLANK}" rx="2" class="rack"/>`;
+    for (let wx = SHELF_X0 + 10; wx < SHELF_X1 - 4; wx += 12) s += `<line x1="${wx}" y1="${y + 2}" x2="${wx}" y2="${y + PLANK - 2}" class="wire"/>`;
   }
-  s += txt(SHELF_X0, 30, "t-head", "SHELVES") + txt(SHELF_X0, 47, "t-py", "objects in memory (the heap)");
-  const { x, y, w, h } = HATCH;
-  s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" class="frame"/>
-    <rect x="${x + 14}" y="${y + 14}" width="${w - 28}" height="${h - 28}" class="opening"/>
-    <line x1="${x + 20}" y1="${y + 34}" x2="${x + w - 20}" y2="${y + 34}" class="rail"/>
-    <rect x="${x - 12}" y="${y + h - 4}" width="${w + 24}" height="16" rx="3" class="plank"/>
-    ${emoji(x + w - 30, y + h - 6, 30, "🛎️")}
-    ${txt(x, y + h + 40, "t-k", "Serving hatch")}${txt(x, y + h + 57, "t-py", "print() output")}`;
-  const tx = SINK.x + SINK.w / 2;
-  s += `<rect x="${tx - 7}" y="${COUNTER - 72}" width="14" height="72" class="steel"/>
-    <path d="M${tx},${COUNTER - 66} q0,-26 -30,-26 h-16 v10" fill="none" stroke="var(--steel-dark)" stroke-width="12" stroke-linecap="round"/>
-    <rect x="${tx - 22}" y="${COUNTER - 42}" width="44" height="8" rx="4" class="steel-dark"/>`;
-  s += `<rect x="0" y="${COUNTER}" width="${W}" height="${COUNTER_END - COUNTER}" class="stone"/>
-    <rect x="0" y="${COUNTER - 5}" width="${W}" height="5" class="stone-edge"/>`;
-  for (let k = 0; k < 70; k++) {
-    const fx = (k * 173) % W, fy = COUNTER + 10 + ((k * 97) % (COUNTER_END - COUNTER - 20));
-    s += `<circle cx="${fx}" cy="${fy}" r="${1 + (k % 3)}" class="fleck"/>`;
-  }
-  s += `<rect x="0" y="${COUNTER_END}" width="${W}" height="${EDGE}" class="stone-edge"/>
-    <rect x="0" y="${COUNTER_END + EDGE}" width="${W}" height="${H - COUNTER_END - EDGE}" class="cab"/>`;
+  s += txt(SHELF_X0 + 18, 30, "t-head", "STEEL RACK") + txt(SHELF_X0 + 18, 47, "t-py", "objects in memory (the heap)");
+  // the pass with heat lamps
+  const { x, y, w, h } = PASS;
+  s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" class="pass-frame"/>
+    <rect x="${x + 12}" y="${y + 12}" width="${w - 24}" height="${h - 24}" class="opening"/>
+    <rect x="${x + 12}" y="${y + 12}" width="${w - 24}" height="${h - 24}" class="glow"/>
+    <line x1="${x + 18}" y1="${y + 30}" x2="${x + w - 18}" y2="${y + 30}" class="rail"/>
+    <rect x="${x - 14}" y="${y + h - 4}" width="${w + 28}" height="14" rx="3" class="steel"/>`;
+  for (const lx of [x + 70, x + w - 70]) s += `<line x1="${lx}" y1="0" x2="${lx}" y2="${y - 6}" class="rail"/><path d="M${lx - 26},${y + 8} L${lx - 12},${y - 8} H${lx + 12} L${lx + 26},${y + 8} Z" class="lamp"/>`;
+  s += `${emoji(x + w - 26, y + h - 6, 28, "🛎️")}${txt(x, y + h + 36, "t-k", "The pass")}${txt(x + 80, y + h + 36, "t-py", "print() output")}`;
+  // pre-rinse tap over the dish sink
+  const tx = SINK.x + SINK.w - 50;
+  s += `<rect x="${tx - 6}" y="${COUNTER - 84}" width="12" height="84" class="steel"/>
+    <path d="M${tx},${COUNTER - 80} q0,-26 -36,-26 q-28,0 -28,26 v18" fill="none" stroke="var(--steel-dark)" stroke-width="8" stroke-linecap="round"/>
+    <rect x="${tx - 76}" y="${COUNTER - 40}" width="24" height="12" rx="4" class="steel-dark"/>`;
+  // counter and under-counter doors
+  s += `<rect x="0" y="${COUNTER}" width="${W}" height="${COUNTER_END - COUNTER}" class="counter-top"/>`;
+  for (let ly = COUNTER + 18; ly < COUNTER_END; ly += 22) s += `<line x1="0" y1="${ly}" x2="${W}" y2="${ly}" class="brush"/>`;
+  s += `<rect x="0" y="${COUNTER_END}" width="${W}" height="${EDGE}" class="counter-edge"/>
+    <rect x="0" y="${COUNTER_END + EDGE}" width="${W}" height="${H - COUNTER_END - EDGE}" class="under"/>`;
   for (let k = 0; k < 6; k++) {
     const dx = 14 + k * 198;
-    s += `<rect x="${dx}" y="${COUNTER_END + EDGE + 10}" width="182" height="${H - COUNTER_END - EDGE}" rx="4" class="cab-door"/>
-      <rect x="${dx + (k % 2 ? 14 : 152)}" y="${COUNTER_END + EDGE + 24}" width="16" height="6" rx="3" class="handle"/>`;
+    s += `<rect x="${dx}" y="${COUNTER_END + EDGE + 10}" width="182" height="${H - COUNTER_END - EDGE}" rx="4" class="door"/>
+      <rect x="${dx + 40}" y="${COUNTER_END + EDGE + 22}" width="102" height="7" rx="3.5" class="handle"/>`;
   }
-  s += txt(BOARD_X0, COUNTER + 26, "t-head", "COUNTERTOP") + txt(BOARD_X0, COUNTER + 43, "t-py", "frames (the call stack)");
-  s += `<rect x="${SINK.x}" y="${SINK.y}" width="${SINK.w}" height="${SINK.h}" rx="18" class="basin"/>
+  s += txt(BOARD_X0, COUNTER + 26, "t-head", "PREP COUNTER") + txt(BOARD_X0, COUNTER + 43, "t-py", "frames (the call stack)");
+  s += `<rect x="${SINK.x}" y="${SINK.y}" width="${SINK.w}" height="${SINK.h}" rx="12" class="basin"/>
     <circle cx="${SINK.x + SINK.w / 2}" cy="${SINK.y + SINK.h - 18}" r="7" class="drain"/>
-    ${txt(SINK.x, SINK.y + SINK.h + 24, "t-k", "Sink")}${txt(SINK.x + 46, SINK.y + SINK.h + 24, "t-py", "garbage collection")}`;
+    ${txt(SINK.x, SINK.y + SINK.h + 24, "t-k", "Dish sink")}${txt(SINK.x + 82, SINK.y + SINK.h + 24, "t-py", "garbage collection")}`;
   return s;
 }
 
 function drawKitchen(st, prev) {
-  const live = reachable(st);
-  const ids = Object.keys(st.heap);
+  const live = reachable(st), ids = Object.keys(st.heap);
   const changedObj = id => prev && JSON.stringify(prev.heap[id]) !== JSON.stringify(st.heap[id]);
   let s = backdrop(), twine = "";
   const anchors = {};
 
-  /* shelf objects: lower shelf first, overflow to the upper one */
-  let x = SHELF_X0 + 14, shelfY = SHELF_LOW;
+  let x = SHELF_X0 + 22, shelfY = SHELF_LOW;
   const onShelf = ids.filter(id => live.has(id));
-  if (!onShelf.length) s += txt(SHELF_X0 + 20, SHELF_LOW - 20, "t-muted", "Nothing on the shelves yet");
+  if (!onShelf.length) s += txt(SHELF_X0 + 26, SHELF_LOW - 20, "t-muted", "The rack is empty");
   for (const id of onShelf) {
     const o = st.heap[id], v = vessel(o);
     const [kname, pyname] = KIND[o.t];
-    const capW = Math.max((o.k || kname).length * 8.6, pyname.length * 7.9) + 10;
-    const w = Math.max(v.w, capW);
-    if (x + w > SHELF_X1 - 10 && shelfY === SHELF_LOW && x > SHELF_X0 + 14) { x = SHELF_X0 + 14; shelfY = SHELF_HIGH; }
+    const w = Math.max(v.w, Math.max((o.k || kname).length * 8.6, pyname.length * 7.9) + 10);
+    if (x + w > SHELF_X1 - 14 && shelfY === SHELF_LOW && x > SHELF_X0 + 22) { x = SHELF_X0 + 22; shelfY = SHELF_HIGH; }
     const cx = x + w / 2, vx = cx - v.w / 2;
     if (changedObj(id)) s += `<rect x="${vx - 10}" y="${shelfY - v.h - 12}" width="${v.w + 20}" height="${v.h + 12}" rx="10" class="flash"/>`;
     s += `<g transform="translate(${vx},${shelfY})">${v.svg}</g>`;
     let cy = shelfY + PLANK + 18;
     if (o.vessel === "cup") {
       const tw = o.v.length * 7.9 + 16;
-      s += `<rect x="${cx - tw / 2}" y="${shelfY + 2}" width="${tw}" height="20" rx="3" class="paper"/>${txt(cx, shelfY + 17, "t-val", esc(o.v), "middle")}`;
+      s += `<rect x="${cx - tw / 2}" y="${shelfY + 1}" width="${tw}" height="20" rx="3" class="paper"/>${txt(cx, shelfY + 16, "t-val", esc(o.v), "middle")}`;
       cy += 12;
     }
     s += txt(cx, cy, "t-k", o.k || kname, "middle") + txt(cx, cy + 16, "t-py", pyname, "middle");
@@ -588,14 +909,11 @@ function drawKitchen(st, prev) {
     x += w + 34;
   }
 
-  /* sink: objects nothing refers to any more */
   ids.filter(id => !live.has(id)).forEach((id, k) => {
     const v = vessel(st.heap[id]);
-    const sc = Math.min(.55, 150 / v.w);
-    s += `<g transform="translate(${SINK.x + 40 + k * 90},${SINK.y + SINK.h - 14}) rotate(-12) scale(${sc})" opacity=".85">${v.svg}</g>`;
+    s += `<g transform="translate(${SINK.x + 30 + k * 90},${SINK.y + SINK.h - 14}) rotate(-12) scale(${Math.min(.55, 150 / v.w)})" opacity=".85">${v.svg}</g>`;
   });
 
-  /* cutting boards = frames */
   const multi = st.frames.length > 1;
   const boards = st.frames.map((f, fi) => {
     const rows = Object.entries(f.vars);
@@ -603,23 +921,19 @@ function drawKitchen(st, prev) {
     const sub = fi === 0 ? "global frame" : `frame: ${f.name}()`;
     let w = Math.max(210, title.length * 8.6 + (multi ? 96 : 30), sub.length * 7.9 + 30);
     rows.forEach(([name, v]) => {
-      const left = name === "$ret" ? 150 : Math.max(name.length * 10.5 + 26, 76);
-      const right = v.r ? 24 : chipW(v);
-      w = Math.max(w, 16 + left + 22 + right + 16);
+      const left = name.startsWith("$") ? 150 : Math.max(name.length * 10.5 + 26, 76);
+      w = Math.max(w, 16 + left + 22 + (v.r ? 24 : chipW(v)) + 16);
     });
-    const h = 62 + Math.max(1, rows.length) * 50;
-    return { f, fi, rows, title, sub, w, h };
+    return { f, fi, rows, title, sub, w, h: 62 + Math.max(1, rows.length) * 50 };
   });
   const total = boards.reduce((a, b) => a + b.w + 34, -34);
-  const maxH = Math.max(...boards.map(b => b.h));
-  const sc = Math.min(1, (BOARD_X1 - BOARD_X0) / total, BOARD_MAXH / maxH);
+  const sc = Math.min(1, (BOARD_X1 - BOARD_X0) / total, BOARD_MAXH / Math.max(...boards.map(b => b.h)));
   const T = (px, py) => [BOARD_X0 + (px - BOARD_X0) * sc, BOARD_Y + (py - BOARD_Y) * sc];
   let bs = "", bx = BOARD_X0;
   const pframes = prev ? prev.frames : [];
   for (const b of boards) {
-    const isActive = b.fi === st.frames.length - 1;
+    const isActive = b.fi === st.frames.length - 1, by = BOARD_Y;
     const pf = pframes[b.fi] && pframes[b.fi].name === b.f.name ? pframes[b.fi] : null;
-    const by = BOARD_Y;
     bs += `<g class="${multi && !isActive ? "waiting" : ""}">
       <rect x="${bx + b.w - 6}" y="${by + b.h / 2 - 16}" width="28" height="32" rx="12" class="board"/>
       <circle cx="${bx + b.w + 10}" cy="${by + b.h / 2}" r="5" class="hole"/>
@@ -628,7 +942,7 @@ function drawKitchen(st, prev) {
       ${multi && isActive ? `<rect x="${bx - 4}" y="${by - 4}" width="${b.w + 8}" height="${b.h + 8}" rx="19" class="ring"/>` : ""}
       ${txt(bx + 16, by + 24, "t-k-board", b.title)}${txt(bx + 16, by + 41, "t-py", esc(b.sub))}
       ${multi ? txt(bx + b.w - 16, by + 24, "t-k-board", isActive ? "cooking" : "waiting", "end") + txt(bx + b.w - 16, by + 41, "t-py", isActive ? "running" : "paused", "end") : ""}`;
-    if (!b.rows.length) bs += txt(bx + 16, by + 82, "t-k-board", "No tape yet", "start", 'opacity=".6" font-style="italic"');
+    if (!b.rows.length) bs += txt(bx + 16, by + 82, "t-k-board", "No labels yet", "start", 'opacity=".6" font-style="italic"');
     b.rows.forEach(([name, v], ri) => {
       const ry = by + 56 + ri * 50;
       const changed = prev && (!pf || JSON.stringify(pf.vars[name]) !== JSON.stringify(v));
@@ -636,51 +950,49 @@ function drawKitchen(st, prev) {
       if (name === "$ret") {
         bs += `<ellipse cx="${bx + 38}" cy="${ry + 20}" rx="24" ry="10" class="china"/><ellipse cx="${bx + 38}" cy="${ry + 19}" rx="15" ry="5.5" fill="none" stroke="var(--china-edge)" stroke-width="1.5"/>
           ${txt(bx + 70, ry + 16, "t-k-board", "Plate")}${txt(bx + 70, ry + 33, "t-py", "return value")}`;
+      } else if (name === "$err") {
+        bs += `<rect x="${bx + 10}" y="${ry - 2}" width="${b.w - 20}" height="44" rx="8" class="alarm"/>${emoji(bx + 32, ry + 28, 22, "🚨")}
+          ${txt(bx + 52, ry + 16, "t-white", "Alarm!")}${txt(bx + 52, ry + 33, "t-white", "exception raised", "start", 'font-size="11"')}
+          ${txt(bx + b.w - 24, ry + 26, "t-white", esc(v.p), "end")}`;
+        return;
       } else {
-        const tw = name.length * 10.5 + 22;
-        bs += `<g transform="rotate(-1.5 ${bx + 16} ${ry})"><rect x="${bx + 16}" y="${ry}" width="${tw}" height="28" class="tape"/>
+        bs += `<g transform="rotate(-1.5 ${bx + 16} ${ry})"><rect x="${bx + 16}" y="${ry}" width="${name.length * 10.5 + 22}" height="28" class="tape"/>
           ${txt(bx + 27, ry + 21, "t-hand", esc(name))}</g>${txt(bx + 18, ry + 42, "t-py", "variable")}`;
       }
       const xr = bx + b.w - 16, cy = ry + 16;
       if (v.r) {
         bs += `<circle cx="${xr - 9}" cy="${cy}" r="8" class="knot"/>`;
         if (anchors[v.r]) {
-          const [kx, ky] = T(xr - 9, cy), [ax, ay] = anchors[v.r];
-          const dy = Math.max(40, (ky - ay) / 2);
+          const [kx, ky] = T(xr - 9, cy), [ax, ay] = anchors[v.r], dy = Math.max(40, (ky - ay) / 2);
           twine += `<path d="M${kx},${ky} C${kx},${ky - dy} ${ax},${ay + dy} ${ax},${ay + 3}" class="twine${changed ? " new" : ""}" marker-end="url(#tie)"/>`;
         }
-      } else {
-        bs += chipSVG(xr, cy, v);
-      }
+      } else bs += chipSVG(xr, cy, v);
     });
     bs += `</g>`;
     bx += b.w + 34;
   }
   s += `<g transform="translate(${BOARD_X0} ${BOARD_Y}) scale(${sc}) translate(${-BOARD_X0} ${-BOARD_Y})">${bs}</g>`;
 
-  /* order tickets in the hatch */
-  const { x: hx, y: hy, w: hw, h: hh } = HATCH;
-  if (!st.out.length) s += txt(hx + hw / 2, hy + hh / 2 + 10, "t-open", "No orders out yet", "middle");
-  let ty = hy + 42;
+  const { x: hx, y: hy, w: hw, h: hh } = PASS;
+  if (!st.out.length) s += txt(hx + hw / 2, hy + hh / 2 + 10, "t-open", "Nothing at the pass yet", "middle");
+  let ty = hy + 38;
   st.out.forEach((line, n) => {
     const chunks = line.match(/.{1,26}(\s|$)|.{1,26}/g).map(c => c.trimEnd());
-    const th = 30 + chunks.length * 17;
-    const fresh = prev && n >= prev.out.length;
+    const th = 30 + chunks.length * 17, fresh = prev && n >= prev.out.length;
     s += `${fresh ? `<rect x="${hx + 22}" y="${ty - 4}" width="${hw - 44}" height="${th + 8}" rx="6" class="flash"/>` : ""}
       <rect x="${hx + 28}" y="${ty}" width="${hw - 56}" height="${th}" class="paper" transform="rotate(${n % 2 ? 1.2 : -1.2} ${hx + hw / 2} ${ty})"/>
       <rect x="${hx + hw / 2 - 12}" y="${ty - 8}" width="24" height="12" rx="2" class="steel"/>
-      ${txt(hx + 40, ty + 18, "t-tiny", `ORDER ${n + 1}`)}
+      ${txt(hx + 40, ty + 18, "t-tiny", `SERVED · LINE ${n + 1}`)}
       ${chunks.map((c, k) => txt(hx + 40, ty + 36 + k * 17, "t-ticket", esc(c))).join("")}`;
     ty += th + 14;
   });
-
   return s + twine;
 }
 
-/* ------------------------------------------------------------------ page */
+/* ------------------------------------------------------------------ game */
 
 function highlight(src) {
-  const re = /("[^"]*"|'[^']*')|\b(def|return|if|for|in|while|else|elif)\b|\b(\d+)\b|\b(print|len|range)\b/g;
+  const re = /("[^"]*"|'[^']*')|\b(def|return|if|for|in|while|else|elif|try|except)\b|\b(\d+)\b|\b(print|len|range)\b/g;
   let out = "", last = 0, m;
   while ((m = re.exec(src))) {
     out += esc(src.slice(last, m.index));
@@ -690,59 +1002,120 @@ function highlight(src) {
   return out + esc(src.slice(last));
 }
 
-let L = LESSONS[0], i = 0, timer = null;
+const load = () => { try { return JSON.parse(localStorage.getItem("pk-best") || "{}"); } catch (e) { return {}; } };
+let best = load();
+const save = () => { try { localStorage.setItem("pk-best", JSON.stringify(best)); } catch (e) {} };
+
+let D = null, i = 0, mistakes = 0, order = [], wrongPicked = new Set(), hinted = false, orderNo = 40;
+const starsFor = m => m === 0 ? 3 : m <= 2 ? 2 : 1;
+const starRow = n => "★★★".split("").map((c, k) => `<span class="${k < n ? "" : "off"}">⭐</span>`).join("");
+
+function shuffle(n) { const a = [...Array(n).keys()]; for (let k = n - 1; k > 0; k--) { const j = Math.floor(Math.random() * (k + 1)); [a[k], a[j]] = [a[j], a[k]]; } return a; }
+
+function enterStep() {
+  wrongPicked = new Set(); hinted = false;
+  const next = D.steps[i + 1];
+  order = next ? shuffle(next.wrong.length + 1) : [];
+}
+
+function printTicket() {
+  orderNo += 1;
+  $("#order-no").textContent = `#${orderNo}`;
+  const lvl = "●".repeat(D.tier) + "○".repeat(5 - D.tier);
+  $("#ticket").innerHTML = `<div class="th"><span>Order #${orderNo}</span><span>Table ${1 + (orderNo % 9)}</span><span>${lvl}</span></div>
+    <div class="dish">${D.pic} ${esc(D.name)}</div>
+    <ol id="lines">${D.code.map((src, n) =>
+      `<li class="printing" style="animation-delay:${n * 0.14}s"><span class="ln">${n + 1}</span><span>${highlight(src) || " "}</span></li>`).join("")}</ol>
+    <div class="foot"><span>${esc(D.topics)}</span><span>${D.steps.length - 1} steps</span></div>`;
+}
 
 function render() {
-  const step = L.steps[i], prev = i > 0 ? L.steps[i - 1].st : null;
-  $("#ltitle").textContent = L.title;
-  $("#lblurb").textContent = L.blurb;
-  $("#code").innerHTML = L.code.map((src, n) =>
-    `<li class="${step.line === n + 1 ? "cur" : ""}"><span class="ln">${n + 1}</span><span>${highlight(src) || " "}</span></li>`).join("");
-  $("#nk").innerHTML = fmt(step.k);
-  $("#npy").innerHTML = fmt(step.py);
-  $("#kitchen").innerHTML = drawKitchen(step.st, prev);
+  const cur = D.steps[i], next = D.steps[i + 1], prev = i > 0 ? D.steps[i - 1].st : null;
+  document.querySelectorAll("#lines li").forEach((li, n) => li.classList.toggle("next", !!next && next.line === n + 1));
+  $("#kitchen").innerHTML = drawKitchen(cur.st, prev);
 
-  const last = L.steps.length - 1;
-  $("#count").textContent = `Step ${i} of ${last}`;
-  $("#scrub").max = last; $("#scrub").value = i;
-  $("#b-first").disabled = $("#b-prev").disabled = i === 0;
-  $("#b-next").disabled = i === last;
-  $("#b-next").textContent = i === 0 ? "Start cooking" : "Next step";
-  $("#b-play").textContent = timer ? "Pause" : "Play";
-  document.querySelectorAll("#lessons button").forEach(b => b.setAttribute("aria-pressed", b.dataset.id === L.id));
+  const last = i > 0 ? `<div class="fb ok"><span class="lbl">✓ Right. Here's what happened</span><p>${code(cur.py)}</p></div>
+      <div class="fb k"><span class="lbl">In the kitchen</span><p>${fmt(cur.k)}</p></div>` : "";
+
+  if (!next) {
+    const stars = starsFor(mistakes);
+    $("#move").innerHTML = `<div class="done">
+      <h2>Order up! ${D.pic} ${esc(D.name)} is served</h2>
+      <div class="stars" aria-label="${stars} of 3 stars">${starRow(stars)}</div>
+      <p>${mistakes === 0 ? "A perfect service, with no wrong steps." : `${mistakes} wrong ${mistakes === 1 ? "step" : "steps"} along the way.`} You practised <b>${esc(D.topics)}</b>.</p>
+      <div class="row"><button class="primary" type="button" id="b-book">Choose the next dish</button><button type="button" id="b-again">Cook it again</button></div>
+    </div>${last}`;
+    $("#b-book").onclick = openBook;
+    $("#b-again").onclick = () => startDish(D.id);
+    return;
+  }
+
+  const opts = [{ k: next.right[0], p: next.right[1], ok: true }, ...next.wrong.map(([k, p, why]) => ({ k, p, why }))];
+  const lineSrc = D.code[next.line - 1].trim();
+  $("#move").innerHTML = `<div class="q"><div>${term(i === 0 ? "Your first move" : "Your next move", "which step does Python take?")}
+      <h2 style="margin-top:6px">Line ${next.line}: <code style="font: 600 15px var(--mono)">${esc(lineSrc)}</code></h2></div>
+      <div class="stat">step ${i + 1}/${D.steps.length - 1}<br>${mistakes} wrong</div></div>
+    <div class="opts">${order.map(k => {
+      const o = opts[k], wrong = wrongPicked.has(k);
+      return `<button type="button" class="opt ${wrong ? "wrong" : ""} ${hinted && o.ok ? "hint" : ""}" data-k="${k}" ${wrong ? "disabled" : ""}>
+        <span>${code(o.k)}</span><span class="op">${esc(o.p)}</span>${wrong ? `<span class="why">✗ ${code(o.why)}</span>` : ""}</button>`;
+    }).join("")}</div>
+    <div class="tools"><button type="button" id="b-hint">Show me the right step</button><button type="button" id="b-restart">Restart dish</button></div>
+    ${last || `<div class="fb k" style="margin-top:12px"><span class="lbl">In the kitchen</span><p>${fmt("The printer just printed your order [ticket|code]. Read the highlighted line and pick what the kitchen does first.")}</p></div>`}`;
+
+  $("#move").querySelectorAll(".opt").forEach(btn => btn.onclick = () => {
+    const k = +btn.dataset.k;
+    if (opts[k].ok) { i += 1; enterStep(); render(); return; }
+    if (!wrongPicked.has(k)) { wrongPicked.add(k); mistakes += 1; }
+    render();
+    const again = $(`#move .opt[data-k="${k}"]`);
+    if (again) again.classList.add("shake");
+  });
+  $("#b-hint").onclick = () => { if (!hinted) { hinted = true; mistakes += 1; } render(); };
+  $("#b-restart").onclick = () => startDish(D.id);
 }
 
-function go(n) { i = Math.max(0, Math.min(L.steps.length - 1, n)); render(); }
-function stop() { clearInterval(timer); timer = null; }
-function pick(id) {
-  stop();
-  L = LESSONS.find(l => l.id === id) || LESSONS[0];
-  i = 0;
-  try { localStorage.setItem("pk-lesson", L.id); } catch (e) {}
+function startDish(id) {
+  D = DISHES.find(d => d.id === id) || DISHES[0];
+  i = 0; mistakes = 0;
+  try { localStorage.setItem("pk-dish", D.id); } catch (e) {}
+  printTicket();
+  enterStep();
   render();
+  closeBook();
 }
 
-$("#recipe-head").innerHTML = term("The recipe", "your code");
-$("#lessons").innerHTML = LESSONS.map((l, n) =>
-  `<button type="button" data-id="${l.id}" aria-pressed="false"><span class="n">${n + 1}</span>${term(esc(l.title), esc(l.topic))}</button>`).join("");
-$("#lessons").addEventListener("click", e => { const b = e.target.closest("button"); if (b) pick(b.dataset.id); });
-$("#b-first").onclick = () => { stop(); go(0); };
-$("#b-prev").onclick = () => { stop(); go(i - 1); };
-$("#b-next").onclick = () => { stop(); go(i + 1); };
-$("#b-play").onclick = () => {
-  if (timer) { stop(); render(); return; }
-  if (i === L.steps.length - 1) i = 0;
-  timer = setInterval(() => { if (i >= L.steps.length - 1) { stop(); render(); } else go(i + 1); }, 2400);
-  render();
+/* rating is recorded when the last step is reached */
+const _render = render;
+render = function () {
+  _render();
+  if (D && !D.steps[i + 1]) {
+    const stars = starsFor(mistakes);
+    if (!best[D.id] || best[D.id] < stars) { best[D.id] = stars; save(); }
+  }
 };
-$("#scrub").oninput = e => { stop(); go(+e.target.value); };
-document.addEventListener("keydown", e => {
-  if (e.target.tagName === "INPUT") return;
-  if (e.key === "ArrowRight") { stop(); go(i + 1); }
-  if (e.key === "ArrowLeft") { stop(); go(i - 1); }
-});
 
-let start = location.hash.slice(1);
-if (!LESSONS.some(l => l.id === start)) { try { start = localStorage.getItem("pk-lesson") || ""; } catch (e) { start = ""; } }
-pick(start);
+function renderBook() {
+  const tierHTML = ([lvl, name, py]) => `<div class="tier"><h3><span class="lvl">${"●".repeat(lvl)}${"○".repeat(5 - lvl)}</span>${term(name, py)}</h3>
+    ${DISHES.filter(d => d.tier === lvl).map(d => `<button type="button" class="dish-btn" data-id="${d.id}">
+      <span class="pic">${d.pic}</span><span class="info"><span class="name">${esc(d.name)}</span><span class="topics">${esc(d.topics)}</span></span>
+      <span class="best">${best[d.id] ? "⭐".repeat(best[d.id]) : "Not cooked yet"}</span></button>`).join("")}</div>`;
+  $("#pages").innerHTML = `<div class="page">${TIERS.slice(0, 3).map(tierHTML).join("")}</div><div class="page">${TIERS.slice(3).map(tierHTML).join("")}</div>`;
+  $("#pages").querySelectorAll(".dish-btn").forEach(b => b.onclick = () => startDish(b.dataset.id));
+}
+function openBook() { renderBook(); $("#book").hidden = false; $("#close-book").hidden = !D; }
+function closeBook() { $("#book").hidden = true; }
+
+$("#open-book").onclick = openBook;
+$("#close-book").onclick = closeBook;
+$("#book").addEventListener("click", e => { if (e.target.id === "book" && D) closeBook(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && D) closeBook(); });
+
+let first = location.hash.slice(1);
+if (DISHES.some(d => d.id === first)) startDish(first);
+else {
+  let last = ""; try { last = localStorage.getItem("pk-dish") || ""; } catch (e) {}
+  startDish(DISHES.some(d => d.id === last) ? last : "toast");
+  openBook();
+}
 </script>
