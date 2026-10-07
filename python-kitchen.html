@@ -108,6 +108,15 @@ h1 { font: 800 clamp(26px, 4vw, 38px)/1.05 var(--display); margin: 0; }
 @media (prefers-reduced-motion: reduce) { .ticket li.printing { animation: none; } }
 .ticket .kw { color: #7b3fb5; font-weight: 600; } .ticket .st { color: #2c7a4b; } .ticket .nu { color: #b4521a; } .ticket .bi { color: #2350c4; }
 .printer, .ticket { min-width: 0; }
+.needs { margin: 0 0 8px; border-bottom: 1.5px dashed #c9c2ad; padding-bottom: 8px; font-family: var(--body); }
+.needs summary { cursor: pointer; font: 600 11px/1.4 var(--body); letter-spacing: .08em; text-transform: uppercase; color: #6b665a; }
+.needs summary span { letter-spacing: 0; }
+.needs ul { list-style: none; margin: 6px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(138px, 1fr)); gap: 6px 10px; }
+.ticket .needs li { display: flex; gap: 6px; align-items: flex-start; min-width: 0; white-space: normal; border-left: none; padding: 0; }
+.needs .ne { font-size: 16px; line-height: 1.2; flex: none; }
+.needs .term { min-width: 0; }
+.needs .tk { font: 600 12px/1.25 var(--body); color: #23211b; }
+.needs .tp { font: 500 10.5px/1.3 var(--mono); color: #2350c4; overflow-wrap: anywhere; }
 .ticket .src { flex: 1 1 auto; min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
 .peek { flex: none; margin-left: 8px; width: 26px; height: 22px; padding: 0; border-radius: 6px; border: 1px solid #d8d1bd; background: #f6f1e3;
   cursor: pointer; font-size: 12px; line-height: 1; align-self: center; }
@@ -528,6 +537,36 @@ const EXTRA = {
     ANS("Throw the oven away too", "the object is deleted", "`oven` still labels it, so it stays.", "del oven"),
     ANS("Send \"Oven at oven.temp degrees\"", "print the name as text", "With quotes it's just the word. Without them, the value (200) is printed.", 'print("Oven at", "oven.temp", "degrees")'),
   ],
+};
+
+/* Everything each recipe uses: food, containers, tools and fixtures, each as [emoji, kitchen name, Python meaning]. */
+const BASICS = [["🏷️", "Masking tape", "variables"], ["🧵", "Twine", "references"], ["🪵", "Main board", "global frame"], ["🛎️", "The pass", "print() output"]];
+const NEEDS = {
+  toast:    [["🍞", "Bread slices", "the int 2"], ["🧺", "Bread basket", "int object"]],
+  sugar:    [["⬜", "Sugar cubes", "the ints 5 and 6"], ["🫙", "Sealed jars", "immutable int objects"], ["➕", "One extra cube", "+ 1"]],
+  pizza:    [["🍕", "Margherita pizza", "str 'margherita'"], ["📦", "Pizza box", "str object"], ["🗣️", "Order words \"One\" and \"pizza\"", "string literals"]],
+  lemonade: [["🍋", "Lemons", "the int 3"], ["📦", "Lemon crate", "int object"], ["✖️", "Two glasses per lemon", "* 2"],
+             ["🥤", "Glasses on a tray", "the int 6"], ["🔤", "Word strips \"lemon\" and \"ade\"", "joining strings with +"], ["🫗", "Pitcher", "str object 'lemonade'"]],
+  egg:      [["⏲️", "Timer", "minutes = 8"], ["🥚", "Egg", "str 'hard'"], ["❓", "Doneness check", "> comparison"], ["🔀", "Hard or soft path", "if / else"]],
+  pancakes: [["🥣", "Mixing bowl", "list"], ["🌾", "Flour", "'flour'"], ["🥚", "Egg", "'egg'"], ["🥛", "Milk", "append()"], ["🔢", "Counting the bowl", "len()"]],
+  cookies:  [["⚖️", "Kitchen scale", "weight variable"], ["🍽️", "Prep tray", "list"], ["🌾", "Flour", "200"], ["🧈", "Butter", "150"], ["🍫", "Chocolate", "50"],
+             ["🔁", "Weigh one item at a time", "for loop"], ["➕", "Add to the scale", "+="], ["🚰", "Dish sink", "garbage collection"]],
+  soup:     [["🍲", "Soup pot", "the dish"], ["🌡️", "Thermometer", "temp variable"], ["🔥", "Burner, +40° a pass", "temp + 40"],
+             ["❓", "Below-100° check", "< comparison"], ["🔁", "Keep heating", "while loop"]],
+  tea:      [["📇", "Recipe card", "function make_tea"], ["🌿", "Mint", "argument 'mint'"], ["🪴", "Herb pot", "str object"], ["🔪", "Cutting board", "the function's frame"],
+             ["🍵", "Teacup", "str 'mint tea'"], ["🍽️", "Plate", "return value"], ["🚰", "Dish sink", "garbage collection"]],
+  bowls:    [["🥣", "Sweet batter bowl", "list"], ["🌀", "Mixer", "second name: alias"], ["🥣", "Savory batter bowl", ".copy()"],
+             ["🥚", "Egg", "'egg'"], ["🌾", "Flour", "'flour'"], ["🥛", "Milk", "append()"], ["🧂", "Salt", "append()"]],
+  spices:   [["🗄️", "Spice cabinet", "dict"], ["🧂", "Salt drawer", "key 'salt'"], ["🌶️", "Pepper drawer", "key 'pepper'"],
+             ["🥄", "Spoons", "values"], ["🚶", "Walk along the drawers", ".items() loop"]],
+  sandwich: [["🍽️", "Plate", "list"], ["🍞", "Bread slices", "'bread' at [0] and [3]"], ["🍖", "Ham", "'ham' at [1]"], ["🧀", "Cheese", "'cheese' at [2]"],
+             ["🍅", "Tomato", "replaces [1]"], ["🫳", "Lifting off the top slice", "pop()"]],
+  cake:     [["📇", "Cake recipe card", "recursive function"], ["🔪", "A cutting board per layer", "frames on the call stack"], ["❓", "One-layer check", "base case"],
+             ["🍰", "Sponge base", "'base'"], ["🍦", "Cream layers", "'+layer'"], ["🍽️", "Plates", "return values"]],
+  milk:     [["☕", "Coffee order", "the dish"], ["🧊", "Fridge", "dict"], ["🥚", "Egg drawer", "key 'egg'"], ["🥛", "Milk drawer (missing!)", "absent key 'milk'"],
+             ["🧤", "Oven mitts", "try"], ["🚨", "Alarm", "KeyError"], ["📋", "Backup plan", "except"]],
+  oven:     [["📘", "Oven blueprint", "class Oven"], ["🔧", "Setup instructions", "__init__"], ["♨️", "Oven", "instance (object)"],
+             ["🎛️", "Temperature dial", "attribute self.temp"], ["🔥", "Heat button", "method heat()"], ["🔪", "Cutting boards", "method frames"]],
 };
 
 const DISHES = [
@@ -1472,6 +1511,10 @@ function printTicket() {
   const lvl = "●".repeat(D.tier) + "○".repeat(5 - D.tier);
   $("#ticket").innerHTML = `<div class="th"><span>Order #${orderNo}</span><span>Table ${1 + (orderNo % 9)}</span><span>${lvl}</span></div>
     <div class="dish">${D.pic} ${esc(D.name)}</div>
+    ${(() => { const need = [...(NEEDS[D.id] || []), ...BASICS]; return `<details class="needs" open>
+      <summary>You'll need <span>(${need.length})</span></summary>
+      <ul>${need.map(([e, k, py]) => `<li><span class="ne">${e}</span><span class="term"><span class="tk">${esc(k)}</span><span class="tp">${esc(py)}</span></span></li>`).join("")}</ul>
+    </details>`; })()}
     <ol id="lines">${D.code.map((src, n) =>
       `<li class="cl printing" data-n="${n + 1}" style="animation-delay:${n * 0.14}s"><span class="ln">${n + 1}</span><span class="src">${highlight(src) || " "}</span>${src.trim()
         ? `<button type="button" class="peek" data-n="${n + 1}" aria-expanded="false" aria-label="Break down line ${n + 1} word by word" title="Break this line down">🔍</button>` : ""}</li>`).join("")}</ol>
