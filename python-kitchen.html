@@ -204,6 +204,8 @@ button:focus-visible { outline: 3px solid var(--hl-edge); outline-offset: 2px; }
 .waiting { opacity: .62; }
 .glass { fill: var(--glass); stroke: var(--glass-edge); stroke-width: 2.5; }
 .glass-shine { fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; opacity: .55; }
+.terracotta { fill: #c7683f; stroke: #8f4426; stroke-width: 2; } .terracotta-rim { fill: #b05a35; stroke: #8f4426; stroke-width: 2; }
+.lemonade { fill: #f3d65b; opacity: .85; }
 .lid { fill: var(--lid); } .lid-dark { fill: var(--lid-dark); }
 .paper { fill: var(--paper); stroke: var(--paper-edge); stroke-width: 1.2; }
 .china { fill: var(--china); stroke: var(--china-edge); stroke-width: 2; } .china-line { fill: none; stroke: var(--china-edge); stroke-width: 7; stroke-linecap: round; }
@@ -337,13 +339,13 @@ const DISHES = [
   /* ---------- ★ starters ---------- */
   dish({ id: "toast", tier: 1, pic: "🍞", name: "Buttered toast", topics: "variables · print()",
     code: ["slices = 2", "print(slices)"] }, step => {
-    step(1, ["Put 2 slices of bread in a jar and tie a `slices` label to it", "create the int 2, bind the name slices to it"],
+    step(1, ["Put 2 slices of bread in a bread basket and tie a `slices` label to it", "create the int 2, bind the name slices to it"],
       [["Wait: nothing happens until you print", "assignment is delayed", "Every line runs in order. `=` makes the value and attaches the name right away. Only a comment (`#`) is skipped.", "# slices = 2"],
-       ["Put out 2 separate empty jars", "create two objects", "`2` is one int object whose value is 2, not two containers.", "slices = [[], []]"]],
-      "The bread goes on the rack in a [jar|object] and a [label|variable] called `slices` is tied to it with [twine|a reference].",
+       ["Put out 2 separate empty baskets", "create two objects", "`2` is one int object whose value is 2, not two containers.", "slices = [[], []]"]],
+      "The bread goes on the rack in a [basket|object] and a [label|variable] called `slices` is tied to it with [twine|a reference].",
       "`slices = 2` creates the int object 2 and binds the name `slices` to it.",
-      st => { st.heap.o1 = { t: "int", v: "2", fill: "🍞", count: 2 }; g(st).slices = R("o1"); });
-    step(2, ["Follow the label to the jar and send \"2\" to the pass", "print looks up slices and outputs 2"],
+      st => { st.heap.o1 = { t: "int", v: "2", fill: "🍞", count: 2, vessel: "basket", k: "Bread basket" }; g(st).slices = R("o1"); });
+    step(2, ["Follow the label to the basket and send \"2\" to the pass", "print looks up slices and outputs 2"],
       [["Send the word \"slices\" to the pass", "prints the text slices", "That needs quotes. Without quotes, `slices` is a name, and `print` shows what it refers to.", 'print("slices")'],
        ["Throw the bread away after serving", "print deletes the variable", "`print` only reads. Removing a name takes a separate `del`.", "print(slices); del slices"]],
       "Follow the [twine|reference] to the bread and call out the amount at [the pass|output].",
@@ -382,28 +384,28 @@ const DISHES = [
   /* ---------- ★★ easy ---------- */
   dish({ id: "lemonade", tier: 2, pic: "🍋", name: "Lemonade", topics: "arithmetic · joining strings",
     code: ["lemons = 3", "cups = lemons * 2", 'drink = "lemon" + "ade"', "print(cups, drink)"] }, step => {
-    step(1, ["Put 3 lemons in a jar labeled `lemons`", "create the int 3, bind lemons"],
-      [["Put 1 lemon in each of 3 jars", "create three objects", "`3` is a single int object, not a collection of three things.", "lemons = [1, 1, 1]"],
+    step(1, ["Put 3 lemons in a crate labeled `lemons`", "create the int 3, bind lemons"],
+      [["Put 1 lemon in each of 3 crates", "create three objects", "`3` is a single int object, not a collection of three things.", "lemons = [1, 1, 1]"],
        ["Squeeze the lemons first", "run line 2 early", "Lines run top to bottom. Running line 2 first fails with NameError because `lemons` doesn't exist yet.", "cups = lemons * 2"]],
-      "The lemons go in a [jar|int object] with a `lemons` [label|variable].",
+      "The lemons go in a [crate|int object] with a `lemons` [label|variable].",
       "`lemons = 3` creates the int 3 and binds `lemons` to it.",
-      st => { st.heap.o1 = { t: "int", v: "3", fill: "🍋", count: 3 }; g(st).lemons = R("o1"); });
-    step(2, ["Count the lemons, double it, and put 6 cups in a new jar labeled `cups`", "evaluate lemons * 2 = 6, bind cups"],
-      [["Double the lemons inside the `lemons` jar", "lemons becomes 6", "The right side is only read. The ticket assigns to `cups`, so `lemons` stays 3.", "lemons = lemons * 2"],
-       ["Tie the `cups` label to the lemon jar", "cups refers to lemons", "`lemons * 2` computes a new value, 6. Without `* 2`, both names would share the 3.", "cups = lemons"]],
-      "Read the lemon jar, do the sum, and fill a [new jar|new object] with the result.",
+      st => { st.heap.o1 = { t: "int", v: "3", fill: "🍋", count: 3, vessel: "crate", k: "Lemon crate" }; g(st).lemons = R("o1"); });
+    step(2, ["Count the lemons, double it, and set out 6 glasses on a new tray labeled `cups`", "evaluate lemons * 2 = 6, bind cups"],
+      [["Double the lemons in the `lemons` crate", "lemons becomes 6", "The right side is only read. The ticket assigns to `cups`, so `lemons` stays 3.", "lemons = lemons * 2"],
+       ["Tie the `cups` label to the lemon crate", "cups refers to lemons", "`lemons * 2` computes a new value, 6. Without `* 2`, both names would share the 3.", "cups = lemons"]],
+      "Read the lemon crate, do the sum, and set out a [new tray|new object] with the result.",
       "Python evaluates `lemons * 2` to 6, creates that int, and binds `cups` to it.",
-      st => { st.heap.o2 = { t: "int", v: "6", fill: "🥤", count: 6 }; g(st).cups = R("o2"); });
-    step(3, ["Join the words \"lemon\" and \"ade\" into one new jar: \"lemonade\"", "concatenate two strings into 'lemonade'"],
+      st => { st.heap.o2 = { t: "int", v: "6", fill: "🥤", count: 6, vessel: "glasses", k: "Tray of glasses" }; g(st).cups = R("o2"); });
+    step(3, ["Join the words \"lemon\" and \"ade\" and pour one new pitcher: \"lemonade\"", "concatenate two strings into 'lemonade'"],
       [["Join them with a space: \"lemon ade\"", "+ adds a space", "`+` joins strings exactly as they are. A space only appears if you add one.", 'drink = "lemon" + " " + "ade"'],
-       ["Keep \"lemon\" and \"ade\" in two jars", "make a list of two strings", "`+` builds one new string; square brackets would make a list.", 'drink = ["lemon", "ade"]']],
-      "Stick the two words together into a [new sealed jar|new str object] labeled `drink`.",
+       ["Keep \"lemon\" and \"ade\" in two pitchers", "make a list of two strings", "`+` builds one new string; square brackets would make a list.", 'drink = ["lemon", "ade"]']],
+      "Stick the two words together into a [new pitcher|new str object] labeled `drink`.",
       "`\"lemon\" + \"ade\"` concatenates into the new string `'lemonade'`, bound to `drink`.",
-      st => { st.heap.o3 = { t: "str", v: "'lemonade'", fill: "🍋" }; g(st).drink = R("o3"); });
+      st => { st.heap.o3 = { t: "str", v: "'lemonade'", vessel: "pitcher", k: "Pitcher" }; g(st).drink = R("o3"); });
     step(4, ["Send \"6 lemonade\" to the pass", "print outputs 6 lemonade"],
       [["Send \"6 'lemonade'\"", "print shows the quotes", "`print` shows text without its quotes. You'd need `repr()` to see them.", "print(cups, repr(drink))"],
        ["Send \"cups drink\"", "prints the names", "That needs quotes. Without them, the names' values are printed.", 'print("cups", "drink")']],
-      "Two jars, one call at [the pass|output].",
+      "A tray and a pitcher, one call at [the pass|output].",
       "`print(cups, drink)` outputs `6 lemonade`, separated by a space.",
       st => { st.out.push("6 lemonade"); });
   }),
@@ -413,7 +415,7 @@ const DISHES = [
     step(1, ["Set the timer: write 8 on a `minutes` label", "bind minutes to 8"],
       [["Set the timer to 6", "minutes is 6", "The ticket says 8. The 6 only appears in the check on line 2.", "minutes = 6"],
        ["Start the else steps", "jump to else", "Line 1 runs first; nothing has been checked yet.", 'egg = "soft"']],
-      "Small numbers are written straight on the [tape|variable], no jar needed.",
+      "Small numbers are written straight on the [tape|variable], no container needed.",
       "`minutes` is bound to 8.",
       st => { g(st).minutes = P(8, { ico: "⏲️" }); });
     step(2, ["Check: is 8 more than 6? Yes, take the first path", "condition is True, run the if block"],
@@ -552,10 +554,10 @@ const DISHES = [
        ["Label the mint `order`", "assign order first", "The right side (the call) must finish before `order` exists.", 'order = "mint"']],
       "A [fresh cutting board|new frame] comes out. The mint you handed over is labeled `leaf`, the [ingredient the card asks for|parameter].",
       "Calling `make_tea(\"mint\")` creates a new frame and binds the parameter `leaf` to `'mint'`.",
-      st => { st.heap.o2 = { t: "str", v: "'mint'", fill: "🌿" }; st.frames.push({ name: "make_tea", vars: { leaf: R("o2") } }); });
+      st => { st.heap.o2 = { t: "str", v: "'mint'", vessel: "herbpot", k: "Pot of mint" }; st.frames.push({ name: "make_tea", vars: { leaf: R("o2") } }); });
     step(2, ["Brew a cup of mint tea and label it `cup` on this board", "local variable cup = 'mint tea'"],
       [["Label the tea `cup` on the main board", "cup is global", "Variables made inside a function are local to its frame unless you declare them `global`.", 'global cup; cup = leaf + " tea"'],
-       ["Add \" tea\" into the mint jar", "change the string in place", "Strings are sealed: they have no `append`. `+` makes a new one.", 'leaf.append(" tea")']],
+       ["Stir \" tea\" into the pot of mint", "change the string in place", "Strings are sealed: they have no `append`. `+` makes a new one.", 'leaf.append(" tea")']],
       "This [label|local variable] only exists on this board.",
       "`cup` is a local variable in the function's frame.",
       st => { st.heap.o3 = { t: "str", v: "'mint tea'", vessel: "cup", k: "Teacup" }; active(st).cup = R("o3"); });
@@ -567,7 +569,7 @@ const DISHES = [
       st => { active(st).$ret = R("o3"); });
     step(5, ["Put the board away, and label the returned tea `order`", "the frame is discarded, order = 'mint tea'"],
       [["Tie `order` to the recipe card", "assign the function, don't call it", "Without `()` nothing is cooked: `order` becomes another label on the recipe card.", "order = make_tea"],
-       ["Label the mint jar `order`", "order = the argument", "The function returned the tea, not the mint.", 'order = "mint"']],
+       ["Label the pot of mint `order`", "order = the argument", "The function returned the tea, not the mint.", 'order = "mint"']],
       "The board is [put away|frame destroyed]. The tea gets an `order` [label|variable]. The mint has no label left, so it goes in the [sink|garbage].",
       "`leaf` and `cup` disappear with the frame. The returned object survives as `order`.",
       st => { st.frames.pop(); g(st).order = R("o3"); });
@@ -625,7 +627,7 @@ const DISHES = [
     const spoons = n => P(n, { ico: "🥄", rep: n });
     step(1, ["Set up a spice cabinet with a salt drawer holding 3 spoons", "create a dict {'salt': 3}"],
       [["Put salt and 3 in a mixing bowl", "make a list", "Square brackets make a list. Curly braces with `key: value` make a dict.", 'spices = ["salt", 3]'],
-       ["Label a jar `salt`", "salt is a variable", "\"salt\" is a key inside the dict, not a variable.", "salt = 3"]],
+       ["Label a salt shaker `salt`", "salt is a variable", "\"salt\" is a key inside the dict, not a variable.", "salt = 3"]],
       "A [spice cabinet|dict]: each drawer has a [name|key] and an [amount|value].",
       "A dict maps unique keys to values.",
       st => { st.heap.o1 = { t: "dict", items: [["'salt'", spoons(3)]] }; g(st).spices = R("o1"); });
@@ -722,7 +724,7 @@ const DISHES = [
     code: ['fridge = {"egg": 6}', "try:", '    milk = fridge["milk"]', "except KeyError:", "    milk = 0", "print(milk)"] }, step => {
     step(1, ["Stock the fridge: an egg drawer holding 6", "create a dict {'egg': 6}"],
       [["Stock eggs and milk", "the dict has two keys", "Only `\"egg\"` is on the ticket.", 'fridge = {"egg": 6, "milk": 1}'],
-       ["Label a jar `egg`", "egg is a variable", "\"egg\" is a key in the dict, not a variable.", "egg = 6"]],
+       ["Label an egg carton `egg`", "egg is a variable", "\"egg\" is a key in the dict, not a variable.", "egg = 6"]],
       "The [fridge|dict] has one drawer: [egg|key] → [6|value].",
       "`fridge` refers to a dict with one key.",
       st => { st.heap.o1 = { t: "dict", k: "Fridge", vessel: "fridge", items: [["'egg'", P(6, { ico: "🥚" })]] }; g(st).fridge = R("o1"); });
@@ -803,6 +805,41 @@ function vessel(o) {
        <rect x="10" y="-126" width="76" height="17" rx="4" class="lid"/><rect x="10" y="-113" width="76" height="4" class="lid-dark"/>
        <rect x="12" y="-102" width="72" height="26" rx="3" class="paper"/>${txt(48, -84, "t-val", esc(trunc(o.v, 9)), "middle")}
        <path d="M14,-66 L14,-20" class="glass-shine"/>` };
+  }
+  const tag = (cx, y, w) => `<rect x="${cx - w / 2}" y="${y}" width="${w}" height="22" rx="3" class="paper"/>${txt(cx, y + 16, "t-val", esc(o.v), "middle")}`;
+  const row = (cx, y, size, gap, n, e) => Array.from({ length: n }, (_, k) => emoji(cx + (k - (n - 1) / 2) * gap, y, size, e)).join("");
+  if (kind === "basket") {
+    return { w: 130, h: 92, svg:
+      `${row(65, -52, 38, 34, o.count, o.fill)}
+       <path d="M8,-52 L122,-52 L110,0 L20,0 Z" class="wood"/>
+       <path d="M12,-38 H118 M15,-24 H115 M18,-10 H112" stroke="var(--wood-dark)" stroke-width="2" fill="none"/>
+       <rect x="3" y="-56" width="124" height="9" rx="4.5" class="wood"/>${tag(65, -40, 52)}` };
+  }
+  if (kind === "crate") {
+    return { w: 132, h: 84, svg:
+      `${row(66, -50, 30, 36, o.count, o.fill)}
+       <rect x="4" y="-58" width="124" height="58" rx="3" class="wood"/>
+       <path d="M4,-40 H128 M4,-20 H128" stroke="var(--wood-dark)" stroke-width="2"/>
+       <rect x="4" y="-58" width="10" height="58" class="knob"/><rect x="118" y="-58" width="10" height="58" class="knob"/>${tag(66, -42, 52)}` };
+  }
+  if (kind === "glasses") {
+    const n = o.count, w = n * 28 + 24;
+    return { w, h: 70, svg:
+      `${row(w / 2, -24, 26, 28, n, o.fill)}
+       <rect x="0" y="-24" width="${w}" height="24" rx="4" class="steel"/>${tag(w / 2, -23, 52)}` };
+  }
+  if (kind === "pitcher") {
+    return { w: 136, h: 124, svg:
+      `<path d="M104,-96 C132,-94 132,-40 104,-34" fill="none" stroke="var(--glass-edge)" stroke-width="7" stroke-linecap="round"/>
+       <path d="M18,-74 Q8,-40 16,-8 Q18,-2 28,-2 L96,-2 Q105,-2 107,-8 Q115,-40 105,-74 Z" class="lemonade"/>
+       <path d="M24,-114 L100,-114 L106,-98 Q120,-60 110,-8 Q108,0 98,0 L26,0 Q16,0 14,-8 Q4,-60 18,-98 L8,-108 Z" class="glass"/>
+       ${emoji(84, -80, 18, "🍋")}<path d="M24,-96 Q16,-60 22,-24" class="glass-shine"/>${tag(62, -54, 92)}` };
+  }
+  if (kind === "herbpot") {
+    return { w: 110, h: 112, svg:
+      `${row(55, -50, 34, 26, 3, "🌿")}
+       <path d="M16,-54 L94,-54 L82,0 L28,0 Z" class="terracotta"/>
+       <rect x="8" y="-62" width="94" height="13" rx="3" class="terracotta-rim"/>${tag(55, -40, 64)}` };
   }
   if (kind === "cup") {
     return { w: 132, h: 98, svg:
@@ -1151,7 +1188,7 @@ function explainTokens(src) {
       if (j === first && n && (n.t === "+=" || n.t === "-=")) return set("name", "variable (being updated)", "This name is read, combined with the right side, and then re-bound to the result.", "The scale or label whose reading is about to change.");
       if (j === first && n && n.t === "[" && hasAssign) return set("name", "container (being changed)", "The dict or list whose entry is about to be set or updated.", "The cabinet whose drawer you're about to open.");
       if (n && n.t === ".") return set("name", "variable (object used)", `Python follows \`${x.t}\` to its object, then uses the method after the dot on that object.`, "Following the label's twine to the container you'll work with.");
-      return set("name", "variable (being read)", `Python looks up \`${x.t}\` and follows its reference to the object it points to.`, "Reading a label and following its twine to the jar.");
+      return set("name", "variable (being read)", `Python looks up \`${x.t}\` and follows its reference to the object it points to.`, "Reading a label and following its twine to the container on the rack.");
     }
     if (x.k === "op") {
       const strNear = (p && p.k === "str") || (n && n.k === "str") || (toks.slice(j + 1).some(y => y.k === "str") && x.t === "+" && p && p.t === ")");
