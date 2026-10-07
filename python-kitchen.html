@@ -420,7 +420,7 @@ const EXTRA = {
     ANS("Fill the jar with the word \"5\"", "a string, not a number", "Quotes make the text '5'. Text can't be added to like a number.", 'sugar = "5"'),
     ANS("Tie `backup` to an empty jar", "backup starts empty", "`backup = sugar` ties it to whatever `sugar` points at: the 5.", "backup = None"),
     ANS("Fill the new jar with \"51\"", "+ joins like text", "`sugar` is a number, so `+ 1` adds. Joining only happens with strings.", 'sugar = str(sugar) + "1"'),
-    SAY_NAME("sugar backup", "6 5"),
+    ANS("Send \"sugar cubes and backup cubes\"", "print the names as text", "With quotes they're just words. Without them, the values (6 and 5) are printed.", 'print("sugar", "cubes and", "backup", "cubes")'),
   ],
   pizza: [
     ANS("Write the label in quotes: `\"pizza\"`", "a string as the name", "Quotes make a value, not a label. Assigning to a string is a SyntaxError.", '"pizza" = "margherita"'),
@@ -473,12 +473,12 @@ const EXTRA = {
     SAY_NAME("order", "mint tea"),
   ],
   bowls: [
-    ANS("Put egg and flour in a spice cabinet", "a dict", "Curly braces with keys make a dict; square brackets make a list.", 'bowl = {"egg": 1, "flour": 1}'),
-    ANS("Tie `mixing` to the egg only", "alias the first item", "`mixing = bowl` ties it to the whole bowl.", "mixing = bowl[0]"),
+    ANS("Put egg and flour in a spice cabinet", "a dict", "Curly braces with keys make a dict; square brackets make a list.", 'sweet = {"egg": 1, "flour": 1}'),
+    ANS("Tie `mixing` to the egg only", "alias the first item", "`mixing = sweet` ties it to the whole bowl.", "mixing = sweet[0]"),
     ANS("Pour the milk in at the front", "insert at 0", "`append` adds at the end.", 'mixing.insert(0, "milk")'),
-    ANS("Copy only the egg into a new bowl", "copy part of it", "`.copy()` copies every item.", "side = bowl[:1]"),
-    ANS("Add salt to the `mixing` bowl", "mixing is the copy", "`mixing` is still the original bowl; `side` is the copy.", 'mixing.append("salt")'),
-    ANS("Serve three bowls", "mixing is printed too", "The ticket prints `bowl` and `side` only.", "print(bowl, mixing, side)"),
+    ANS("Copy only the egg into the savory bowl", "copy part of it", "`.copy()` copies every item.", "savory = sweet[:1]"),
+    ANS("Salt the bowl on the mixer", "mixing is the copy", "`mixing` is still the sweet bowl; `savory` is the copy.", 'mixing.append("salt")'),
+    ANS("Serve three bowls", "mixing is printed too", "`mixing` and `sweet` are the same bowl; the ticket prints `sweet` and `savory`.", "print(sweet, mixing, savory)"),
   ],
   spices: [
     ANS("Put salt and 3 in a sealed jar", "a tuple", "Round brackets make a tuple; `{\"salt\": 3}` makes a dict.", 'spices = ("salt", 3)'),
@@ -492,10 +492,10 @@ const EXTRA = {
   ],
   sandwich: [
     ANS("Lay them out in a different order", "lists sort themselves", "A list keeps the order you wrote.", 'stack = ["bread", "cheese", "ham", "bread"]'),
-    ANS("Look at the last item instead", "index 0 is the end", "`[0]` is the first item; the last is `[-1]`.", "top = stack[-1]"),
+    ANS("Look at the last item instead", "index 0 is the end", "`[0]` is the first item; the last is `[-1]`.", "base = stack[-1]"),
     ANS("Swap the cheese at spot 2", "index 1 is the third item", "Counting from 0, the ham is at 1.", 'stack[2] = "tomato"'),
     ANS("Eat the whole sandwich", "pop clears the list", "`pop()` removes one item.", "stack.clear()"),
-    ANS("Serve just the bottom bread", "print the first item", "`top` is one slice. The ticket prints the whole `stack`.", "print(top)"),
+    ANS("Serve just the bottom bread", "print the first item", "`base` is one slice. The ticket prints the whole `stack`.", "print(base)"),
   ],
   cake: [
     ANS("Write a card that only ever makes 3 layers", "hard-code the answer", "The card takes any number of `layers`.", 'def cake(): return "base+layer+layer"'),
@@ -549,7 +549,7 @@ const DISHES = [
   }),
 
   dish({ id: "sugar", tier: 1, pic: "🍬", name: "Two jars of sugar", topics: "reassignment · immutable ints",
-    code: ["sugar = 5", "backup = sugar", "sugar = sugar + 1", "print(sugar, backup)"] }, step => {
+    code: ["sugar = 5", "backup = sugar", "sugar = sugar + 1", 'print(sugar, "cubes and", backup, "cubes")'] }, step => {
     step(1, ["Fill a sealed jar with 5 cubes and label it `sugar`", "create the int 5, bind sugar"],
       [["Make an empty jar labeled `sugar`, fill it later", "create a name with no value", "The ticket gives the value right away: 5. An empty placeholder would be `None`.", "sugar = None"],
        ["Tie the jar to the label the other way round", "assign right to left", "The name always goes on the left of `=`. Writing it backwards is a SyntaxError.", "5 = sugar"]],
@@ -568,12 +568,12 @@ const DISHES = [
       "The jar is [sealed|immutable], so a [new jar|new object] of 6 is made and only the `sugar` [label|name] moves. `backup` stays on 5.",
       "`sugar + 1` creates a new object 6 and `sugar` is rebound to it. `backup` still refers to 5.",
       st => { st.heap.o2 = { t: "int", v: "6", cubes: 6 }; g(st).sugar = R("o2"); });
-    step(4, ["Send \"6 5\" to the pass", "print outputs 6 5"],
-      [["Send \"6 6\"", "both names changed", "`backup` was still tied to the old jar of 5.", "print(sugar, sugar)"],
-       ["Send \"5 5\"", "nothing changed", "`sugar` was moved to the new jar of 6.", "print(backup, backup)"]],
+    step(4, ["Send \"6 cubes and 5 cubes\" to the pass", "print outputs 6 cubes and 5 cubes"],
+      [["Send \"6 cubes and 6 cubes\"", "both names changed", "`backup` was still tied to the old jar of 5.", 'print(sugar, "cubes and", sugar, "cubes")'],
+       ["Send \"5 cubes and 5 cubes\"", "nothing changed", "`sugar` was moved to the new jar of 6.", 'print(backup, "cubes and", backup, "cubes")']],
       "Follow each [twine|reference] and call out what's in the jars at [the pass|output].",
-      "`print` follows each reference and outputs `6 5`.",
-      st => { st.out.push("6 5"); });
+      "`print` follows each reference and serves `6 cubes and 5 cubes`.",
+      st => { st.out.push("6 cubes and 5 cubes"); });
   }),
 
   /* ---------- ★★ easy ---------- */
@@ -777,43 +777,43 @@ const DISHES = [
   }),
 
   /* ---------- ★★★★ hard ---------- */
-  dish({ id: "bowls", tier: 4, pic: "🥣", name: "Two bowls of batter", topics: "aliasing · mutation · copy()",
-    code: ['bowl = ["egg", "flour"]', "mixing = bowl", 'mixing.append("milk")', "side = bowl.copy()", 'side.append("salt")', "print(bowl, side)"] }, step => {
-    step(1, ["Put an egg and flour in a mixing bowl labeled `bowl`", "create a list, bind bowl"],
+  dish({ id: "bowls", tier: 4, pic: "🥣", name: "Sweet and savory batter", topics: "aliasing · mutation · copy()",
+    code: ['sweet = ["egg", "flour"]', "mixing = sweet", 'mixing.append("milk")', "savory = sweet.copy()", 'savory.append("salt")', "print(sweet, savory)"] }, step => {
+    step(1, ["Put an egg and flour in a mixing bowl labeled `sweet`", "create a list, bind sweet"],
       [["Put each in its own jar", "two variables", "One list holds both items.", 'egg, flour = "egg", "flour"'],
-       ["Use a sealed jar", "a tuple", "Round brackets make a tuple. Square brackets make a list, which can change.", 'bowl = ("egg", "flour")']],
-      "An [open bowl|mutable list] with spots counted from [0|index 0].",
+       ["Use a sealed jar", "a tuple", "Round brackets make a tuple. Square brackets make a list, which can change.", 'sweet = ("egg", "flour")']],
+      "The start of the sweet batter: an [open bowl|mutable list] with spots counted from [0|index 0].",
       "A list is a mutable object.",
-      st => { st.heap.o1 = { t: "list", items: [P("'egg'"), P("'flour'")] }; g(st).bowl = R("o1"); });
-    step(2, ["Tie a `mixing` label to the same bowl", "mixing refers to the same list"],
-      [["Pour everything into a second bowl labeled `mixing`", "copy the list", "That needs `.copy()`. Plain `=` is aliasing: two names, one list.", "mixing = bowl.copy()"],
-       ["Move the `bowl` label to say `mixing`", "rename", "Both labels exist now; nothing is deleted.", "mixing = bowl; del bowl"]],
-      "Two [labels|names] on one [bowl|list object].",
-      "`mixing = bowl` is aliasing. No copy is made.",
+      st => { st.heap.o1 = { t: "list", k: "Sweet batter bowl", items: [P("'egg'"), P("'flour'")] }; g(st).sweet = R("o1"); });
+    step(2, ["Put the bowl on the mixer and tie a second label, `mixing`, to it", "mixing refers to the same list"],
+      [["Pour everything into a second bowl labeled `mixing`", "copy the list", "That needs `.copy()`. Plain `=` is aliasing: two names, one list.", "mixing = sweet.copy()"],
+       ["Peel off `sweet` and write `mixing` instead", "rename", "Both labels exist now; nothing is deleted.", "mixing = sweet; del sweet"]],
+      "Two [labels|names] on one [bowl|list object]: it's the sweet batter, and it's also the bowl on the mixer.",
+      "`mixing = sweet` is aliasing. No copy is made.",
       st => { g(st).mixing = R("o1"); });
-    step(3, ["Pour milk into the bowl. Both labels see it", "the shared list is mutated"],
-      [["Make a new bowl with milk, for `mixing` only", "build a new list", "That's what `+` does. `.append()` changes the one shared bowl, so `bowl` sees the milk too.", 'mixing = mixing + ["milk"]'],
+    step(3, ["Pour milk into the bowl on the mixer. The `sweet` label sees it too", "the shared list is mutated"],
+      [["Make a new bowl with milk, for `mixing` only", "build a new list", "That's what `+` does. `.append()` changes the one shared bowl, so `sweet` sees the milk too.", 'mixing = mixing + ["milk"]'],
        ["Tie `mixing` to what append hands back", "keep append's result", "A classic bug: `.append()` returns `None`, so `mixing` would lose its bowl.", 'mixing = mixing.append("milk")']],
-      "Milk goes into the [one shared bowl|same object].",
-      "`.append()` mutates the list, so `bowl` and `mixing` both show `'milk'`.",
+      "Milk goes into the [one shared bowl|same object], whichever label you read.",
+      "`.append()` mutates the list, so `sweet` and `mixing` both show `'milk'`.",
       st => { st.heap.o1.items.push(P("'milk'")); });
-    step(4, ["Take a second bowl, add the same ingredients, label it `side`", "copy() makes a new list"],
-      [["Tie `side` to the same bowl", "alias it", "`.copy()` builds a separate list; plain `=` would alias.", "side = bowl"],
-       ["Take an empty bowl", "start a new empty list", "`.copy()` copies the items too.", "side = []"]],
-      "A [second bowl|new list] with the same contents.",
-      "`.copy()` returns a new list; `side` refers to a different object.",
-      st => { st.heap.o2 = { t: "list", items: JSON.parse(JSON.stringify(st.heap.o1.items)) }; g(st).side = R("o2"); });
-    step(5, ["Add salt to the side bowl only", "only the copy changes"],
-      [["Add salt to both bowls", "copies stay linked", "A copy is independent once it's made.", 'side.append("salt"); bowl.append("salt")'],
-       ["Add salt to the first bowl", "side is bowl", "`side` refers to the copy.", 'bowl.append("salt")']],
-      "Salt goes in the [copy|second object] only.",
-      "Mutating `side` leaves the original list alone.",
+    step(4, ["Take a second bowl, copy the batter into it, and label it `savory`", "copy() makes a new list"],
+      [["Tie `savory` to the same bowl", "alias it", "`.copy()` builds a separate list; plain `=` would alias, and the salt would end up in the sweet batter too.", "savory = sweet"],
+       ["Take an empty bowl", "start a new empty list", "`.copy()` copies the items too.", "savory = []"]],
+      "A [second bowl|new list] with the same batter, ready to be made savory.",
+      "`.copy()` returns a new list; `savory` refers to a different object.",
+      st => { st.heap.o2 = { t: "list", k: "Savory batter bowl", items: JSON.parse(JSON.stringify(st.heap.o1.items)) }; g(st).savory = R("o2"); });
+    step(5, ["Salt the savory bowl only", "only the copy changes"],
+      [["Salt both bowls", "copies stay linked", "A copy is independent once it's made.", 'savory.append("salt"); sweet.append("salt")'],
+       ["Salt the sweet bowl", "savory is sweet", "`savory` refers to the copy.", 'sweet.append("salt")']],
+      "Salt goes in the [copy|second object] only. The sweet batter stays sweet.",
+      "Mutating `savory` leaves the original list alone.",
       st => { st.heap.o2.items.push(P("'salt'")); });
-    step(6, ["Send both bowls: one with milk, one with milk and salt", "print outputs both lists"],
-      [["The first bowl has no milk", "mixing was separate", "`mixing` was the same bowl, so the milk is there.", 'print(["egg", "flour"], side)'],
-       ["Both bowls have salt", "copy shares changes", "Salt only went into the copy.", "print(side, side)"]],
-      "Serve both at [the pass|output].",
-      "Prints `['egg', 'flour', 'milk'] ['egg', 'flour', 'milk', 'salt']`.",
+    step(6, ["Send both batters: sweet (egg, flour, milk) and savory (with salt)", "print outputs both lists"],
+      [["The sweet batter has no milk", "mixing was separate", "`mixing` was the same bowl as `sweet`, so the milk is there.", 'print(["egg", "flour"], savory)'],
+       ["Both batters are salted", "copy shares changes", "Salt only went into the copy.", "print(savory, savory)"]],
+      "Serve both batters at [the pass|output].",
+      "Prints `['egg', 'flour', 'milk'] ['egg', 'flour', 'milk', 'salt']`: the sweet batter, then the savory one.",
       st => { st.out.push("['egg', 'flour', 'milk'] ['egg', 'flour', 'milk', 'salt']"); });
   }),
 
@@ -971,7 +971,7 @@ const DISHES = [
   }),
 
   dish({ id: "sandwich", tier: 4, pic: "🥪", name: "Open-faced sandwich", topics: "indexes · item assignment · pop()",
-    code: ['stack = ["bread", "ham", "cheese", "bread"]', "top = stack[0]", 'stack[1] = "tomato"', "bite = stack.pop()", "print(stack)"] }, step => {
+    code: ['stack = ["bread", "ham", "cheese", "bread"]', "base = stack[0]", 'stack[1] = "tomato"', "lid = stack.pop()", "print(stack)"] }, step => {
     const items = names => names.map(n => P(`'${n}'`));
     step(1, ["Lay bread, ham, cheese and bread on a plate labeled `stack`", "create a list of 4 strings"],
       [["Pack them in a sealed lunchbox", "make a tuple", "Round brackets make a tuple, which can't change. Square brackets make a list.", 'stack = ("bread", "ham", "cheese", "bread")'],
@@ -979,26 +979,26 @@ const DISHES = [
       "The sandwich is laid out on a [plate|list] in order, counted from [spot 0|index 0].",
       "A list keeps its items in order, duplicates included.",
       st => { st.heap.o1 = { t: "list", vessel: "plate", k: "Sandwich plate", items: items(["bread", "ham", "cheese", "bread"]) }; g(st).stack = R("o1"); });
-    step(2, ["Look at spot 0, the bottom bread, and write it on a `top` label", "index 0 is the first item"],
-      [["Look at spot 1: the ham", "indexes start at 1", "Python counts from 0. `stack[1]` is the ham.", "top = stack[1]"],
-       ["Take the bread off the plate", "indexing removes the item", "Indexing only reads. Removing it would be `pop(0)`.", "top = stack.pop(0)"]],
+    step(2, ["Look at spot 0, the bottom slice, and write it on a `base` label", "index 0 is the first item"],
+      [["Look at spot 1: the ham", "indexes start at 1", "Python counts from 0. `stack[1]` is the ham.", "base = stack[1]"],
+       ["Take the bread off the plate", "indexing removes the item", "Indexing only reads. Removing it would be `pop(0)`.", "base = stack.pop(0)"]],
       "[Spot 0|index 0] is the first thing on the plate. Looking doesn't move it.",
-      "`stack[0]` reads the first item, `'bread'`, and binds `top` to it.",
-      st => { st.heap.o1.hl = 0; g(st).top = P("'bread'"); });
+      "`stack[0]` reads the first item, `'bread'`, and binds `base` to it.",
+      st => { st.heap.o1.hl = 0; g(st).base = P("'bread'"); });
     step(3, ["Swap the ham at spot 1 for a tomato", "replace the item at index 1"],
       [["Add a tomato on top", "append to the end", "Assigning to an index replaces that spot; `append` would add to the end.", 'stack.append("tomato")'],
        ["Slide the tomato in next to the ham", "insert at index 1", "Assigning replaces the ham. `insert` would keep it and push it along.", 'stack.insert(1, "tomato")']],
       "Spot 1 gets a [new filling|new item]. The plate is [open|mutable], so this happens in place.",
       "`stack[1] = \"tomato\"` replaces the item at index 1.",
       st => { st.heap.o1.hl = 1; st.heap.o1.items[1] = P("'tomato'"); });
-    step(4, ["Take the last item, the top bread, off the plate and label it `bite`", "pop() removes and returns the last item"],
-      [["Take the bottom bread", "pop takes index 0", "With no argument, `pop()` takes the last item.", "bite = stack.pop(0)"],
-       ["Just look at the top bread", "read without removing", "That's `stack[-1]`. `pop()` also takes it off the plate.", "bite = stack[-1]"]],
+    step(4, ["Lift the top slice off the plate and label it `lid`", "pop() removes and returns the last item"],
+      [["Take the bottom bread", "pop takes index 0", "With no argument, `pop()` takes the last item.", "lid = stack.pop(0)"],
+       ["Just look at the top bread", "read without removing", "That's `stack[-1]`. `pop()` also takes it off the plate.", "lid = stack[-1]"]],
       "Lift the [last item|index -1] off the plate. The plate now holds 3.",
-      "`stack.pop()` removes `'bread'` from the end and returns it, so `bite` is bound to it.",
-      st => { delete st.heap.o1.hl; st.heap.o1.items.pop(); g(st).bite = P("'bread'"); });
+      "`stack.pop()` removes `'bread'` from the end and returns it, so `lid` is bound to it.",
+      st => { delete st.heap.o1.hl; st.heap.o1.items.pop(); g(st).lid = P("'bread'"); });
     step(5, ["Serve the plate at the pass: bread, tomato, cheese", "print shows the list"],
-      [["Serve it with the top bread put back", "pop didn't remove it", "`pop()` took the top bread off the plate; it's labeled `bite` now.", "print(stack + [bite])"],
+      [["Serve it with the top bread put back", "pop didn't remove it", "`pop()` took the top bread off the plate; it's labeled `lid` now.", "print(stack + [lid])"],
        ["Serve it with ham instead of tomato", "the swap didn't happen", "Line 3 replaced the ham with a tomato.", 'print(["bread", "ham", "cheese"])']],
       "Serve what's left on the [plate|list] at [the pass|output]: an open-faced sandwich.",
       "`print(stack)` shows the list: `['bread', 'tomato', 'cheese']`.",
