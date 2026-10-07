@@ -107,7 +107,8 @@ h1 { font: 800 clamp(26px, 4vw, 38px)/1.05 var(--display); margin: 0; }
 @keyframes print { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 @media (prefers-reduced-motion: reduce) { .ticket li.printing { animation: none; } }
 .ticket .kw { color: #7b3fb5; font-weight: 600; } .ticket .st { color: #2c7a4b; } .ticket .nu { color: #b4521a; } .ticket .bi { color: #2350c4; }
-.ticket .src { flex: 1 0 auto; }
+.printer, .ticket { min-width: 0; }
+.ticket .src { flex: 1 1 auto; min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
 .peek { flex: none; margin-left: 8px; width: 26px; height: 22px; padding: 0; border-radius: 6px; border: 1px solid #d8d1bd; background: #f6f1e3;
   cursor: pointer; font-size: 12px; line-height: 1; align-self: center; }
 .peek:hover, .peek[aria-expanded="true"] { background: #23211b; border-color: #23211b; }
@@ -187,6 +188,48 @@ button:focus-visible { outline: 3px solid var(--hl-edge); outline-offset: 2px; }
 .done .stars .off { opacity: .2; }
 .done .row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
 
+/* cartoon animations (1–2 s) */
+[class*="anim-"], .chef, .chef-face, .bubble, .bit { transform-box: fill-box; }
+.anim-drop { transform-origin: 50% 100%; animation: drop .8s cubic-bezier(.25,1.2,.5,1) both; }
+@keyframes drop { 0% { transform: translateY(-170px) scale(.9); opacity: 0; } 50% { transform: translateY(0) scale(1.14, .84); opacity: 1; } 72% { transform: scale(.94, 1.07); } 100% { transform: none; } }
+.anim-pop { transform-origin: 50% 100%; animation: pop .65s ease-out both; }
+@keyframes pop { 30% { transform: scale(1.16, .86); } 60% { transform: scale(.95, 1.06); } 100% { transform: none; } }
+.anim-sink { transform-origin: 50% 50%; animation: tumble 1s cubic-bezier(.5,0,.7,1) both; }
+@keyframes tumble { 0% { transform: translate(-320px, -420px) rotate(-220deg); opacity: 0; } 12% { opacity: 1; } 85% { transform: translate(0, 10px) rotate(10deg); } 100% { transform: none; } }
+.anim-slide { transform-origin: 0 100%; animation: slide .7s cubic-bezier(.25,1.3,.5,1) both; }
+@keyframes slide { 0% { transform: translateX(-160px) rotate(-8deg); opacity: 0; } 100% { transform: none; opacity: 1; } }
+.anim-out { transform-origin: 50% 100%; animation: out .9s ease-in forwards; }
+@keyframes out { 0% { opacity: 1; } 30% { transform: translateY(-14px) rotate(-3deg); } 100% { transform: translate(90px, 170px) rotate(16deg); opacity: 0; } }
+.anim-slap { transform-origin: 10% 50%; animation: slap .5s cubic-bezier(.3,1.6,.5,1) both; }
+@keyframes slap { 0% { transform: scale(1.7) rotate(-12deg); opacity: 0; } 100% { transform: none; opacity: 1; } }
+.anim-ticket { transform-origin: 50% 0; animation: ticket .7s cubic-bezier(.25,1.5,.5,1) both; }
+@keyframes ticket { 0% { transform: translateY(-90px) rotate(-6deg); opacity: 0; } 100% { transform: none; opacity: 1; } }
+.anim-ring { transform-origin: 50% 0; animation: ring .14s ease-in-out 7 alternate; }
+@keyframes ring { from { transform: rotate(-20deg); } to { transform: rotate(20deg); } }
+.knot-run { fill: var(--twine); stroke: #fff; stroke-width: 2; animation: fadeout .25s .7s forwards; }
+.twine.new { animation: fadein .35s .45s both; }
+@keyframes fadein { from { opacity: 0; } }
+@keyframes fadeout { to { opacity: 0; } }
+.chef { transform-origin: 50% 100%; animation: chef 1.9s cubic-bezier(.3,1.25,.5,1) both; }
+@keyframes chef { 0% { transform: translateY(170px); } 15% { transform: translateY(-14px); } 24%, 80% { transform: translateY(0); } 100% { transform: translateY(190px); } }
+.chef-face { transform-origin: 50% 100%; }
+.chef-right .chef-face { animation: hop .32s .32s ease-in-out 3 alternate; }
+@keyframes hop { to { transform: translateY(-20px) rotate(-7deg) scale(1.04, .97); } }
+.chef-wrong .chef-face { animation: nope .16s .32s ease-in-out 6 alternate; }
+@keyframes nope { from { transform: rotate(-11deg); } to { transform: rotate(11deg); } }
+.bubble { transform-origin: 100% 100%; animation: bubble 1.9s both; }
+@keyframes bubble { 0%, 16% { transform: scale(0); } 26% { transform: scale(1.12); } 32%, 80% { transform: scale(1); } 88%, 100% { transform: scale(0); } }
+.bubble-bg { fill: #fff; stroke: #1c2629; stroke-width: 3; }
+.chef-wrong .bubble-bg { fill: #ffe9e5; stroke: #b8382a; }
+.t-bubble { fill: #1c2629; font: 800 18px var(--display); }
+.chef-wrong .t-bubble { fill: #b8382a; }
+.bit { transform-origin: 50% 50%; opacity: 0; animation: bit 1s ease-out both; }
+@keyframes bit { 0% { opacity: 0; transform: translate(0, 0) scale(.3); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.3) rotate(35deg); } }
+.scene-wrap.shake { animation: shake .45s; }
+@media (prefers-reduced-motion: reduce) {
+  [class*="anim-"], .chef, .chef-face, .bubble, .bit, .knot-run, .twine.new, .scene-wrap.shake { animation: none !important; }
+  .chef, .knot-run, .anim-out { display: none; }
+}
 .scene-wrap { min-width: 0; overflow-x: auto; border-radius: 14px; border: 1px solid var(--line); background: var(--wall); }
 #kitchen { display: block; width: 100%; min-width: 760px; height: auto; }
 
@@ -206,6 +249,12 @@ button:focus-visible { outline: 3px solid var(--hl-edge); outline-offset: 2px; }
 .glass-shine { fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; opacity: .55; }
 .terracotta { fill: #c7683f; stroke: #8f4426; stroke-width: 2; } .terracotta-rim { fill: #b05a35; stroke: #8f4426; stroke-width: 2; }
 .lemonade { fill: #f3d65b; opacity: .85; }
+.cardboard { fill: #d9b27c; stroke: #9c7442; stroke-width: 2; } .t-box { fill: #8a3b22; font: 800 16px var(--display); letter-spacing: .12em; }
+.blueprint { fill: #2f5fa8; stroke: #1f3f73; stroke-width: 2; } .bp-grid { stroke: #ffffff; stroke-width: 1; opacity: .14; }
+.t-bp-title { fill: #ffffff; font: 700 15px var(--mono); } .t-bp { fill: #dbe7fb; font: 500 12px var(--mono); }
+.oven-window { fill: #2a2420; stroke: var(--steel-dark); stroke-width: 3; } .oven-display { fill: #10261a; stroke: var(--steel-dark); stroke-width: 2; }
+.t-disp-k { fill: #7ee2a0; font: 500 10.5px var(--mono); } .t-disp { fill: #a9ffc6; font: 700 15px var(--mono); }
+.dial { fill: var(--steel-hi); stroke: var(--steel-dark); stroke-width: 3; }
 .lid { fill: var(--lid); } .lid-dark { fill: var(--lid-dark); }
 .paper { fill: var(--paper); stroke: var(--paper-edge); stroke-width: 1.2; }
 .china { fill: var(--china); stroke: var(--china-edge); stroke-width: 2; } .china-line { fill: none; stroke: var(--china-edge); stroke-width: 7; stroke-linecap: round; }
@@ -309,7 +358,7 @@ const term = (k, py) => `<span class="term"><span class="tk">${k}</span><span cl
 const code = s => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>");
 const fmt = s => code(s).replace(/\[([^\]|]+)\|([^\]]+)\]/g, "<ruby>$1<rt>$2</rt></ruby>");
 
-const INGREDIENT = { "'egg'": "🥚", "'flour'": "🌾", "'milk'": "🥛", "'salt'": "🧂", "'mint'": "🌿", "'pepper'": "🌶️" };
+const INGREDIENT = { "'bread'": "🍞", "'ham'": "🍖", "'cheese'": "🧀", "'tomato'": "🍅", "'margherita'": "🍕", "'egg'": "🥚", "'flour'": "🌾", "'milk'": "🥛", "'salt'": "🧂", "'mint'": "🌿", "'pepper'": "🌶️" };
 const P = (v, opt = {}) => ({ p: String(v), ...opt });
 const R = id => ({ r: id });
 const g = st => st.frames[0].vars;
@@ -318,6 +367,7 @@ const active = st => st.frames[st.frames.length - 1].vars;
 const KIND = {
   int: ["Sealed jar", "int object"], str: ["Sealed jar", "str object"], list: ["Mixing bowl", "list object"],
   dict: ["Spice cabinet", "dict object"], func: ["Recipe card", "function object"],
+  class: ["Blueprint", "class object"], obj: ["Oven", "Oven instance (object)"],
 };
 
 /* A dish is a program. Each step: the line it runs, the right action [kitchen, python], wrong actions [kitchen, python, why],
@@ -328,7 +378,9 @@ function dish(meta, script) {
   const step = (line, right, wrong, k, py, fn) => {
     st = JSON.parse(JSON.stringify(st));
     if (fn) fn(st);
-    steps.push({ line, right, wrong, k, py, st });
+    const o = { line, right, wrong, k, py, st };
+    steps.push(o);
+    return o;
   };
   steps.push({ line: null, st: JSON.parse(JSON.stringify(st)) });
   script(step);
@@ -758,6 +810,109 @@ const DISHES = [
       "`print(milk)` outputs `0`.",
       st => { st.out.push("0"); });
   }),
+  /* ---------- added dishes ---------- */
+  dish({ id: "pizza", tier: 1, pic: "🍕", name: "Pizza order", topics: "strings · print() with several values",
+    code: ['pizza = "margherita"', 'print("One", pizza, "please!")'] }, step => {
+    step(1, ["Slide a margherita into a pizza box and tie a `pizza` label to it", "create the str 'margherita', bind pizza"],
+      [["Write margherita on a label, with no pizza", "a name without quotes", "Without quotes Python reads `margherita` as a variable name, and none exists: NameError.", "pizza = margherita"],
+       ["Box a pepperoni instead", "a different string", "The ticket says margherita. Strings are taken exactly as written.", 'pizza = "pepperoni"']],
+      "The pizza goes on the rack in a [pizza box|str object] labeled `pizza`. The [quotes|string delimiters] on the ticket say it's food, not a label.",
+      "`\"margherita\"` is a string: text inside quotes. `pizza` is bound to it.",
+      st => { st.heap.o1 = { t: "str", v: "'margherita'", vessel: "pizzabox", k: "Pizza box" }; g(st).pizza = R("o1"); });
+    step(2, ["Shout \"One margherita please!\" through the pass", "print joins its three values with spaces"],
+      [["Shout \"Onemargheritaplease!\"", "no spaces", "That's what `+` does. `print` puts a space between each value it's given.", 'print("One" + pizza + "please!")'],
+       ["Shout \"One pizza please!\"", "print the word pizza", "In the print, `pizza` has no quotes, so its value is used.", 'print("One", "pizza", "please!")']],
+      "Three pieces, read out at [the pass|output] with a space between each.",
+      "`print` with several values separates them with spaces: `One margherita please!`.",
+      st => { st.out.push("One margherita please!"); });
+  }),
+
+  dish({ id: "sandwich", tier: 4, pic: "🥪", name: "Sandwich stack", topics: "indexes · item assignment · pop()",
+    code: ['stack = ["bread", "ham", "cheese", "bread"]', "top = stack[0]", 'stack[1] = "tomato"', "bite = stack.pop()", "print(top, len(stack))"] }, step => {
+    const items = names => names.map(n => P(`'${n}'`));
+    step(1, ["Lay bread, ham, cheese and bread on a plate labeled `stack`", "create a list of 4 strings"],
+      [["Pack them in a sealed lunchbox", "make a tuple", "Round brackets make a tuple, which can't change. Square brackets make a list.", 'stack = ("bread", "ham", "cheese", "bread")'],
+       ["Use one slice of bread for both ends", "duplicates merge", "Lists keep duplicates: two separate 'bread' items, at 0 and 3. Curly braces would make a set and drop one.", 'stack = {"bread", "ham", "cheese"}']],
+      "The sandwich is laid out on a [plate|list] in order, counted from [spot 0|index 0].",
+      "A list keeps its items in order, duplicates included.",
+      st => { st.heap.o1 = { t: "list", vessel: "plate", k: "Sandwich plate", items: items(["bread", "ham", "cheese", "bread"]) }; g(st).stack = R("o1"); });
+    step(2, ["Look at spot 0, the bottom bread, and write it on a `top` label", "index 0 is the first item"],
+      [["Look at spot 1: the ham", "indexes start at 1", "Python counts from 0. `stack[1]` is the ham.", "top = stack[1]"],
+       ["Take the bread off the plate", "indexing removes the item", "Indexing only reads. Removing it would be `pop(0)`.", "top = stack.pop(0)"]],
+      "[Spot 0|index 0] is the first thing on the plate. Looking doesn't move it.",
+      "`stack[0]` reads the first item, `'bread'`, and binds `top` to it.",
+      st => { st.heap.o1.hl = 0; g(st).top = P("'bread'"); });
+    step(3, ["Swap the ham at spot 1 for a tomato", "replace the item at index 1"],
+      [["Add a tomato on top", "append to the end", "Assigning to an index replaces that spot; `append` would add to the end.", 'stack.append("tomato")'],
+       ["Slide the tomato in next to the ham", "insert at index 1", "Assigning replaces the ham. `insert` would keep it and push it along.", 'stack.insert(1, "tomato")']],
+      "Spot 1 gets a [new filling|new item]. The plate is [open|mutable], so this happens in place.",
+      "`stack[1] = \"tomato\"` replaces the item at index 1.",
+      st => { st.heap.o1.hl = 1; st.heap.o1.items[1] = P("'tomato'"); });
+    step(4, ["Take the last item, the top bread, off the plate and label it `bite`", "pop() removes and returns the last item"],
+      [["Take the bottom bread", "pop takes index 0", "With no argument, `pop()` takes the last item.", "bite = stack.pop(0)"],
+       ["Just look at the top bread", "read without removing", "That's `stack[-1]`. `pop()` also takes it off the plate.", "bite = stack[-1]"]],
+      "Lift the [last item|index -1] off the plate. The plate now holds 3.",
+      "`stack.pop()` removes `'bread'` from the end and returns it, so `bite` is bound to it.",
+      st => { delete st.heap.o1.hl; st.heap.o1.items.pop(); g(st).bite = P("'bread'"); });
+    step(5, ["Shout \"bread 3\" through the pass", "print outputs bread 3"],
+      [["Shout \"bread 4\"", "pop didn't shrink the list", "`pop()` removed an item, leaving 3.", "print(top, 4)"],
+       ["Shout \"ham 3\"", "top followed the swap", "`top` was read before the swap and still refers to 'bread'.", 'print("ham", len(stack))']],
+      "Call out the label and the [count|len()] at [the pass|output].",
+      "`print(top, len(stack))` outputs `bread 3`.",
+      st => { st.out.push("bread 3"); });
+  }),
+
+  dish({ id: "oven", tier: 5, pic: "🔥", name: "Smart oven", topics: "classes · __init__ · self · methods",
+    code: ["class Oven:", "    def __init__(self, temp):", "        self.temp = temp", "    def heat(self, extra):", "        self.temp += extra", "", "oven = Oven(180)", "oven.heat(20)", "print(oven.temp)"] }, step => {
+    step(1, ["Pin an oven blueprint called `Oven` to the rack", "class creates a class object with two methods"],
+      [["Build an oven right away", "class makes an oven", "A class is only the blueprint. `Oven(180)` builds one later.", "oven = Oven(180)"],
+       ["Write a recipe card called `Oven`", "class is a function", "`def` makes a function. `class` makes a blueprint that bundles data and methods.", "def Oven(temp): ..."]],
+      "A [blueprint|class] describes every oven: how to [set one up|__init__] and how to [heat it|a method]. No oven exists yet.",
+      "Python runs the class body, saving `__init__` and `heat` inside the class object `Oven`.",
+      st => { st.heap.c1 = { t: "class", v: "Oven", methods: ["__init__(self, temp)", "heat(self, extra)"] }; g(st).Oven = R("c1"); }).also = [2, 4];
+    step(7, ["Build a new oven from the blueprint, and open a setup board with `self` and `temp`", "Oven(180) makes an instance and calls __init__"],
+      [["Tie `oven` to the blueprint", "no call", "Without `(180)` nothing is built; `oven` would label the blueprint.", "oven = Oven"],
+       ["Write 180 on the main board", "temp becomes global", "The 180 goes into the new oven's setup board, not onto the main board.", "temp = 180"]],
+      "A brand-new [oven|instance] arrives, still unset. A [setup board|__init__ frame] opens, where `self` is tied to that new oven.",
+      "Calling the class creates an empty instance, then runs `__init__(self, 180)` with `self` referring to it.",
+      st => { st.heap.o1 = { t: "obj", v: "Oven", attrs: [] }; st.frames.push({ name: "__init__", vars: { self: R("o1"), temp: P(180, { ico: "🌡️" }) } }); });
+    step(3, ["Set this oven's own dial to 180", "store the attribute temp on self"],
+      [["Write 180 on a loose label on the board", "a local variable", "Without `self.`, `temp` would vanish with the board. `self.temp` stores it on the oven itself.", "temp = temp"],
+       ["Set the dial on the blueprint", "a class attribute", "`self` is this oven, not the blueprint.", "Oven.temp = temp"]],
+      "The [dial|attribute] belongs to [this oven|self], so it stays after the board is put away.",
+      "`self.temp = temp` creates the attribute `temp` on the instance.",
+      st => { st.heap.o1.attrs.push(["temp", P(180)]); });
+    step(7, ["Put the setup board away and tie `oven` to the new oven", "__init__ ends; oven refers to the instance"],
+      [["Tie `oven` to what the setup board returned", "use __init__'s return", "`__init__` returns None. It's `Oven(180)` that hands back the new oven.", "oven = None"],
+       ["Leave the setup board out", "keep the frame", "When `__init__` finishes, its frame is discarded.", "pass"]],
+      "The [setup board|__init__ frame] is put away. The oven is ready and gets an `oven` [label|variable].",
+      "`Oven(180)` returns the new instance; `oven` is bound to it.",
+      st => { st.frames.pop(); g(st).oven = R("o1"); });
+    step(8, ["Open a `heat` board with `self` = this oven and `extra` = 20", "call the method; self is passed automatically"],
+      [["Call heat on the blueprint", "no oven for self", "Calling it on the class gives no oven for `self`: TypeError.", "Oven.heat(20)"],
+       ["Turn every oven up by 20", "change the class", "A method call only works on the oven before the dot.", "Oven.temp += 20"]],
+      "Use [this oven's heat button|a method call]. Python passes the oven in as `self` for you.",
+      "`oven.heat(20)` calls `heat(oven, 20)`: a new frame with `self` and `extra`.",
+      st => { st.frames.push({ name: "heat", vars: { self: R("o1"), extra: P(20, { ico: "🔥" }) } }); });
+    step(5, ["Turn this oven's dial from 180 up to 200", "self.temp becomes 200"],
+      [["Write 200 on a loose label", "a local variable", "Without `self.`, the oven's dial wouldn't change.", "temp = 180 + extra"],
+       ["Set the dial to 20", "replace instead of add", "`+=` adds to the current reading.", "self.temp = extra"]],
+      "The [dial on the oven|attribute] changes, and every label tied to this oven sees it.",
+      "`self.temp += extra` updates the instance's attribute to 200.",
+      st => { st.heap.o1.attrs[0][1] = P(200); });
+    step(8, ["Put the heat board away. The oven keeps its new setting", "heat returns None; the frame ends"],
+      [["Reset the oven to 180", "changes are undone", "Changes made through `self` stay on the object after the method ends.", "oven.temp = 180"],
+       ["Leave the heat board out", "keep the frame", "When a method returns, its frame is discarded.", "pass"]],
+      "The [board|frame] goes, but [the oven|the object] keeps its dial at 200.",
+      "The method ends; the attribute change stays on the instance.",
+      st => { st.frames.pop(); });
+    step(9, ["Read the oven's dial and shout \"200\"", "print outputs 200"],
+      [["Shout \"180\"", "the original value", "`heat()` changed the dial to 200.", "print(180)"],
+       ["Shout \"20\"", "print extra", "`extra` belonged to the heat board, which is gone: NameError.", "print(extra)"]],
+      "Read [the oven's dial|oven.temp] at [the pass|output].",
+      "`oven.temp` looks up the attribute: `200`.",
+      st => { st.out.push("200"); });
+  }),
 ];
 
 const TIERS = [
@@ -794,7 +949,7 @@ function chipSVG(xr, cy, v) {
 }
 
 function vessel(o) {
-  const kind = o.vessel || { int: "jar", str: "jar", list: "bowl", dict: "cabinet", func: "card" }[o.t];
+  const kind = o.vessel || { int: "jar", str: "jar", list: "bowl", dict: "cabinet", func: "card", class: "blueprint", obj: "oven" }[o.t];
   if (kind === "jar") {
     let fill = "";
     if (o.cubes) for (let k = 0; k < o.cubes; k++) fill += `<rect class="cube" x="${19 + (k % 3) * 20}" y="${-24 - Math.floor(k / 3) * 19}" width="16" height="16" rx="2"/>`;
@@ -808,6 +963,41 @@ function vessel(o) {
   }
   const tag = (cx, y, w) => `<rect x="${cx - w / 2}" y="${y}" width="${w}" height="22" rx="3" class="paper"/>${txt(cx, y + 16, "t-val", esc(o.v), "middle")}`;
   const row = (cx, y, size, gap, n, e) => Array.from({ length: n }, (_, k) => emoji(cx + (k - (n - 1) / 2) * gap, y, size, e)).join("");
+  if (kind === "pizzabox") {
+    return { w: 150, h: 112, svg:
+      `<path d="M10,-30 L140,-30 L128,-104 L22,-104 Z" class="cardboard"/>${txt(75, -72, "t-box", "PIZZA", "middle")}
+       ${emoji(75, -46, 22, "🍕")}<rect x="4" y="-30" width="142" height="30" rx="2" class="cardboard"/>
+       <ellipse cx="75" cy="-31" rx="54" ry="5" fill="#e0a64a"/>${tag(75, -26, 104)}` };
+  }
+  if (kind === "plate") {
+    const n = o.items.length, w = Math.max(160, n * 66 + 30);
+    let sv = "";
+    o.items.forEach((v, i) => {
+      const cx = 15 + 33 + i * 66;
+      if (o.hl === i) sv += `<rect x="${cx - 30}" y="-96" width="60" height="88" rx="8" class="hl"/>`;
+      sv += txt(cx, -82, "t-py", `[${i}]`, "middle") + txt(cx, -66, "t-val", esc(v.p), "middle") + emoji(cx, -18, 34, ingOf(v));
+    });
+    return { w, h: 100, svg: `<ellipse cx="${w / 2}" cy="-8" rx="${w / 2}" ry="10" class="china"/><ellipse cx="${w / 2}" cy="-10" rx="${w / 2 - 16}" ry="5" fill="none" stroke="var(--china-edge)" stroke-width="1.5"/>${sv}` };
+  }
+  if (kind === "blueprint") {
+    const w = 210, h = 54 + o.methods.length * 20;
+    return { w, h: h + 6, svg:
+      `<g transform="rotate(-2 105 0)"><rect x="0" y="${-h}" width="${w}" height="${h}" rx="3" class="blueprint"/>
+       <path d="${Array.from({ length: 9 }, (_, k) => `M${12 + k * 23},${-h + 4} V-4`).join(" ")}" class="bp-grid"/>
+       ${txt(14, -h + 24, "t-bp-title", `class ${esc(o.v)}`)}
+       ${o.methods.map((m, k) => txt(14, -h + 48 + k * 20, "t-bp", "⚙ " + esc(m))).join("")}</g>` };
+  }
+  if (kind === "oven") {
+    const t = o.attrs.find(a => a[0] === "temp");
+    return { w: 170, h: 132, svg:
+      `<rect x="0" y="-126" width="170" height="126" rx="10" class="steel"/>
+       <rect x="12" y="-70" width="146" height="58" rx="6" class="oven-window"/>
+       <rect x="12" y="-70" width="146" height="58" rx="6" fill="url(#glow)" opacity="${t ? 1 : 0}"/>
+       <rect x="14" y="-114" width="96" height="34" rx="4" class="oven-display"/>
+       ${t ? txt(22, -101, "t-disp-k", "self.temp") + txt(22, -86, "t-disp", `${esc(t[1].p)}°`) : txt(22, -92, "t-disp-k", "no attributes yet")}
+       <circle cx="138" cy="-97" r="16" class="dial"/><line x1="138" y1="-97" x2="${t ? 148 : 138}" y2="${t ? -108 : -112}" stroke="#1c2629" stroke-width="3" stroke-linecap="round"/>
+       <rect x="30" y="-8" width="110" height="6" rx="3" class="steel-dark"/>` };
+  }
   if (kind === "basket") {
     return { w: 130, h: 92, svg:
       `${row(65, -52, 38, 34, o.count, o.fill)}
@@ -904,13 +1094,14 @@ function reachable(st) {
     seen.add(v.r);
     const o = st.heap[v.r];
     (o.items || []).forEach(it => visit(o.t === "dict" ? it[1] : it));
+    (o.attrs || []).forEach(a => visit(a[1]));
   };
   st.frames.forEach(f => Object.values(f.vars).forEach(visit));
   Object.entries(st.heap).forEach(([id, o]) => { if (o.hold) visit(R(id)); });
   return seen;
 }
 
-function backdrop() {
+function backdrop(ring) {
   let s = `<defs>
     <pattern id="tiles" width="56" height="56" patternUnits="userSpaceOnUse">
       <rect width="56" height="56" class="wall"/><path d="M0,0.75 H56 M0,28.75 H56 M0.75,0 V28 M28.75,28 V56" class="grout"/>
@@ -938,7 +1129,7 @@ function backdrop() {
     <line x1="${x + 18}" y1="${y + 30}" x2="${x + w - 18}" y2="${y + 30}" class="rail"/>
     <rect x="${x - 14}" y="${y + h - 4}" width="${w + 28}" height="14" rx="3" class="steel"/>`;
   for (const lx of [x + 70, x + w - 70]) s += `<line x1="${lx}" y1="0" x2="${lx}" y2="${y - 6}" class="rail"/><path d="M${lx - 26},${y + 8} L${lx - 12},${y - 8} H${lx + 12} L${lx + 26},${y + 8} Z" class="lamp"/>`;
-  s += `${emoji(x + w - 26, y + h - 6, 28, "🛎️")}${txt(x, y + h + 36, "t-k", "The pass")}${txt(x + 80, y + h + 36, "t-py", "print() output")}`;
+  s += `<g class="${ring ? "anim-ring" : ""}">${emoji(x + w - 26, y + h - 6, 28, "🛎️")}</g>${txt(x, y + h + 36, "t-k", "The pass")}${txt(x + 80, y + h + 36, "t-py", "print() output")}`;
   // pre-rinse tap over the dish sink
   const tx = SINK.x + SINK.w - 50;
   s += `<rect x="${tx - 6}" y="${COUNTER - 84}" width="12" height="84" class="steel"/>
@@ -961,10 +1152,13 @@ function backdrop() {
   return s;
 }
 
-function drawKitchen(st, prev) {
+/* prev is the state before the step that just happened (only after a right answer); it drives the animations */
+function drawKitchen(st, prev, fx) {
   const live = reachable(st), ids = Object.keys(st.heap);
-  const changedObj = id => prev && JSON.stringify(prev.heap[id]) !== JSON.stringify(st.heap[id]);
-  let s = backdrop(), twine = "";
+  const prevLive = prev ? reachable(prev) : null;
+  const changedObj = id => prev && prev.heap[id] && JSON.stringify(prev.heap[id]) !== JSON.stringify(st.heap[id]);
+  const newOut = prev && st.out.length > prev.out.length;
+  let s = backdrop(newOut), twine = "";
   const anchors = {};
 
   let x = SHELF_X0 + 22, shelfY = SHELF_LOW;
@@ -976,8 +1170,9 @@ function drawKitchen(st, prev) {
     const w = Math.max(v.w, Math.max((o.k || kname).length * 8.6, pyname.length * 7.9) + 10);
     if (x + w > SHELF_X1 - 14 && shelfY === SHELF_LOW && x > SHELF_X0 + 22) { x = SHELF_X0 + 22; shelfY = SHELF_HIGH; }
     const cx = x + w / 2, vx = cx - v.w / 2;
-    if (changedObj(id)) s += `<rect x="${vx - 10}" y="${shelfY - v.h - 12}" width="${v.w + 20}" height="${v.h + 12}" rx="10" class="flash"/>`;
-    s += `<g transform="translate(${vx},${shelfY})">${v.svg}</g>`;
+    const anim = prev && !prev.heap[id] ? "anim-drop" : changedObj(id) ? "anim-pop" : "";
+    if (anim) s += `<rect x="${vx - 10}" y="${shelfY - v.h - 12}" width="${v.w + 20}" height="${v.h + 12}" rx="10" class="flash"/>`;
+    s += `<g transform="translate(${vx},${shelfY})"><g class="${anim}">${v.svg}</g></g>`;
     let cy = shelfY + PLANK + 18;
     if (o.vessel === "cup") {
       const tw = o.v.length * 7.9 + 16;
@@ -992,7 +1187,8 @@ function drawKitchen(st, prev) {
 
   ids.filter(id => !live.has(id)).forEach((id, k) => {
     const v = vessel(st.heap[id]);
-    s += `<g transform="translate(${SINK.x + 30 + k * 90},${SINK.y + SINK.h - 14}) rotate(-12) scale(${Math.min(.55, 150 / v.w)})" opacity=".85">${v.svg}</g>`;
+    const falling = prev && (!prev.heap[id] || prevLive.has(id));
+    s += `<g transform="translate(${SINK.x + 30 + k * 90},${SINK.y + SINK.h - 14}) rotate(-12) scale(${Math.min(.55, 150 / v.w)})" opacity=".85"><g class="${falling ? "anim-sink" : ""}">${v.svg}</g></g>`;
   });
 
   const multi = st.frames.length > 1;
@@ -1010,16 +1206,17 @@ function drawKitchen(st, prev) {
   const total = boards.reduce((a, b) => a + b.w + 34, -34);
   const sc = Math.min(1, (BOARD_X1 - BOARD_X0) / total, BOARD_MAXH / Math.max(...boards.map(b => b.h)));
   const T = (px, py) => [BOARD_X0 + (px - BOARD_X0) * sc, BOARD_Y + (py - BOARD_Y) * sc];
+  const shell = (bx, by, w, h) => `<rect x="${bx + w - 6}" y="${by + h / 2 - 16}" width="28" height="32" rx="12" class="board"/>
+      <circle cx="${bx + w + 10}" cy="${by + h / 2}" r="5" class="hole"/>
+      <rect x="${bx}" y="${by}" width="${w}" height="${h}" rx="16" class="board"/>
+      <path d="M${bx + 20},${by + h - 14} q${w / 3},-6 ${w - 40},0" class="board-grain"/>`;
   let bs = "", bx = BOARD_X0;
   const pframes = prev ? prev.frames : [];
   for (const b of boards) {
     const isActive = b.fi === st.frames.length - 1, by = BOARD_Y;
     const pf = pframes[b.fi] && pframes[b.fi].name === b.f.name ? pframes[b.fi] : null;
-    bs += `<g class="${multi && !isActive ? "waiting" : ""}">
-      <rect x="${bx + b.w - 6}" y="${by + b.h / 2 - 16}" width="28" height="32" rx="12" class="board"/>
-      <circle cx="${bx + b.w + 10}" cy="${by + b.h / 2}" r="5" class="hole"/>
-      <rect x="${bx}" y="${by}" width="${b.w}" height="${b.h}" rx="16" class="board"/>
-      <path d="M${bx + 20},${by + b.h - 14} q${b.w / 3},-6 ${b.w - 40},0" class="board-grain"/>
+    const fresh = prev && b.fi >= pframes.length;
+    bs += `<g class="${multi && !isActive ? "waiting" : ""}"><g class="${fresh ? "anim-slide" : ""}">${shell(bx, by, b.w, b.h)}
       ${multi && isActive ? `<rect x="${bx - 4}" y="${by - 4}" width="${b.w + 8}" height="${b.h + 8}" rx="19" class="ring"/>` : ""}
       ${txt(bx + 16, by + 24, "t-k-board", b.title)}${txt(bx + 16, by + 41, "t-py", esc(b.sub))}
       ${multi ? txt(bx + b.w - 16, by + 24, "t-k-board", isActive ? "cooking" : "waiting", "end") + txt(bx + b.w - 16, by + 41, "t-py", isActive ? "running" : "paused", "end") : ""}`;
@@ -1028,13 +1225,14 @@ function drawKitchen(st, prev) {
       const ry = by + 56 + ri * 50;
       const changed = prev && (!pf || JSON.stringify(pf.vars[name]) !== JSON.stringify(v));
       if (changed) bs += `<rect x="${bx + 6}" y="${ry - 4}" width="${b.w - 12}" height="48" rx="8" class="flash"/>`;
+      bs += `<g class="${changed ? "anim-slap" : ""}">`;
       if (name === "$ret") {
         bs += `<ellipse cx="${bx + 38}" cy="${ry + 20}" rx="24" ry="10" class="china"/><ellipse cx="${bx + 38}" cy="${ry + 19}" rx="15" ry="5.5" fill="none" stroke="var(--china-edge)" stroke-width="1.5"/>
           ${txt(bx + 70, ry + 16, "t-k-board", "Plate")}${txt(bx + 70, ry + 33, "t-py", "return value")}`;
       } else if (name === "$err") {
         bs += `<rect x="${bx + 10}" y="${ry - 2}" width="${b.w - 20}" height="44" rx="8" class="alarm"/>${emoji(bx + 32, ry + 28, 22, "🚨")}
           ${txt(bx + 52, ry + 16, "t-white", "Alarm!")}${txt(bx + 52, ry + 33, "t-white", "exception raised", "start", 'font-size="11"')}
-          ${txt(bx + b.w - 24, ry + 26, "t-white", esc(v.p), "end")}`;
+          ${txt(bx + b.w - 24, ry + 26, "t-white", esc(v.p), "end")}</g>`;
         return;
       } else {
         bs += `<g transform="rotate(-1.5 ${bx + 16} ${ry})"><rect x="${bx + 16}" y="${ry}" width="${name.length * 10.5 + 22}" height="28" class="tape"/>
@@ -1045,13 +1243,22 @@ function drawKitchen(st, prev) {
         bs += `<circle cx="${xr - 9}" cy="${cy}" r="8" class="knot"/>`;
         if (anchors[v.r]) {
           const [kx, ky] = T(xr - 9, cy), [ax, ay] = anchors[v.r], dy = Math.max(40, (ky - ay) / 2);
-          twine += `<path d="M${kx},${ky} C${kx},${ky - dy} ${ax},${ay + dy} ${ax},${ay + 3}" class="twine${changed ? " new" : ""}" marker-end="url(#tie)"/>`;
+          const d = `M${kx},${ky} C${kx},${ky - dy} ${ax},${ay + dy} ${ax},${ay + 3}`;
+          twine += `<path d="${d}" class="twine${changed ? " new" : ""}" marker-end="url(#tie)"/>`;
+          if (changed) twine += `<circle r="7" class="knot-run"><animateMotion dur=".7s" fill="freeze" path="${d}"/></circle>`;
         }
       } else bs += chipSVG(xr, cy, v);
+      bs += `</g>`;
     });
-    bs += `</g>`;
+    bs += `</g></g>`;
     bx += b.w + 34;
   }
+  // boards that were just put away slide off the counter
+  pframes.slice(st.frames.length).forEach((f, k) => {
+    bs += `<g class="anim-out">${shell(bx, BOARD_Y, 210, 112)}${txt(bx + 16, BOARD_Y + 24, "t-k-board", `Cutting board ${st.frames.length + k}`)}
+      ${txt(bx + 16, BOARD_Y + 41, "t-py", `frame: ${esc(f.name)}() ends`)}${emoji(bx + 105, BOARD_Y + 88, 34, "💨")}</g>`;
+    bx += 244;
+  });
   s += `<g transform="translate(${BOARD_X0} ${BOARD_Y}) scale(${sc}) translate(${-BOARD_X0} ${-BOARD_Y})">${bs}</g>`;
 
   const { x: hx, y: hy, w: hw, h: hh } = PASS;
@@ -1060,20 +1267,37 @@ function drawKitchen(st, prev) {
   st.out.forEach((line, n) => {
     const chunks = line.match(/.{1,26}(\s|$)|.{1,26}/g).map(c => c.trimEnd());
     const th = 30 + chunks.length * 17, fresh = prev && n >= prev.out.length;
-    s += `${fresh ? `<rect x="${hx + 22}" y="${ty - 4}" width="${hw - 44}" height="${th + 8}" rx="6" class="flash"/>` : ""}
+    s += `<g class="${fresh ? "anim-ticket" : ""}">${fresh ? `<rect x="${hx + 22}" y="${ty - 4}" width="${hw - 44}" height="${th + 8}" rx="6" class="flash"/>` : ""}
       <rect x="${hx + 28}" y="${ty}" width="${hw - 56}" height="${th}" class="paper" transform="rotate(${n % 2 ? 1.2 : -1.2} ${hx + hw / 2} ${ty})"/>
       <rect x="${hx + hw / 2 - 12}" y="${ty - 8}" width="24" height="12" rx="2" class="steel"/>
       ${txt(hx + 40, ty + 18, "t-tiny", `SERVED · LINE ${n + 1}`)}
-      ${chunks.map((c, k) => txt(hx + 40, ty + 36 + k * 17, "t-ticket", esc(c))).join("")}`;
+      ${chunks.map((c, k) => txt(hx + 40, ty + 36 + k * 17, "t-ticket", esc(c))).join("")}</g>`;
     ty += th + 14;
   });
-  return s + twine;
+  return s + twine + chefSVG(fx);
+}
+
+/* the cartoon chef who reacts to every answer */
+let chefSeed = 0;
+function chefSVG(fx) {
+  if (!fx) return "";
+  chefSeed += 1;
+  const lines = fx === "right" ? ["Yes, chef!", "Perfect!", "Nailed it!", "Delicious!", "Order up!", "Chef's kiss!"]
+                               : ["Oops!", "Not quite, chef!", "That's burnt!", "Hmm, try again!", "Back to the pan!"];
+  const say = lines[chefSeed % lines.length], bw = say.length * 10.5 + 34;
+  const bits = (fx === "right" ? [[-80, -150, "✨"], [70, -160, "✨"], [-10, -190, "⭐"], [-120, -100, "✨"]]
+                               : [[-60, -150, "💨"], [50, -160, "💨"], [-5, -185, "💢"]])
+    .map(([dx, dy, e], k) => `<text x="0" y="-60" class="emoji bit" font-size="28" text-anchor="middle" style="--dx:${dx}px;--dy:${dy + 60}px;animation-delay:${.3 + k * .07}s">${e}</text>`).join("");
+  return `<g transform="translate(1112 788)"><g class="chef chef-${fx}">${bits}
+    <g class="bubble"><path d="M${-62 - bw},-150 h${bw} a22,22 0 0 1 0,44 h${-bw + 30} l-16,14 l2,-14 h-16 a22,22 0 0 1 0,-44 z" class="bubble-bg"/>
+      ${txt(-62 - bw / 2, -121, "t-bubble", say, "middle")}</g>
+    <g class="chef-face">${emoji(0, 0, 104, "🧑‍🍳")}</g></g></g>`;
 }
 
 /* ------------------------------------------------------------------ game */
 
 function highlight(src) {
-  const re = /("[^"]*"|'[^']*')|\b(def|return|if|for|in|while|else|elif|try|except)\b|\b(\d+)\b|\b(print|len|range)\b/g;
+  const re = /("[^"]*"|'[^']*')|\b(def|class|return|if|for|in|while|else|elif|try|except)\b|\b(\d+)\b|\b(print|len|range)\b/g;
   let out = "", last = 0, m;
   while ((m = re.exec(src))) {
     out += esc(src.slice(last, m.index));
@@ -1087,7 +1311,7 @@ const load = () => { try { return JSON.parse(localStorage.getItem("pk-best") || 
 let best = load();
 const save = () => { try { localStorage.setItem("pk-best", JSON.stringify(best)); } catch (e) {} };
 
-let D = null, i = 0, mistakes = 0, order = [], wrongPicked = new Set(), hinted = false, orderNo = 40;
+let fx = null, D = null, i = 0, mistakes = 0, order = [], wrongPicked = new Set(), hinted = false, orderNo = 40;
 const starsFor = m => m === 0 ? 3 : m <= 2 ? 2 : 1;
 const starRow = n => "★★★".split("").map((c, k) => `<span class="${k < n ? "" : "off"}">⭐</span>`).join("");
 
@@ -1123,6 +1347,7 @@ let openLine = null;
 
 const KW = {
   def:    ["keyword: def", "Starts a function definition: `def name(parameters):`. The indented lines below are the body, which only runs when the function is called.", "Writing a new recipe card."],
+  class:  ["keyword: class", "Starts a class: a blueprint for making objects. The indented `def`s inside become its methods.", "Pinning up a blueprint for a kind of appliance."],
   return: ["keyword: return", "Ends the function and hands the value after it back to whoever called the function.", "Putting the finished food on the plate to hand back."],
   if:     ["keyword: if", "Starts a condition. The indented block below runs only when the test after `if` is True.", "Checking the order before choosing a path."],
   else:   ["keyword: else", "The fallback block. It runs only when the `if` test was False.", "The other path, used when the check fails."],
@@ -1138,6 +1363,8 @@ const BUILTIN = {
 };
 const METHOD = {
   append: ["list method: append", "Adds one item to the end of the list. It changes the existing list in place and makes no copy.", "Pouring one more ingredient into the same bowl."],
+  pop:    ["list method: pop", "Removes an item and hands it back. With no argument it takes the last item.", "Lifting the top item off the plate."],
+  heat:   ["method: heat", "A function defined in the class. Called as `oven.heat(20)`, Python passes `oven` in as `self`.", "Pressing this oven's heat button."],
   copy:   ["method: copy", "Builds a new list (or dict) holding the same items. Later changes to one don't affect the other.", "Getting a second bowl and filling it the same way."],
   items:  ["dict method: items", "Gives the dict's (key, value) pairs, one per entry, in insertion order.", "Walking along the drawers, reading each name and amount."],
 };
@@ -1155,6 +1382,7 @@ function tokenize(src) {
   return out;
 }
 
+const inClass = src => /^\s+def /.test(src) && D && D.code.some(l => /^class /.test(l));
 function explainTokens(src) {
   const toks = tokenize(src);
   const first = toks.findIndex(x => x.k !== "indent");
@@ -1177,12 +1405,20 @@ function explainTokens(src) {
         if (x.t === "in") afterFor = false;
         return set("kw", ...KW[x.t]);
       }
+      if (p && p.t === "def" && x.t === "__init__") return set("name", "special method: __init__", "Runs automatically when a new object is built, to set it up. It always receives the new object as `self`.", "The setup instructions on the blueprint, followed for every new oven.");
+      if (p && p.t === "def" && inClass(src)) return set("name", "method name (being defined)", `A function that belongs to the class. Every object built from it can use it as \`object.${x.t}(...)\`.`, "A button on every oven built from this blueprint.");
+      if (inParams && x.t === "self") return set("name", "parameter: self", "The first parameter of a method. It receives the object the method was called on, automatically.", "\"This very oven\": whichever appliance pressed the button.");
       if (p && p.t === "def") return set("name", "function name (being defined)", `The name the new function will be stored under. Later, \`${x.t}(...)\` runs it.`, "The title on the recipe card, which is also its label on the rack.");
       if (inParams) return set("name", "parameter", `A name the function receives. Each call fills it with the argument passed in, inside that call's own frame.`, "The ingredient slot on the recipe card, filled in when an order comes.");
       if (afterFor) return set("name", "loop variable", `Re-bound to the next item on every pass of the loop. After the loop ends it keeps the last item.`, "A label moved onto each ingredient as you pick it up.");
+      if (x.t === "self") return set("name", "self", "The object this method is working on. Python fills it in automatically: in `oven.heat(20)`, `self` is `oven`.", "\"This very oven\": the appliance the board is working on.");
+      if (p && p.t === "def" && x.t === "__init__") return set("name", "special method: __init__", "Runs automatically when a new object is built, to set it up. It always receives the new object as `self`.", "The setup instructions on the blueprint, followed for every new oven.");
+      if (p && p.t === "class") return set("name", "class name", "The name of the new blueprint. Class names start with a capital letter by convention.", "The title on the blueprint.");
+      if (p && p.t === "." && !(n && n.t === "(")) return set("name", "attribute", `A value stored on the object before the dot. \`${x.t}\` belongs to that particular object.`, "A dial or setting on that particular appliance.");
       if (p && p.t === ".") return set("call", ...(METHOD[x.t] || [`method: ${x.t}`, "A function that belongs to the object before the dot.", "A tool that belongs to that container."]));
       if (BUILTIN[x.t]) return set("call", ...BUILTIN[x.t]);
       if (x.t === "KeyError") return set("name", "exception type: KeyError", "The error Python raises when you look up a dict key that doesn't exist.", "The alarm for a missing drawer.");
+      if (n && n.t === "(" && /^[A-Z]/.test(x.t)) return set("call", "class call (build an object)", `Calling the class \`${x.t}\` builds a new object from it and runs its \`__init__\`.`, "Building a new appliance from the blueprint.");
       if (n && n.t === "(") return set("call", "function call", `Runs the function \`${x.t}\`. A fresh frame is created for this call.`, `Using the ${x.t} recipe card: a fresh cutting board comes out.`);
       if (j === first && n && n.t === "=") return set("name", "variable (being assigned)", `The name on the left of \`=\`. It gets tied to whatever the right side produces. If it already existed, it's moved to the new object.`, "Writing a masking-tape label and tying it to the result.");
       if (j === first && n && (n.t === "+=" || n.t === "-=")) return set("name", "variable (being updated)", "This name is read, combined with the right side, and then re-bound to the result.", "The scale or label whose reading is about to change.");
@@ -1237,6 +1473,8 @@ function explainTokens(src) {
 }
 
 const PATTERNS = [
+  [/^\s*class /, "class Name:", "Define a blueprint for objects. The indented methods below belong to it."],
+  [/^\s*\w+\.\w+\s*(=|\+=)/, "object.attribute = value", "Store or update a value on that object."],
   [/^\s*def /, "def name(parameters):", "Define a new function. Nothing inside it runs until it's called."],
   [/^\s*return /, "return value", "Finish the function and hand this value back to the caller."],
   [/^\s*if /, "if condition:", "Run the indented block below only when the condition is True."],
@@ -1256,7 +1494,7 @@ function breakdownHTML(n) {
   const src = D.code[n - 1];
   const toks = explainTokens(src);
   const pat = PATTERNS.find(([re]) => re.test(src));
-  const runs = D.steps.map((s, idx) => ({ s, idx })).filter(x => x.idx > 0 && x.s.line === n);
+  const runs = D.steps.map((s, idx) => ({ s, idx })).filter(x => x.idx > 0 && (x.s.line === n || (x.s.also || []).includes(n)));
   const done = runs.filter(x => x.idx <= i);
   const show = (done[0] || runs[0]);
   let kitchen;
@@ -1287,7 +1525,7 @@ function showBreakdown() {
 
 /* code lines in the answer comparison, with words that differ from the ticket marked */
 const lexLine = s => s.match(/"[^"]*"|'[^']*'|#.*$|\w+|\s+|[^\s\w]/g) || [];
-const PYKW = new Set(["def", "return", "if", "else", "for", "in", "while", "try", "except", "del", "global", "pass", "break", "raise", "True", "False", "None"]);
+const PYKW = new Set(["class", "self", "def", "return", "if", "else", "for", "in", "while", "try", "except", "del", "global", "pass", "break", "raise", "True", "False", "None"]);
 function tokClass(t) {
   if (t[0] === "#") return "cm";
   if (t[0] === '"' || t[0] === "'") return "st";
@@ -1312,10 +1550,12 @@ function diffHTML(a, b) {
 }
 
 function render() {
-  const cur = D.steps[i], next = D.steps[i + 1], prev = i > 0 ? D.steps[i - 1].st : null;
+  const cur = D.steps[i], next = D.steps[i + 1], prev = fx === "right" && i > 0 ? D.steps[i - 1].st : null;
   document.querySelectorAll("#lines li.cl").forEach(li => li.classList.toggle("next", !!next && next.line === +li.dataset.n));
   showBreakdown();
-  $("#kitchen").innerHTML = drawKitchen(cur.st, prev);
+  $("#kitchen").innerHTML = drawKitchen(cur.st, prev, fx);
+  if (fx === "wrong") { const sw = $(".scene-wrap"); sw.classList.remove("shake"); void sw.offsetWidth; sw.classList.add("shake"); }
+  fx = null;
 
   const last = i > 0 ? `<div class="fb ok"><span class="lbl">✓ Right. Here's what happened</span>
       <code class="line">${diffHTML(D.code[cur.line - 1].trim(), D.code[cur.line - 1].trim())}</code><p>${code(cur.py)}</p></div>
@@ -1352,8 +1592,9 @@ function render() {
 
   $("#move").querySelectorAll(".opt").forEach(btn => btn.onclick = () => {
     const k = +btn.dataset.k;
-    if (opts[k].ok) { i += 1; enterStep(); render(); return; }
+    if (opts[k].ok) { i += 1; fx = "right"; enterStep(); render(); return; }
     if (!wrongPicked.has(k)) { wrongPicked.add(k); mistakes += 1; }
+    fx = "wrong";
     render();
     const again = $(`#move .opt[data-k="${k}"]`);
     if (again) again.classList.add("shake");
