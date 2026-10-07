@@ -3,71 +3,70 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Kalam:wght@700&display=swap">
 <style>
-/* Layout: recipe card + notes + controls on the left; an illustrated kitchen on the right (tiled wall with shelf on top,
-   countertop with cutting boards and sink below, serving hatch at the bottom). Twine strings run from labels up to the shelf. */
+/* Layout: a narrow left column (recipe = code, step controls, the two explanations) beside one large 2D kitchen drawing.
+   The kitchen is a single SVG: tiled back wall with two shelves and a serving hatch, a stone countertop with cutting boards
+   and a sink, cabinets below. Every drawn thing carries its Python name in blue underneath. */
 :root {
-  --bg: #dfe8e6;
-  --panel: #ffffff;
-  --ink: #1b2a2a;
-  --muted: #5a6b6a;
-  --line: #c9d8d5;
-  --py: #2a55c9;           /* every Python term is printed in this blue */
-  --tape: #f2e1ae; --tape-ink: #3d3214;
-  --twine: #9a6326;
+  --bg: #e3e9e7; --panel: #ffffff; --ink: #1d2a2a; --muted: #5d6c6b; --line: #cdd9d6;
+  --py: #2350c4;
   --hl-bg: #fff2b8; --hl-edge: #e0b414;
-  --tile: #f3f7f6; --grout: #d3dfdc;
-  --wood: #ddb987; --wood-dark: #a9773f; --wood-ink: #3f2a12;
-  --board: #e9cfa6;
-  --stone: #b9c2c4; --stone-dark: #8f9a9d;
-  --steel: #cfd7dc; --steel-dark: #8d9aa3;
-  --glass: rgba(214, 233, 246, .65); --glass-edge: #8eaac0;
-  --lid: #c4503b;
-  --paper: #fffdf6;
-  --plate: #ffffff; --plate-edge: #c7cfd3;
-  --kw: #7b3fb5; --str: #2c7a4b; --num: #b4521a;
-  --flash: rgba(224, 180, 20, .5);
+  --wall: #f4f6f2; --grout: #d9dfd9;
+  --plank: #c99a62; --plank-dark: #8e6436;
+  --stone: #c3c8c6; --stone-edge: #9ea5a3; --stone-fleck: #b3b9b7;
+  --cab: #5f7f78; --cab-edge: #4a6660; --handle: #d6dcdc;
+  --board: #e2bf8c; --board-edge: #a87a45; --board-ink: #3b2610;
+  --glass: rgba(205, 228, 242, .55); --glass-edge: #86a7bf;
+  --lid: #c4503b; --lid-dark: #93372a;
+  --paper: #fffdf5; --paper-edge: #d8d2bf;
+  --china: #ffffff; --china-edge: #b9c3c8;
+  --tea: #a46d2a;
+  --steel: #d3dade; --steel-dark: #8f9ca5; --basin: #a9b4bb;
+  --opening: #3b3530; --opening-ink: #e9e1d4;
+  --tape: #f1dfa8; --tape-ink: #3d3214;
+  --twine: #8f5a1e;
+  --sponge: #e8b66c; --cream: #f6d8e2;
+  --flash: rgba(240, 196, 30, .55);
   --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
   --hand: "Kalam", "Segoe Print", "Comic Sans MS", cursive;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #0f1716; --panel: #172221; --ink: #e4eeec; --muted: #97aaa8; --line: #2b3b39; --py: #86abff;
-  --tape: #dcc88f; --tape-ink: #2b2208; --twine: #e2ad66; --hl-bg: #3b3313; --hl-edge: #f0c93c;
-  --tile: #1a2524; --grout: #243433; --wood: #7a5733; --wood-dark: #523a20; --wood-ink: #f5e6d0; --board: #5e4428;
-  --stone: #2f3739; --stone-dark: #232a2c; --steel: #3d4950; --steel-dark: #27323a;
-  --glass: rgba(120, 160, 190, .22); --glass-edge: #5f7f97; --lid: #d9664f;
-  --paper: #22211c; --plate: #dfe5e8; --plate-edge: #9aa6ad;
-  --kw: #c79bff; --str: #7fd39c; --num: #f2a56b; --flash: rgba(240, 201, 60, .35); color-scheme: dark;
+  --bg: #0f1615; --panel: #172120; --ink: #e4edeb; --muted: #98a9a7; --line: #2b3a38; --py: #8cb0ff;
+  --hl-bg: #3b3313; --hl-edge: #f0c93c;
+  --wall: #1f2826; --grout: #2a3533; --plank: #7d5a32; --plank-dark: #563c1f;
+  --stone: #3a4140; --stone-edge: #2b3130; --stone-fleck: #444c4a; --cab: #2c3d3a; --cab-edge: #1f2c2a; --handle: #8c9998;
+  --board: #8a6639; --board-edge: #5e4322; --board-ink: #fbeedb;
+  --glass: rgba(140, 180, 210, .2); --glass-edge: #6488a3; --lid: #d4614b; --lid-dark: #9c3f2f;
+  --paper: #f3eedf; --paper-edge: #b9b29c; --china: #e9eef0; --china-edge: #9aa6ad; --tea: #b67c35;
+  --steel: #5c6970; --steel-dark: #3c474e; --basin: #2c353b; --opening: #0b0a09; --opening-ink: #d8d0c2;
+  --tape: #dcc88f; --tape-ink: #2b2208; --twine: #e2ad66; --flash: rgba(240, 201, 60, .4); color-scheme: dark;
 } }
 :root[data-theme="dark"] {
-  --bg: #0f1716; --panel: #172221; --ink: #e4eeec; --muted: #97aaa8; --line: #2b3b39; --py: #86abff;
-  --tape: #dcc88f; --tape-ink: #2b2208; --twine: #e2ad66; --hl-bg: #3b3313; --hl-edge: #f0c93c;
-  --tile: #1a2524; --grout: #243433; --wood: #7a5733; --wood-dark: #523a20; --wood-ink: #f5e6d0; --board: #5e4428;
-  --stone: #2f3739; --stone-dark: #232a2c; --steel: #3d4950; --steel-dark: #27323a;
-  --glass: rgba(120, 160, 190, .22); --glass-edge: #5f7f97; --lid: #d9664f;
-  --paper: #22211c; --plate: #dfe5e8; --plate-edge: #9aa6ad;
-  --kw: #c79bff; --str: #7fd39c; --num: #f2a56b; --flash: rgba(240, 201, 60, .35); color-scheme: dark;
+  --bg: #0f1615; --panel: #172120; --ink: #e4edeb; --muted: #98a9a7; --line: #2b3a38; --py: #8cb0ff;
+  --hl-bg: #3b3313; --hl-edge: #f0c93c;
+  --wall: #1f2826; --grout: #2a3533; --plank: #7d5a32; --plank-dark: #563c1f;
+  --stone: #3a4140; --stone-edge: #2b3130; --stone-fleck: #444c4a; --cab: #2c3d3a; --cab-edge: #1f2c2a; --handle: #8c9998;
+  --board: #8a6639; --board-edge: #5e4322; --board-ink: #fbeedb;
+  --glass: rgba(140, 180, 210, .2); --glass-edge: #6488a3; --lid: #d4614b; --lid-dark: #9c3f2f;
+  --paper: #f3eedf; --paper-edge: #b9b29c; --china: #e9eef0; --china-edge: #9aa6ad; --tea: #b67c35;
+  --steel: #5c6970; --steel-dark: #3c474e; --basin: #2c353b; --opening: #0b0a09; --opening-ink: #d8d0c2;
+  --tape: #dcc88f; --tape-ink: #2b2208; --twine: #e2ad66; --flash: rgba(240, 201, 60, .4); color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
 body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
-.wrap { max-width: 1280px; margin: 0 auto; padding-inline: 18px; padding-block: 26px 48px; display: grid; gap: 18px; }
+.wrap { max-width: 1440px; margin: 0 auto; padding-inline: 18px; padding-block: 24px 48px; display: grid; gap: 16px; }
 
-/* a kitchen word with its Python word underneath */
 .term { display: inline-flex; flex-direction: column; line-height: 1.15; vertical-align: middle; }
 .term .tk { font-weight: 600; }
 .term .tp { font: 500 11px/1.3 var(--mono); color: var(--py); }
 ruby { ruby-position: under; }
 rt { font: 500 10.5px var(--mono); color: var(--py); padding-top: 1px; }
 
-header { display: grid; gap: 6px; }
-h1 { font: 800 clamp(30px, 5vw, 44px)/1.05 var(--display); margin: 0; text-wrap: balance; }
-.sub { margin: 0; color: var(--muted); max-width: 68ch; }
-
-.glossary { display: flex; flex-wrap: wrap; gap: 8px; }
-.gl { display: flex; align-items: center; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px 6px 8px; font-size: 13px; }
-.gl .ico { font-size: 20px; line-height: 1; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
+h1 { font: 800 clamp(28px, 4.4vw, 40px)/1.05 var(--display); margin: 0; }
+.sub { margin: 0; color: var(--muted); max-width: 70ch; }
 
 nav.lessons { display: flex; flex-wrap: wrap; gap: 8px; }
 nav.lessons button { display: flex; align-items: center; gap: 10px; text-align: left; font: 500 14px/1.2 var(--body); color: var(--ink);
@@ -76,37 +75,35 @@ nav.lessons .n { font: 600 12px var(--mono); width: 22px; height: 22px; display:
 nav.lessons button[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
 nav.lessons button[aria-pressed="true"] .n { background: var(--ink); color: var(--bg); }
 
-.stage { display: grid; grid-template-columns: minmax(0, 4.2fr) minmax(0, 7.8fr); gap: 18px; align-items: start; }
-@media (max-width: 960px) { .stage { grid-template-columns: minmax(0, 1fr); } }
-.col { display: grid; gap: 14px; min-width: 0; }
-.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; min-width: 0; }
-.head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
-.head .term .tk { font: 600 13px var(--body); text-transform: uppercase; letter-spacing: .1em; }
-h2 { font: 600 22px/1.2 var(--display); margin: 0 0 4px; text-wrap: balance; }
-.blurb { margin: 0 0 12px; color: var(--muted); }
+.stage { display: grid; grid-template-columns: minmax(290px, 340px) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 1000px) { .stage { grid-template-columns: minmax(0, 1fr); } .stage .scene-wrap { order: -1; } }
+.col { display: grid; gap: 12px; min-width: 0; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; min-width: 0; }
+.head .term .tk { font: 600 12px var(--body); text-transform: uppercase; letter-spacing: .1em; }
+h2 { font: 600 20px/1.2 var(--display); margin: 8px 0 2px; text-wrap: balance; }
+.blurb { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
 
-/* recipe card = code */
-.recipe { background: var(--paper); border: 1px solid var(--line); border-radius: 6px; overflow-x: auto; position: relative;
-  background-image: linear-gradient(var(--lid), var(--lid)), repeating-linear-gradient(to bottom, transparent 0 29px, var(--line) 29px 30px);
-  background-size: 100% 3px, 100% 100%; background-repeat: no-repeat, repeat; background-position: 0 0, 0 9px; }
-.recipe ol { list-style: none; margin: 0; padding: 10px 0 8px; font: 14px/30px var(--mono); }
-.recipe li { display: flex; white-space: pre; border-left: 4px solid transparent; padding-right: 14px; }
-.recipe .ln { width: 38px; flex: none; text-align: right; padding-right: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
-.recipe li.cur { background: var(--hl-bg); border-left-color: var(--hl-edge); }
-.recipe li.cur .ln { color: var(--ink); font-weight: 600; }
-.kw { color: var(--kw); font-weight: 600; } .st { color: var(--str); } .nu { color: var(--num); } .bi { color: var(--py); }
+.recipe { background: var(--paper); color: #24221c; border: 1px solid var(--paper-edge); border-top: 4px solid var(--lid); border-radius: 4px; overflow-x: auto;
+  background-image: repeating-linear-gradient(to bottom, transparent 0 27px, var(--paper-edge) 27px 28px); background-position: 0 8px; }
+.recipe ol { list-style: none; margin: 0; padding: 8px 0; font: 13px/28px var(--mono); }
+.recipe li { display: flex; white-space: pre; border-left: 4px solid transparent; padding-right: 12px; }
+.recipe .ln { width: 32px; flex: none; text-align: right; padding-right: 10px; color: #7a7564; font-variant-numeric: tabular-nums; }
+.recipe li.cur { background: #fff0a8; border-left-color: #e0b414; }
+.recipe li.cur .ln { color: #24221c; font-weight: 600; }
+.recipe .kw { color: #7b3fb5; font-weight: 600; } .recipe .st { color: #2c7a4b; } .recipe .nu { color: #b4521a; } .recipe .bi { color: #2350c4; }
 
 .note { border-radius: 10px; padding: 12px 14px; min-width: 0; }
-.note.k { background: var(--board); border: 1px solid var(--wood-dark); color: var(--wood-ink); }
+.note.k { background: var(--board); border: 1px solid var(--board-edge); color: var(--board-ink); }
 .note.py { background: var(--panel); border: 1px solid var(--line); }
 .note h3 { font: 600 11px/1 var(--body); text-transform: uppercase; letter-spacing: .12em; margin: 0 0 8px; opacity: .75; }
 .note p { margin: 0; }
 .note.k p { line-height: 2.3; }
-.note code { font: 13px var(--mono); background: color-mix(in srgb, currentColor 10%, transparent); padding: 1px 5px; border-radius: 4px; }
+.note.k rt { color: var(--board-ink); opacity: .85; font-weight: 600; }
+.note code { font: 12.5px var(--mono); background: color-mix(in srgb, currentColor 11%, transparent); padding: 1px 5px; border-radius: 4px; }
 
-.controls { display: grid; gap: 12px; }
+.controls { display: grid; gap: 10px; }
 .btns { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.btns button { font: 500 14px/1 var(--body); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+.btns button { font: 500 14px/1 var(--body); padding: 10px 13px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
 .btns button.primary { background: var(--ink); border-color: var(--ink); color: var(--bg); font-weight: 600; }
 .btns button:disabled { opacity: .4; cursor: default; }
 .count { margin-left: auto; font: 13px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
@@ -114,116 +111,60 @@ input[type=range] { width: 100%; accent-color: var(--ink); }
 .hint { font-size: 12px; color: var(--muted); margin: 0; }
 button:focus-visible, input:focus-visible { outline: 3px solid var(--hl-edge); outline-offset: 2px; }
 
-/* ---------- the kitchen scene ---------- */
-.scene { position: relative; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: var(--tile); }
-#strings { position: absolute; inset: 0; pointer-events: none; z-index: 5; color: var(--twine); }
-#strings path.s { fill: none; stroke: var(--twine); stroke-width: 2.2; stroke-linecap: round; stroke-dasharray: 7 3; opacity: .95; }
-#strings path.s.new { stroke-width: 3.2; }
-.zone-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
-.zone-head .term .tk { font: 600 12px var(--body); text-transform: uppercase; letter-spacing: .12em; }
+.scene-wrap { min-width: 0; overflow-x: auto; border-radius: 14px; border: 1px solid var(--line); background: var(--wall); }
+#kitchen { display: block; width: 100%; min-width: 760px; height: auto; }
 
-.wall { padding: 16px 16px 20px;
-  background-color: var(--tile);
-  background-image: linear-gradient(var(--grout) 1.5px, transparent 1.5px), linear-gradient(90deg, var(--grout) 1.5px, transparent 1.5px);
-  background-size: 46px 23px; }
-.shelf { display: flex; flex-wrap: wrap; align-items: flex-end; row-gap: 14px; min-height: 150px; }
-.shelf .empty { width: 100%; border-bottom: 12px solid var(--wood); padding: 40px 12px 14px; color: var(--muted); font-style: italic; }
-
-.obj { display: flex; flex-direction: column; align-items: stretch; min-width: 0; }
-.obj .spot { display: flex; justify-content: center; align-items: flex-end; padding: 14px 16px 0; min-height: 110px;
-  border-bottom: 12px solid var(--wood); box-shadow: 0 6px 0 -2px var(--wood-dark); }
-.obj .cap { display: grid; justify-items: center; gap: 4px; padding: 10px 8px 2px; text-align: center; font-size: 13px; }
-.obj .cap .val { font: 600 13px var(--mono); background: var(--paper); border: 1px solid var(--line); padding: 1px 7px; border-radius: 4px; }
-.tag { font-size: 11px; padding: 3px 8px; border-radius: 999px; border: 1px dashed var(--wood-dark); background: var(--paper); }
-.tag .term .tp { font-size: 10px; }
-
-/* vessels */
-.v-jar { position: relative; width: 86px; min-height: 92px; margin-top: 14px; background: var(--glass); border: 2.5px solid var(--glass-edge);
-  border-radius: 12px 12px 18px 18px; display: flex; flex-wrap: wrap-reverse; align-content: flex-start; justify-content: center; gap: 3px; padding: 8px 6px; }
-.v-jar::before { content: ""; position: absolute; left: 6px; right: 6px; top: -14px; height: 13px; background: var(--lid); border-radius: 5px 5px 2px 2px;
-  box-shadow: inset 0 -3px 0 rgba(0,0,0,.18); }
-.v-jar .fill { font-size: 26px; line-height: 1; }
-.cube { width: 17px; height: 17px; background: #fbfbf8; border: 1px solid #c9c9bf; border-radius: 3px; box-shadow: inset -2px -2px 0 #e4e4dc; }
-.v-cup { position: relative; width: 78px; height: 58px; background: var(--plate); border: 2px solid var(--plate-edge); border-radius: 4px 4px 34px 34px;
-  margin-right: 16px; display: grid; place-items: start center; overflow: visible; }
-.v-cup::after { content: ""; position: absolute; right: -18px; top: 10px; width: 18px; height: 22px; border: 4px solid var(--plate-edge); border-left: none; border-radius: 0 14px 14px 0; }
-.v-cup .tea { width: 64px; height: 12px; margin-top: 5px; border-radius: 50%; background: #9c6b2b; display: grid; place-items: center; font-size: 15px; line-height: 0; }
-.v-bowl, .v-tray { display: flex; gap: 4px; padding: 10px 14px 18px; background: var(--glass); border: 2.5px solid var(--glass-edge); max-width: 100%; flex-wrap: wrap; justify-content: center; }
-.v-bowl { border-radius: 8px 8px 50% 50% / 8px 8px 60% 60%; padding-bottom: 26px; min-width: 120px; }
-.v-tray { background: color-mix(in srgb, var(--steel) 85%, transparent); border-color: var(--steel-dark); border-radius: 6px; border-top-width: 1px; }
-.slot { display: grid; justify-items: center; gap: 1px; padding: 4px 6px; border-radius: 8px; min-width: 50px; }
-.slot .ing { font-size: 28px; line-height: 1.1; }
-.slot .sv { font: 600 11px var(--mono); white-space: nowrap; }
-.slot .si { font: 500 10px var(--mono); color: var(--py); }
-.slot.on { background: var(--hl-bg); outline: 2px solid var(--hl-edge); }
-.v-cabinet { display: grid; gap: 5px; padding: 7px; background: var(--wood); border: 3px solid var(--wood-dark); border-radius: 6px; min-width: 210px; }
-.drawer { display: flex; align-items: center; gap: 8px; background: var(--board); border: 1.5px solid var(--wood-dark); border-radius: 4px; padding: 6px 8px; color: var(--wood-ink); }
-.drawer.on { outline: 2.5px solid var(--hl-edge); }
-.drawer .knob { width: 10px; height: 10px; border-radius: 50%; background: var(--wood-dark); flex: none; }
-.drawer .dk { flex: 1; display: flex; align-items: center; gap: 6px; font: 600 13px var(--mono); }
-.drawer .dk .ing { font-size: 20px; }
-.drawer .dk small { font: 500 10px var(--mono); color: var(--py); display: block; }
-.v-card { width: 150px; background: var(--paper); border: 1px solid var(--line); border-top: 4px solid var(--lid); border-radius: 3px; padding: 8px 10px 10px;
-  font: 600 13px var(--mono); transform: rotate(-2deg); box-shadow: 0 2px 4px rgba(0,0,0,.12); display: grid; gap: 6px; }
-.v-card i { display: block; height: 1px; background: var(--line); }
-
-/* countertop */
-.counter { position: relative; padding: 18px 16px 18px; background: linear-gradient(180deg, var(--stone) 0, var(--stone) 100%);
-  border-top: 8px solid var(--stone-dark); }
-.counter-grid { display: grid; grid-template-columns: minmax(0, 1fr) 190px; gap: 16px; align-items: start; }
-@media (max-width: 620px) { .counter-grid { grid-template-columns: minmax(0, 1fr); } }
-.stations { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; min-width: 0; }
-.board { position: relative; flex: 1 1 210px; max-width: 320px; background: var(--board); border: 2px solid var(--wood-dark); border-radius: 14px 30px 30px 14px;
-  padding: 12px 18px 14px 14px; color: var(--wood-ink); display: grid; gap: 8px; box-shadow: 0 4px 0 var(--wood-dark); }
-.board.waiting { opacity: .7; }
-.board.working { box-shadow: 0 4px 0 var(--wood-dark), 0 0 0 4px var(--hl-edge); }
-.bhead { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-.bhead .state { font-size: 11px; text-align: right; }
-.bhead .state .tk { font-weight: 500; }
-.var { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 3px 4px; border-radius: 6px; }
-.lab { display: grid; justify-items: start; gap: 2px; }
-.tape { font: 700 17px/1 var(--hand); background: var(--tape); color: var(--tape-ink); padding: 6px 10px 4px; transform: rotate(-1.5deg);
-  box-shadow: 0 1px 1px rgba(0,0,0,.15); overflow-wrap: anywhere; }
-.lab .tp { font: 500 10px var(--mono); color: var(--py); padding-left: 2px; }
-.plate { width: 30px; height: 30px; border-radius: 50%; background: var(--plate); border: 2px solid var(--plate-edge); box-shadow: inset 0 0 0 5px color-mix(in srgb, var(--plate-edge) 35%, transparent); flex: none; }
-.plate-row { display: flex; align-items: center; gap: 8px; }
-.knot { width: 14px; height: 14px; border-radius: 50%; background: var(--twine); box-shadow: 0 0 0 3px color-mix(in srgb, var(--twine) 30%, transparent); flex: none; }
-.chip { display: inline-flex; align-items: center; gap: 5px; background: var(--paper); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; }
-.chip code { font: 600 13px var(--mono); white-space: nowrap; }
-.chip .ing { font-size: 18px; line-height: 1; }
-.cake { display: inline-flex; flex-direction: column-reverse; align-items: center; }
-.cake i { display: block; width: 34px; height: 9px; background: #e9b872; border: 1px solid #a8743a; border-radius: 3px; margin-top: -1px; }
-.cake i:nth-child(n+2) { width: 30px; background: #f4d7e0; border-color: #c48a9c; }
-.empty-note { color: var(--muted); font-size: 13px; font-style: italic; margin: 0; }
-.board .empty-note { color: inherit; opacity: .7; }
-
-.sink { border-radius: 12px; padding: 10px; background: var(--steel); border: 2px solid var(--steel-dark); display: grid; gap: 8px; }
-.basin { min-height: 96px; border-radius: 10px; background: radial-gradient(circle at 50% 78%, var(--steel-dark) 0 6px, transparent 7px), linear-gradient(180deg, var(--steel-dark), var(--steel) 70%);
-  box-shadow: inset 0 4px 10px rgba(0,0,0,.25); display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end; gap: 6px; padding: 8px; }
-.basin .obj { opacity: .75; transform: rotate(-8deg) scale(.8); }
-.basin .obj .spot { border: none; box-shadow: none; min-height: 0; padding: 0; }
-.basin .obj .cap { display: none; }
-.sink .note-s { align-self: flex-start; font-size: 11px; color: var(--ink); opacity: .8; text-align: center; }
-
-/* serving hatch */
-.hatch { border-radius: 14px; border: 10px solid var(--wood); outline: 2px solid var(--wood-dark); background: var(--tile); padding: 14px 16px 16px; }
-.tickets { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; }
-.ticket { background: var(--paper); border: 1px solid var(--line); border-top: 3px dashed var(--line); padding: 8px 12px 10px; font: 14px/1.5 var(--mono);
-  box-shadow: 0 2px 4px rgba(0,0,0,.1); overflow-wrap: anywhere; max-width: 100%; }
-.ticket small { display: block; font: 500 10px var(--body); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
-
-.changed { animation: flash 1.2s ease-out; }
-@keyframes flash { from { background-color: var(--flash); } to { background-color: transparent; } }
-@media (prefers-reduced-motion: reduce) { .changed { animation: none; } }
+/* ---- SVG kitchen ---- */
+#kitchen text { font-family: var(--body); }
+.wall { fill: var(--wall); } .grout { stroke: var(--grout); stroke-width: 1.5; fill: none; }
+.plank { fill: var(--plank); } .plank-dark { fill: var(--plank-dark); }
+.stone { fill: var(--stone); } .stone-edge { fill: var(--stone-edge); } .fleck { fill: var(--stone-fleck); }
+.cab { fill: var(--cab); } .cab-door { fill: none; stroke: var(--cab-edge); stroke-width: 3; } .handle { fill: var(--handle); }
+.board { fill: var(--board); stroke: var(--board-edge); stroke-width: 2.5; } .hole { fill: var(--stone); stroke: var(--board-edge); stroke-width: 2; }
+.board-grain { stroke: var(--board-edge); stroke-width: 1; opacity: .25; fill: none; }
+.ring { fill: none; stroke: var(--hl-edge); stroke-width: 5; }
+.waiting { opacity: .62; }
+.glass { fill: var(--glass); stroke: var(--glass-edge); stroke-width: 2.5; }
+.glass-shine { fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; opacity: .55; }
+.lid { fill: var(--lid); } .lid-dark { fill: var(--lid-dark); }
+.paper { fill: var(--paper); stroke: var(--paper-edge); stroke-width: 1.2; }
+.china { fill: var(--china); stroke: var(--china-edge); stroke-width: 2; } .china-line { fill: none; stroke: var(--china-edge); stroke-width: 7; stroke-linecap: round; }
+.tea { fill: var(--tea); } .steam { fill: none; stroke: var(--china-edge); stroke-width: 2; stroke-linecap: round; opacity: .7; }
+.steel { fill: var(--steel); stroke: var(--steel-dark); stroke-width: 2; } .steel-dark { fill: var(--steel-dark); }
+.basin { fill: var(--basin); stroke: var(--steel-dark); stroke-width: 4; } .drain { fill: var(--steel-dark); }
+.wood { fill: var(--plank); stroke: var(--plank-dark); stroke-width: 3; } .drawer { fill: var(--board); stroke: var(--plank-dark); stroke-width: 1.5; }
+.knob { fill: var(--plank-dark); }
+.cube { fill: #fbfbf6; stroke: #bdbcae; stroke-width: 1; }
+.opening { fill: var(--opening); } .frame { fill: var(--plank); stroke: var(--plank-dark); stroke-width: 2; }
+.rail { stroke: var(--steel-dark); stroke-width: 3; }
+.tape { fill: var(--tape); }
+.knot { fill: var(--twine); stroke: var(--paper); stroke-width: 2; }
+.twine { fill: none; stroke: var(--twine); stroke-width: 2.4; stroke-dasharray: 8 3; stroke-linecap: round; }
+.twine.new { stroke-width: 3.6; }
+.sponge { fill: var(--sponge); stroke: #a8743a; stroke-width: 1; } .creamy { fill: var(--cream); stroke: #c48a9c; stroke-width: 1; }
+.hl { fill: var(--hl-bg); stroke: var(--hl-edge); stroke-width: 2; }
+.flash { fill: var(--flash); animation: fade 1.4s ease-out forwards; }
+@keyframes fade { from { opacity: 1; } to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .flash { animation: none; opacity: 0; } }
+.t-k { fill: var(--ink); font: 600 16px var(--body); }
+.t-k-board { fill: var(--board-ink); font: 600 16px var(--body); }
+.t-py { fill: var(--py); font: 500 13px var(--mono); }
+.t-head { fill: var(--ink); font: 600 14px var(--body); letter-spacing: .12em; }
+.t-muted { fill: var(--muted); font: italic 15px var(--body); }
+.t-hand { fill: var(--tape-ink); font: 700 20px var(--hand); }
+.t-val { fill: #24221c; font: 600 13px var(--mono); }
+.t-tiny { fill: #7a7564; font: 600 10px var(--body); letter-spacing: .12em; }
+.t-ticket { fill: #24221c; font: 500 13px var(--mono); }
+.t-open { fill: var(--opening-ink); font: italic 15px var(--body); }
+.t-recipe { fill: #24221c; font: 600 14px var(--mono); }
+.emoji { font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
 </style>
 
 <div class="wrap">
   <header>
     <h1>Python Kitchen</h1>
-    <p class="sub">Step through short programs and watch what Python does in its kitchen. Every kitchen word has its Python word written underneath in blue.</p>
+    <p class="sub">Step through short programs and watch them cook. Every object in the kitchen has its Python name written underneath in blue.</p>
   </header>
-
-  <div class="glossary" id="glossary" aria-label="Kitchen to Python dictionary"></div>
 
   <nav class="lessons" id="lessons" aria-label="Lessons"></nav>
 
@@ -235,43 +176,22 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--hl-edge); o
         <p class="blurb" id="lblurb"></p>
         <div class="recipe"><ol id="code"></ol></div>
       </section>
-      <section class="note k" aria-live="polite"><h3>In the kitchen</h3><p id="nk"></p></section>
-      <section class="note py"><h3>In Python</h3><p id="npy"></p></section>
       <section class="panel controls">
         <div class="btns">
-          <button id="b-first" type="button">Start</button>
           <button id="b-prev" type="button">Back</button>
           <button id="b-next" type="button" class="primary">Next step</button>
           <button id="b-play" type="button">Play</button>
+          <button id="b-first" type="button">Restart</button>
           <span class="count" id="count"></span>
         </div>
         <input type="range" id="scrub" min="0" value="0" aria-label="Jump to step">
         <p class="hint">Tip: use the ← and → keys to step.</p>
       </section>
+      <section class="note k" aria-live="polite"><h3>In the kitchen</h3><p id="nk"></p></section>
+      <section class="note py"><h3>In Python</h3><p id="npy"></p></section>
     </div>
-
-    <div class="col">
-      <section class="scene" id="scene">
-        <svg id="strings" aria-hidden="true"></svg>
-        <div class="wall">
-          <div class="zone-head" id="shelf-head"></div>
-          <div class="shelf" id="shelf"></div>
-        </div>
-        <div class="counter">
-          <div class="zone-head" id="counter-head"></div>
-          <div class="counter-grid">
-            <div class="stations" id="stations"></div>
-            <div class="sink">
-              <div id="sink-head"></div>
-              <div class="basin" id="basin"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section class="hatch">
-        <div class="zone-head" id="hatch-head"></div>
-        <div class="tickets" id="out"></div>
-      </section>
+    <div class="scene-wrap">
+      <svg id="kitchen" viewBox="0 0 1200 780" role="img" aria-label="Illustrated kitchen showing the program's memory"></svg>
     </div>
   </div>
 </div>
@@ -280,7 +200,6 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--hl-edge); o
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const term = (k, py) => `<span class="term"><span class="tk">${k}</span><span class="tp">${py}</span></span>`;
-// `code` → <code>, [kitchen|python] → kitchen word with the Python word underneath
 const fmt = s => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\[([^\]|]+)\|([^\]]+)\]/g, "<ruby>$1<rt>$2</rt></ruby>");
 
 const INGREDIENT = { "'egg'": "🥚", "'flour'": "🌾", "'milk'": "🥛", "'salt'": "🧂", "'mint'": "🌿", "'pepper'": "🌶️" };
@@ -290,11 +209,8 @@ const g = st => st.frames[0].vars;
 const active = st => st.frames[st.frames.length - 1].vars;
 
 const KIND = {
-  int:  ["Sealed jar", "int object"],
-  str:  ["Sealed jar", "str object"],
-  list: ["Mixing bowl", "list object"],
-  dict: ["Spice cabinet", "dict object"],
-  func: ["Recipe card", "function object"],
+  int: ["Sealed jar", "int object"], str: ["Sealed jar", "str object"], list: ["Mixing bowl", "list object"],
+  dict: ["Spice cabinet", "dict object"], func: ["Recipe card", "function object"],
 };
 
 function lesson(meta, script) {
@@ -305,7 +221,7 @@ function lesson(meta, script) {
     if (fn) fn(st);
     steps.push({ line, k, py, st });
   };
-  step(null, "A clean kitchen. The [shelf|memory] is empty and there are no [labels|variables] on the [counter|global frame] yet.",
+  step(null, "A clean kitchen. The [shelves|memory] are empty and there's no [masking tape|variables] on the [main board|global frame] yet.",
     "Nothing has run. The global frame has no names and no objects exist.");
   script(step);
   return { ...meta, steps };
@@ -315,7 +231,7 @@ const LESSONS = [
   lesson({ id: "labels", title: "Labels and jars", topic: "variables",
     blurb: "A variable is a label tied to something on the shelf, not a box that holds it.",
     code: ['sugar = 5', 'backup = sugar', 'sugar = sugar + 1', 'print(sugar, backup)'] }, step => {
-    step(1, "Fill a [jar|object] with 5 sugar cubes and seal it. Write `sugar` on a strip of [masking tape|variable name] and tie it to the jar with [twine|reference].",
+    step(1, "Fill a [jar|object] with 5 sugar cubes and seal it. Write `sugar` on [masking tape|a variable name] and tie it to the jar with [twine|a reference].",
       "`sugar = 5` creates an int object 5, then binds the name `sugar` to it.",
       st => { st.heap.o1 = { t: "int", v: "5", cubes: 5 }; g(st).sugar = R("o1"); });
     step(2, "Tie a second [label|name], `backup`, to the same [jar|object]. Still one jar of sugar, now with two labels.",
@@ -355,10 +271,10 @@ const LESSONS = [
   lesson({ id: "loops", title: "Weigh each ingredient", topic: "for loops",
     blurb: "A for loop does the same steps once for every item, like weighing ingredients one at a time.",
     code: ['weight = 0', 'for grams in [200, 150, 50]:', '    weight += grams', 'print(weight)'] }, step => {
-    step(1, "Zero the kitchen scale and write 0 on a [label|variable] called `weight`. Small numbers are written straight on the label, so they don't need a jar.",
+    step(1, "Zero the kitchen scale and write 0 on [masking tape|a variable] called `weight`. Small numbers are written straight on the tape, so they don't need a jar.",
       "`weight` is bound to 0. Small values are drawn inline to keep the picture readable.",
       st => { g(st).weight = P(0, { ico: "⚖️" }); });
-    step(2, "Line up flour, butter and chocolate on a [prep tray|list]. [Pick up|the loop takes] the first one: 200 g of flour. The `grams` label now reads 200.",
+    step(2, "Line up flour, butter and chocolate on a [prep tray|list]. [Pick up|the loop takes] the first one: 200 g of flour. The `grams` tape now reads 200.",
       "The `for` loop takes item 0 from the list and binds `grams` to it.",
       st => { st.heap.o1 = { t: "list", vessel: "tray", k: "Prep tray", hold: true, hl: 0,
                 items: [P(200, { ico: "🌾" }), P(150, { ico: "🧈" }), P(50, { ico: "🍫" })] };
@@ -381,30 +297,30 @@ const LESSONS = [
     step(2, "Nothing left on the tray, so you [stop repeating|the loop ends]. `grams` still shows the last thing you weighed. Nobody needs the tray now, so it goes in the [sink|garbage].",
       "The loop ends when the list runs out. Loop variables keep their last value afterwards. Nothing refers to the list any more.",
       st => { delete st.heap.o1.hl; delete st.heap.o1.hold; });
-    step(4, "The sink is [washed up|garbage-collected] and the total weight is [called out|printed].",
+    step(4, "The sink is [washed up|garbage-collected] and the total weight goes out on an [order ticket|print output].",
       "`print(weight)` outputs 400. The unused list has been garbage-collected.",
       st => { delete st.heap.o1; st.out.push("400"); });
   }),
 
   lesson({ id: "recipes", title: "Recipe cards", topic: "functions",
-    blurb: "A function is a recipe card. Each time you use it, a fresh workstation opens, cooks, and is cleared.",
+    blurb: "A function is a recipe card. Each time you use it, a fresh cutting board comes out, gets used, and is put away.",
     code: ['def make_tea(leaf):', '    cup = leaf + " tea"', '    return cup', '', 'order = make_tea("mint")', 'print(order)'] }, step => {
-    step(1, "Write a [recipe card|function] and label it `make_tea`. Writing the card doesn't brew anything yet.",
+    step(1, "Write a [recipe card|function] and stand it on the shelf, labeled `make_tea`. Writing the card doesn't brew anything yet.",
       "`def` creates a function object and binds the name `make_tea` to it. The body does not run yet.",
       st => { st.heap.o1 = { t: "func", v: "make_tea(leaf)" }; g(st).make_tea = R("o1"); });
-    step(5, "An order comes in. A cook sets up a fresh [cutting board|frame] for this recipe and labels the mint you handed over `leaf`, the [ingredient the card asks for|parameter].",
+    step(5, "An order comes in. A cook takes out a fresh [cutting board|frame] for this recipe and labels the jar of mint you handed over `leaf`, the [ingredient the card asks for|parameter].",
       "Calling `make_tea(\"mint\")` creates a new frame. The parameter `leaf` is bound to the argument.",
-      st => { st.heap.o2 = { t: "str", v: "'mint'", fill: "🌿🌿🌿" }; st.frames.push({ name: "make_tea", vars: { leaf: R("o2") } }); });
-    step(2, "On that board, brew a cup and label it `cup`. This [label|local variable] only exists on this board; the main counter can't see it.",
+      st => { st.heap.o2 = { t: "str", v: "'mint'", fill: "🌿" }; st.frames.push({ name: "make_tea", vars: { leaf: R("o2") } }); });
+    step(2, "On that board, brew a cup and label it `cup`. This [tape|local variable] only exists on this board; the main board can't see it.",
       "`cup` is a local variable. It lives in the function's frame, not the global frame.",
       st => { st.heap.o3 = { t: "str", v: "'mint tea'", vessel: "cup", k: "Teacup" }; active(st).cup = R("o3"); });
     step(3, "Put the cup on the [plate|return value] to hand back.",
       "`return cup` sets the return value to the object `cup` refers to.",
       st => { active(st).$ret = R("o3"); });
-    step(5, "The board is [wiped clean|frame destroyed] and its labels are thrown away. The tea is handed back and gets a new label, `order`. The leftover mint has no label, so it goes in the [sink|garbage].",
+    step(5, "The board is [put away|frame destroyed] and its tape is thrown out. The tea is handed back and gets a new label, `order`. The mint jar has no label left, so it goes in the [sink|garbage].",
       "The frame is destroyed, so `leaf` and `cup` disappear. The returned object survives as `order`. The 'mint' string has no references left.",
       st => { st.frames.pop(); g(st).order = R("o3"); });
-    step(6, "The sink is [washed up|garbage-collected] and the tea goes out through the [hatch|print output].",
+    step(6, "The sink is [washed up|garbage-collected] and the tea goes out on an [order ticket|print output].",
       "Unreferenced objects are garbage-collected. `print` outputs `mint tea`.",
       st => { delete st.heap.o2; st.out.push("mint tea"); });
   }),
@@ -425,7 +341,7 @@ const LESSONS = [
       st => { st.frames.push({ name: "cake", vars: { layers: P(2) } }); });
     step(2, "Is this a 1-layer cake? Still no.",
       "`2 == 1` is False.");
-    step(4, "Board 2 waits too and a third board comes out. Three boards are busy at once, each with its own `layers` [label|local variable].",
+    step(4, "Board 2 waits too and a third board comes out. Three boards are busy at once, each with its own `layers` [tape|local variable].",
       "A third frame. Every call has its own local variables.",
       st => { st.frames.push({ name: "cake", vars: { layers: P(1) } }); });
     step(2, "Board 3 only needs one layer. This is the [easy case|base case].",
@@ -433,13 +349,13 @@ const LESSONS = [
     step(3, "Board 3 bakes a sponge base and sets it on its [plate|return value].",
       "`cake(1)` returns `\"base\"`.",
       st => { active(st).$ret = P("'base'", { cake: 1 }); });
-    step(4, "Board 3 is [cleared|frame destroyed]. Board 2 takes the base, adds a layer of cream, and plates it.",
+    step(4, "Board 3 is [put away|frame destroyed]. Board 2 takes the base, adds a layer of cream, and plates it.",
       "Back in the `layers = 2` frame: `\"base\" + \"+layer\"`.",
       st => { st.frames.pop(); active(st).$ret = P("'base+layer'", { cake: 2 }); });
-    step(4, "Board 2 is cleared. Board 1 adds the final layer.",
+    step(4, "Board 2 is put away. Board 1 adds the final layer.",
       "Back in the `layers = 3` frame, which can finally finish its line.",
       st => { st.frames.pop(); active(st).$ret = P("'base+layer+layer'", { cake: 3 }); });
-    step(6, "Every board is put away and the cake goes out the [hatch|print output]. Without the 1-layer rule, boards would keep coming out until the kitchen ran out of counter space.",
+    step(6, "Every board is put away and the cake goes out on an [order ticket|print output]. Without the 1-layer rule, boards would keep coming out until the counter ran out of room.",
       "The stack unwinds and `print` runs. With no base case, Python would stop with `RecursionError`.",
       st => { st.frames.pop(); st.out.push("base+layer+layer"); });
   }),
@@ -457,16 +373,16 @@ const LESSONS = [
     step(3, "Use a spoon of salt. [Same drawer|same key], new amount.",
       "Assigning to an existing key replaces its value. `-=` reads 3 and writes 2.",
       st => { st.heap.o1.items[0][1] = spoons(2); });
-    step(4, "[Walk along the drawers|loop over .items()]. At each one, read the [name|key] and the [amount|value] onto two labels.",
+    step(4, "[Walk along the drawers|loop over .items()]. At each one, copy the [name|key] and the [amount|value] onto two pieces of tape.",
       "`.items()` gives (key, value) pairs. The loop unpacks each pair into `name` and `qty`.",
       st => { st.heap.o1.hl = 0; g(st).name = P("'salt'"); g(st).qty = P(2, { ico: "🥄" }); });
-    step(5, "[Call it out|print] through the hatch.",
+    step(5, "Send it out on an [order ticket|print output].",
       "Prints the first pair.",
       st => { st.out.push("salt 2"); });
     step(4, "Next drawer.",
       "The second pair.",
       st => { st.heap.o1.hl = 1; g(st).name = P("'pepper'"); g(st).qty = P(2, { ico: "🥄" }); });
-    step(5, "Call it out.",
+    step(5, "Send it out.",
       "Prints the second pair.",
       st => { st.out.push("pepper 2"); });
     step(4, "End of the cabinet. Drawers stay in the [order you fitted them|insertion order].",
@@ -475,32 +391,110 @@ const LESSONS = [
   }),
 ];
 
-const GLOSSARY = [
-  ["📖", "Recipe", "code"], ["🏷️", "Label", "variable"], ["🧵", "Twine", "reference"], ["🫙", "Sealed jar", "immutable object"],
-  ["🥣", "Mixing bowl", "list"], ["🗄️", "Spice cabinet", "dict"], ["📇", "Recipe card", "function"], ["🪵", "Cutting board", "frame"],
-  ["🍽️", "Plate", "return value"], ["🛎️", "Serving hatch", "print() output"], ["🚰", "Sink", "garbage collection"],
-];
+/* ------------------------------------------------------------------ drawing */
 
-function highlight(src) {
-  const re = /("[^"]*"|'[^']*')|\b(def|return|if|for|in|while|else|elif)\b|\b(\d+)\b|\b(print|len|range)\b/g;
-  let out = "", last = 0, m;
-  while ((m = re.exec(src))) {
-    out += esc(src.slice(last, m.index));
-    out += `<span class="${m[1] ? "st" : m[2] ? "kw" : m[3] ? "nu" : "bi"}">${esc(m[0])}</span>`;
-    last = re.lastIndex;
-  }
-  return out + esc(src.slice(last));
-}
+const W = 1200, H = 780;
+const SHELF_LOW = 372, SHELF_HIGH = 196, PLANK = 14, SHELF_X0 = 30, SHELF_X1 = 870;
+const COUNTER = 462, COUNTER_END = 700, EDGE = 14;
+const BOARD_X0 = 30, BOARD_X1 = 880, BOARD_Y = 516, BOARD_MAXH = 176;
+const SINK = { x: 930, y: 520, w: 240, h: 110 };
+const HATCH = { x: 905, y: 30, w: 270, h: 262 };
 
 const ingOf = v => v.ico || INGREDIENT[v.p] || "";
+const txt = (x, y, cls, s, anchor = "start", extra = "") => `<text x="${x}" y="${y}" class="${cls}" text-anchor="${anchor}" ${extra}>${s}</text>`;
+const emoji = (x, y, size, s) => s ? `<text x="${x}" y="${y}" class="emoji" font-size="${size}" text-anchor="middle">${s}</text>` : "";
+const trunc = (s, n) => s.length > n ? s.slice(0, n - 1) + "…" : s;
 
-function chipHTML(v) {
-  const ing = ingOf(v);
-  const pics = v.cake ? `<span class="cake">${"<i></i>".repeat(v.cake)}</span>`
-             : ing ? `<span class="ing">${ing.repeat(v.rep || 1)}</span>` : "";
-  return `<span class="chip">${pics}<code>${esc(v.p)}</code></span>`;
+function cakeSVG(x, bottom, n) {
+  let s = "";
+  for (let k = 0; k < n; k++) s += `<rect x="${x + (k ? 2 : 0)}" y="${bottom - 9 - k * 9}" width="${k ? 30 : 34}" height="9" rx="2" class="${k ? "creamy" : "sponge"}"/>`;
+  return s;
 }
-const valHTML = v => v.r ? `<span class="knot" data-to="${v.r}" title="twine to an object on the shelf"></span>` : chipHTML(v);
+
+/* a value written on a paper chip, right-aligned at xr */
+function chipW(v) {
+  return (ingOf(v) ? 22 * (v.rep || 1) + 4 : 0) + (v.cake ? 42 : 0) + v.p.length * 7.9 + 18;
+}
+function chipSVG(xr, cy, v) {
+  const w = chipW(v), x = xr - w;
+  let s = `<rect x="${x}" y="${cy - 14}" width="${w}" height="28" rx="5" class="paper"/>`, cx = x + 9;
+  if (v.cake) { s += cakeSVG(cx, cy + 10, v.cake); cx += 42; }
+  else if (ingOf(v)) { const n = v.rep || 1; for (let k = 0; k < n; k++) s += emoji(cx + 10 + k * 22, cy + 7, 18, ingOf(v)); cx += 22 * n + 4; }
+  return s + txt(cx, cy + 5, "t-val", esc(v.p));
+}
+
+/* vessels: drawn in local coords, x from 0..w, sitting on y = 0 */
+function vessel(o) {
+  const kind = o.vessel || { int: "jar", str: "jar", list: "bowl", dict: "cabinet", func: "card" }[o.t];
+  if (kind === "jar") {
+    let fill = "";
+    if (o.cubes) for (let k = 0; k < o.cubes; k++) fill += `<rect class="cube" x="${19 + (k % 3) * 20}" y="${-24 - Math.floor(k / 3) * 19}" width="16" height="16" rx="2"/>`;
+    else fill = emoji(48, -14, 34, o.fill) + emoji(30, -18, 26, o.fill) + emoji(66, -20, 26, o.fill);
+    return { w: 96, h: 128, svg:
+      `<rect x="4" y="-112" width="88" height="112" rx="16" class="glass"/>${fill}
+       <rect x="10" y="-126" width="76" height="17" rx="4" class="lid"/><rect x="10" y="-113" width="76" height="4" class="lid-dark"/>
+       <rect x="14" y="-100" width="68" height="28" rx="3" class="paper"/>${txt(48, -81, "t-val", esc(trunc(o.v, 8)), "middle")}
+       <path d="M16,-62 L16,-20" class="glass-shine"/>` };
+  }
+  if (kind === "cup") {
+    return { w: 132, h: 98, svg:
+      `<ellipse cx="62" cy="-7" rx="58" ry="8" class="china"/>
+       <path d="M96,-60 C124,-60 124,-28 90,-27" class="china-line"/>
+       <path d="M20,-72 L102,-72 Q100,-18 61,-16 Q22,-18 20,-72 Z" class="china"/>
+       <ellipse cx="61" cy="-70" rx="39" ry="6" class="tea"/>${emoji(61, -64, 15, "🌿")}
+       <path d="M48,-82 q-6,-8 0,-14 t0,-12 M70,-80 q-6,-8 0,-14 t0,-12" class="steam"/>` };
+  }
+  if (kind === "card") {
+    return { w: 180, h: 120, svg:
+      `<g transform="rotate(-4 90 0)"><rect x="6" y="-114" width="168" height="112" rx="3" class="paper"/>
+       <rect x="6" y="-114" width="168" height="7" class="lid"/>
+       ${txt(18, -90, "t-tiny", "RECIPE")}${txt(18, -68, "t-recipe", esc(o.v))}
+       <path d="M18,-50 H160 M18,-36 H160 M18,-22 H130" stroke="var(--paper-edge)" stroke-width="1.5"/></g>` };
+  }
+  if (kind === "cabinet") {
+    const n = o.items.length, w = 270, h = 20 + n * 50;
+    let s = `<rect x="0" y="${-h}" width="${w}" height="${h}" rx="6" class="wood"/>`;
+    o.items.forEach(([k, v], i) => {
+      const y = -h + 10 + i * 50;
+      s += `<rect x="10" y="${y}" width="${w - 20}" height="42" rx="4" class="${o.hl === i ? "hl" : "drawer"}"/>
+        <circle cx="26" cy="${y + 21}" r="5" class="knob"/>${emoji(48, y + 29, 22, INGREDIENT[k])}
+        ${txt(66, y + 19, "t-val", esc(k))}${txt(66, y + 34, "t-py", "key")}
+        ${emoji(w - 90 - ((v.rep || 1) - 1) * 9, y + 28, 17, "🥄".repeat(v.rep || 1))}
+        ${txt(w - 22, y + 19, "t-val", esc(v.p), "end")}${txt(w - 22, y + 34, "t-py", "value", "end")}`;
+    });
+    return { w, h, svg: s };
+  }
+  if (kind === "tray") {
+    const n = o.items.length, w = n * 78 + 24;
+    let s = "";
+    o.items.forEach((v, i) => {
+      const cx = 12 + 39 + i * 78;
+      if (o.hl === i) s += `<rect x="${cx - 34}" y="-78" width="68" height="50" rx="8" class="hl"/>`;
+      s += emoji(cx, -36, 34, ingOf(v));
+    });
+    s += `<rect x="0" y="-30" width="${w}" height="30" rx="5" class="steel"/><rect x="-4" y="-34" width="${w + 8}" height="7" rx="3" class="steel-dark"/>`;
+    o.items.forEach((v, i) => {
+      const cx = 12 + 39 + i * 78;
+      s += `<text x="${cx}" y="-10" text-anchor="middle"><tspan class="t-val">${esc(v.p)} g </tspan><tspan class="t-py">[${i}]</tspan></text>`;
+    });
+    return { w, h: 80, svg: s };
+  }
+  // bowl
+  const n = o.items.length, w = Math.max(150, n * 66 + 36);
+  let s = "";
+  o.items.forEach((v, i) => {
+    const cx = 18 + 33 + i * 66;
+    if (o.hl === i) s += `<rect x="${cx - 30}" y="-90" width="60" height="80" rx="8" class="hl"/>`;
+    s += emoji(cx, -52, 32, ingOf(v));
+  });
+  s += `<path d="M0,-70 C0,-16 ${w * .25},0 ${w / 2},0 C${w * .75},0 ${w},-16 ${w},-70 Z" class="glass"/>`;
+  o.items.forEach((v, i) => {
+    const cx = 18 + 33 + i * 66;
+    s += txt(cx, -34, "t-val", esc(v.p), "middle") + txt(cx, -19, "t-py", `[${i}]`, "middle");
+  });
+  s += `<rect x="-5" y="-74" width="${w + 10}" height="8" rx="4" class="glass"/><path d="M14,-58 Q16,-34 30,-22" class="glass-shine"/>`;
+  return { w, h: 104, svg: s };
+}
 
 function reachable(st) {
   const seen = new Set();
@@ -515,75 +509,198 @@ function reachable(st) {
   return seen;
 }
 
-function vesselHTML(o) {
-  const vessel = o.vessel || { int: "jar", str: "jar", list: "bowl", dict: "cabinet", func: "card" }[o.t];
-  if (vessel === "card") return `<div class="v-card"><span>${esc(o.v)}</span><i></i><i></i><i></i></div>`;
-  if (vessel === "cup") return `<div class="v-cup"><div class="tea">🌿</div></div>`;
-  if (vessel === "jar") {
-    const fill = o.cubes ? `<i class="cube"></i>`.repeat(o.cubes) : `<span class="fill">${o.fill || ""}</span>`;
-    return `<div class="v-jar">${fill}</div>`;
+function backdrop() {
+  let s = `<defs>
+    <pattern id="tiles" width="56" height="56" patternUnits="userSpaceOnUse">
+      <rect width="56" height="56" class="wall"/>
+      <path d="M0,0.75 H56 M0,28.75 H56 M0.75,0 V28 M28.75,28 V56" class="grout"/>
+    </pattern>
+    <marker id="tie" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--twine)"/></marker>
+  </defs>
+  <rect width="${W}" height="${COUNTER}" fill="url(#tiles)"/>`;
+  for (const y of [SHELF_HIGH, SHELF_LOW]) {
+    s += `<rect x="${SHELF_X0}" y="${y}" width="${SHELF_X1 - SHELF_X0}" height="${PLANK}" rx="2" class="plank"/>
+      <rect x="${SHELF_X0}" y="${y + PLANK - 4}" width="${SHELF_X1 - SHELF_X0}" height="4" class="plank-dark"/>
+      <path d="M${SHELF_X0 + 50},${y + PLANK} h14 l-14,26 z M${SHELF_X1 - 64},${y + PLANK} h14 v26 z" class="plank-dark"/>`;
   }
-  if (vessel === "cabinet") {
-    return `<div class="v-cabinet">${o.items.map(([k, v], i) => `<div class="drawer ${o.hl === i ? "on" : ""}">
-      <span class="knob"></span><span class="dk"><span class="ing">${INGREDIENT[k] || ""}</span><span>${esc(k)}<small>key</small></span></span>
-      ${chipHTML(v)}</div>`).join("")}</div>`;
+  s += txt(SHELF_X0, 30, "t-head", "SHELVES") + txt(SHELF_X0, 47, "t-py", "objects in memory (the heap)");
+  const { x, y, w, h } = HATCH;
+  s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" class="frame"/>
+    <rect x="${x + 14}" y="${y + 14}" width="${w - 28}" height="${h - 28}" class="opening"/>
+    <line x1="${x + 20}" y1="${y + 34}" x2="${x + w - 20}" y2="${y + 34}" class="rail"/>
+    <rect x="${x - 12}" y="${y + h - 4}" width="${w + 24}" height="16" rx="3" class="plank"/>
+    ${emoji(x + w - 30, y + h - 6, 30, "🛎️")}
+    ${txt(x, y + h + 40, "t-k", "Serving hatch")}${txt(x, y + h + 57, "t-py", "print() output")}`;
+  const tx = SINK.x + SINK.w / 2;
+  s += `<rect x="${tx - 7}" y="${COUNTER - 72}" width="14" height="72" class="steel"/>
+    <path d="M${tx},${COUNTER - 66} q0,-26 -30,-26 h-16 v10" fill="none" stroke="var(--steel-dark)" stroke-width="12" stroke-linecap="round"/>
+    <rect x="${tx - 22}" y="${COUNTER - 42}" width="44" height="8" rx="4" class="steel-dark"/>`;
+  s += `<rect x="0" y="${COUNTER}" width="${W}" height="${COUNTER_END - COUNTER}" class="stone"/>
+    <rect x="0" y="${COUNTER - 5}" width="${W}" height="5" class="stone-edge"/>`;
+  for (let k = 0; k < 70; k++) {
+    const fx = (k * 173) % W, fy = COUNTER + 10 + ((k * 97) % (COUNTER_END - COUNTER - 20));
+    s += `<circle cx="${fx}" cy="${fy}" r="${1 + (k % 3)}" class="fleck"/>`;
   }
-  return `<div class="v-${vessel}">${o.items.map((v, i) => `<div class="slot ${o.hl === i ? "on" : ""}">
-    <span class="ing">${ingOf(v) || "·"}</span><span class="sv">${esc(v.p)}</span><span class="si">[${i}]</span></div>`).join("")}</div>`;
+  s += `<rect x="0" y="${COUNTER_END}" width="${W}" height="${EDGE}" class="stone-edge"/>
+    <rect x="0" y="${COUNTER_END + EDGE}" width="${W}" height="${H - COUNTER_END - EDGE}" class="cab"/>`;
+  for (let k = 0; k < 6; k++) {
+    const dx = 14 + k * 198;
+    s += `<rect x="${dx}" y="${COUNTER_END + EDGE + 10}" width="182" height="${H - COUNTER_END - EDGE}" rx="4" class="cab-door"/>
+      <rect x="${dx + (k % 2 ? 14 : 152)}" y="${COUNTER_END + EDGE + 24}" width="16" height="6" rx="3" class="handle"/>`;
+  }
+  s += txt(BOARD_X0, COUNTER + 26, "t-head", "COUNTERTOP") + txt(BOARD_X0, COUNTER + 43, "t-py", "frames (the call stack)");
+  s += `<rect x="${SINK.x}" y="${SINK.y}" width="${SINK.w}" height="${SINK.h}" rx="18" class="basin"/>
+    <circle cx="${SINK.x + SINK.w / 2}" cy="${SINK.y + SINK.h - 18}" r="7" class="drain"/>
+    ${txt(SINK.x, SINK.y + SINK.h + 24, "t-k", "Sink")}${txt(SINK.x + 46, SINK.y + SINK.h + 24, "t-py", "garbage collection")}`;
+  return s;
 }
 
-function objHTML(id, o, changed) {
-  const [kname, pyname] = KIND[o.t];
-  const showVal = o.t === "int" || o.t === "str";
-  const hold = o.hold ? `<span class="tag">${term("on the counter", "being looped over")}</span>` : "";
-  return `<div class="obj" id="obj-${id}">
-    <div class="spot ${changed ? "changed" : ""}">${vesselHTML(o)}</div>
-    <div class="cap">${showVal ? `<span class="val">${esc(o.v)}</span>` : ""}${term(o.k || kname, pyname)}${hold}</div>
-  </div>`;
+function drawKitchen(st, prev) {
+  const live = reachable(st);
+  const ids = Object.keys(st.heap);
+  const changedObj = id => prev && JSON.stringify(prev.heap[id]) !== JSON.stringify(st.heap[id]);
+  let s = backdrop(), twine = "";
+  const anchors = {};
+
+  /* shelf objects: lower shelf first, overflow to the upper one */
+  let x = SHELF_X0 + 14, shelfY = SHELF_LOW;
+  const onShelf = ids.filter(id => live.has(id));
+  if (!onShelf.length) s += txt(SHELF_X0 + 20, SHELF_LOW - 20, "t-muted", "Nothing on the shelves yet");
+  for (const id of onShelf) {
+    const o = st.heap[id], v = vessel(o);
+    const [kname, pyname] = KIND[o.t];
+    const capW = Math.max((o.k || kname).length * 8.6, pyname.length * 7.9) + 10;
+    const w = Math.max(v.w, capW);
+    if (x + w > SHELF_X1 - 10 && shelfY === SHELF_LOW && x > SHELF_X0 + 14) { x = SHELF_X0 + 14; shelfY = SHELF_HIGH; }
+    const cx = x + w / 2, vx = cx - v.w / 2;
+    if (changedObj(id)) s += `<rect x="${vx - 10}" y="${shelfY - v.h - 12}" width="${v.w + 20}" height="${v.h + 12}" rx="10" class="flash"/>`;
+    s += `<g transform="translate(${vx},${shelfY})">${v.svg}</g>`;
+    let cy = shelfY + PLANK + 18;
+    if (o.vessel === "cup") {
+      const tw = o.v.length * 7.9 + 16;
+      s += `<rect x="${cx - tw / 2}" y="${shelfY + 2}" width="${tw}" height="20" rx="3" class="paper"/>${txt(cx, shelfY + 17, "t-val", esc(o.v), "middle")}`;
+      cy += 12;
+    }
+    s += txt(cx, cy, "t-k", o.k || kname, "middle") + txt(cx, cy + 16, "t-py", pyname, "middle");
+    if (o.hold) { s += txt(cx, cy + 32, "t-py", "being looped over", "middle"); cy += 16; }
+    anchors[id] = [cx, cy + 24];
+    x += w + 34;
+  }
+
+  /* sink: objects nothing refers to any more */
+  ids.filter(id => !live.has(id)).forEach((id, k) => {
+    const v = vessel(st.heap[id]);
+    const sc = Math.min(.55, 150 / v.w);
+    s += `<g transform="translate(${SINK.x + 40 + k * 90},${SINK.y + SINK.h - 14}) rotate(-12) scale(${sc})" opacity=".85">${v.svg}</g>`;
+  });
+
+  /* cutting boards = frames */
+  const multi = st.frames.length > 1;
+  const boards = st.frames.map((f, fi) => {
+    const rows = Object.entries(f.vars);
+    const title = fi === 0 ? "Main board" : `Cutting board ${fi}`;
+    const sub = fi === 0 ? "global frame" : `frame: ${f.name}()`;
+    let w = Math.max(210, title.length * 8.6 + (multi ? 96 : 30), sub.length * 7.9 + 30);
+    rows.forEach(([name, v]) => {
+      const left = name === "$ret" ? 150 : Math.max(name.length * 10.5 + 26, 76);
+      const right = v.r ? 24 : chipW(v);
+      w = Math.max(w, 16 + left + 22 + right + 16);
+    });
+    const h = 62 + Math.max(1, rows.length) * 50;
+    return { f, fi, rows, title, sub, w, h };
+  });
+  const total = boards.reduce((a, b) => a + b.w + 34, -34);
+  const maxH = Math.max(...boards.map(b => b.h));
+  const sc = Math.min(1, (BOARD_X1 - BOARD_X0) / total, BOARD_MAXH / maxH);
+  const T = (px, py) => [BOARD_X0 + (px - BOARD_X0) * sc, BOARD_Y + (py - BOARD_Y) * sc];
+  let bs = "", bx = BOARD_X0;
+  const pframes = prev ? prev.frames : [];
+  for (const b of boards) {
+    const isActive = b.fi === st.frames.length - 1;
+    const pf = pframes[b.fi] && pframes[b.fi].name === b.f.name ? pframes[b.fi] : null;
+    const by = BOARD_Y;
+    bs += `<g class="${multi && !isActive ? "waiting" : ""}">
+      <rect x="${bx + b.w - 6}" y="${by + b.h / 2 - 16}" width="28" height="32" rx="12" class="board"/>
+      <circle cx="${bx + b.w + 10}" cy="${by + b.h / 2}" r="5" class="hole"/>
+      <rect x="${bx}" y="${by}" width="${b.w}" height="${b.h}" rx="16" class="board"/>
+      <path d="M${bx + 20},${by + b.h - 14} q${b.w / 3},-6 ${b.w - 40},0" class="board-grain"/>
+      ${multi && isActive ? `<rect x="${bx - 4}" y="${by - 4}" width="${b.w + 8}" height="${b.h + 8}" rx="19" class="ring"/>` : ""}
+      ${txt(bx + 16, by + 24, "t-k-board", b.title)}${txt(bx + 16, by + 41, "t-py", esc(b.sub))}
+      ${multi ? txt(bx + b.w - 16, by + 24, "t-k-board", isActive ? "cooking" : "waiting", "end") + txt(bx + b.w - 16, by + 41, "t-py", isActive ? "running" : "paused", "end") : ""}`;
+    if (!b.rows.length) bs += txt(bx + 16, by + 82, "t-k-board", "No tape yet", "start", 'opacity=".6" font-style="italic"');
+    b.rows.forEach(([name, v], ri) => {
+      const ry = by + 56 + ri * 50;
+      const changed = prev && (!pf || JSON.stringify(pf.vars[name]) !== JSON.stringify(v));
+      if (changed) bs += `<rect x="${bx + 6}" y="${ry - 4}" width="${b.w - 12}" height="48" rx="8" class="flash"/>`;
+      if (name === "$ret") {
+        bs += `<ellipse cx="${bx + 38}" cy="${ry + 20}" rx="24" ry="10" class="china"/><ellipse cx="${bx + 38}" cy="${ry + 19}" rx="15" ry="5.5" fill="none" stroke="var(--china-edge)" stroke-width="1.5"/>
+          ${txt(bx + 70, ry + 16, "t-k-board", "Plate")}${txt(bx + 70, ry + 33, "t-py", "return value")}`;
+      } else {
+        const tw = name.length * 10.5 + 22;
+        bs += `<g transform="rotate(-1.5 ${bx + 16} ${ry})"><rect x="${bx + 16}" y="${ry}" width="${tw}" height="28" class="tape"/>
+          ${txt(bx + 27, ry + 21, "t-hand", esc(name))}</g>${txt(bx + 18, ry + 42, "t-py", "variable")}`;
+      }
+      const xr = bx + b.w - 16, cy = ry + 16;
+      if (v.r) {
+        bs += `<circle cx="${xr - 9}" cy="${cy}" r="8" class="knot"/>`;
+        if (anchors[v.r]) {
+          const [kx, ky] = T(xr - 9, cy), [ax, ay] = anchors[v.r];
+          const dy = Math.max(40, (ky - ay) / 2);
+          twine += `<path d="M${kx},${ky} C${kx},${ky - dy} ${ax},${ay + dy} ${ax},${ay + 3}" class="twine${changed ? " new" : ""}" marker-end="url(#tie)"/>`;
+        }
+      } else {
+        bs += chipSVG(xr, cy, v);
+      }
+    });
+    bs += `</g>`;
+    bx += b.w + 34;
+  }
+  s += `<g transform="translate(${BOARD_X0} ${BOARD_Y}) scale(${sc}) translate(${-BOARD_X0} ${-BOARD_Y})">${bs}</g>`;
+
+  /* order tickets in the hatch */
+  const { x: hx, y: hy, w: hw, h: hh } = HATCH;
+  if (!st.out.length) s += txt(hx + hw / 2, hy + hh / 2 + 10, "t-open", "No orders out yet", "middle");
+  let ty = hy + 42;
+  st.out.forEach((line, n) => {
+    const chunks = line.match(/.{1,26}(\s|$)|.{1,26}/g).map(c => c.trimEnd());
+    const th = 30 + chunks.length * 17;
+    const fresh = prev && n >= prev.out.length;
+    s += `${fresh ? `<rect x="${hx + 22}" y="${ty - 4}" width="${hw - 44}" height="${th + 8}" rx="6" class="flash"/>` : ""}
+      <rect x="${hx + 28}" y="${ty}" width="${hw - 56}" height="${th}" class="paper" transform="rotate(${n % 2 ? 1.2 : -1.2} ${hx + hw / 2} ${ty})"/>
+      <rect x="${hx + hw / 2 - 12}" y="${ty - 8}" width="24" height="12" rx="2" class="steel"/>
+      ${txt(hx + 40, ty + 18, "t-tiny", `ORDER ${n + 1}`)}
+      ${chunks.map((c, k) => txt(hx + 40, ty + 36 + k * 17, "t-ticket", esc(c))).join("")}`;
+    ty += th + 14;
+  });
+
+  return s + twine;
+}
+
+/* ------------------------------------------------------------------ page */
+
+function highlight(src) {
+  const re = /("[^"]*"|'[^']*')|\b(def|return|if|for|in|while|else|elif)\b|\b(\d+)\b|\b(print|len|range)\b/g;
+  let out = "", last = 0, m;
+  while ((m = re.exec(src))) {
+    out += esc(src.slice(last, m.index));
+    out += `<span class="${m[1] ? "st" : m[2] ? "kw" : m[3] ? "nu" : "bi"}">${esc(m[0])}</span>`;
+    last = re.lastIndex;
+  }
+  return out + esc(src.slice(last));
 }
 
 let L = LESSONS[0], i = 0, timer = null;
 
 function render() {
-  const step = L.steps[i], prev = i > 0 ? L.steps[i - 1].st : null, st = step.st;
-
+  const step = L.steps[i], prev = i > 0 ? L.steps[i - 1].st : null;
   $("#ltitle").textContent = L.title;
   $("#lblurb").textContent = L.blurb;
   $("#code").innerHTML = L.code.map((src, n) =>
     `<li class="${step.line === n + 1 ? "cur" : ""}"><span class="ln">${n + 1}</span><span>${highlight(src) || " "}</span></li>`).join("");
   $("#nk").innerHTML = fmt(step.k);
   $("#npy").innerHTML = fmt(step.py);
-
-  const multi = st.frames.length > 1;
-  $("#stations").innerHTML = st.frames.map((f, fi) => {
-    const pf = prev && prev.frames[fi] && prev.frames[fi].name === f.name ? prev.frames[fi] : null;
-    const rows = Object.entries(f.vars).map(([name, v]) => {
-      const changed = prev && (!pf || JSON.stringify(pf.vars[name]) !== JSON.stringify(v));
-      const left = name === "$ret"
-        ? `<span class="plate-row"><span class="plate"></span>${term("Plate", "return value")}</span>`
-        : `<span class="lab"><span class="tape">${esc(name)}</span><span class="tp">variable</span></span>`;
-      return `<div class="var ${changed ? "changed" : ""}">${left}${valHTML(v)}</div>`;
-    }).join("");
-    const isActive = fi === st.frames.length - 1;
-    const title = fi === 0 ? term("Main counter", "global frame") : term(`Cutting board ${fi}`, `frame: ${esc(f.name)}()`);
-    const state = !multi ? "" : isActive ? term("cooking", "running") : term("waiting", "paused");
-    return `<div class="board ${multi ? (isActive ? "working" : "waiting") : ""}">
-      <div class="bhead">${title}<span class="state">${state}</span></div>
-      ${rows || `<p class="empty-note">No labels yet</p>`}</div>`;
-  }).join("");
-
-  const live = reachable(st);
-  const ids = Object.keys(st.heap);
-  const isChanged = id => prev && JSON.stringify(prev.heap[id]) !== JSON.stringify(st.heap[id]);
-  const onShelf = ids.filter(id => live.has(id)), inSink = ids.filter(id => !live.has(id));
-  $("#shelf").innerHTML = onShelf.length ? onShelf.map(id => objHTML(id, st.heap[id], isChanged(id))).join("")
-    : `<div class="empty">Nothing on the shelf yet</div>`;
-  $("#basin").innerHTML = inSink.length ? inSink.map(id => objHTML(id, st.heap[id], false)).join("")
-    : `<span class="note-s">Empty</span>`;
-
-  $("#out").innerHTML = st.out.length
-    ? st.out.map((line, n) => `<div class="ticket ${prev && n >= prev.out.length ? "changed" : ""}"><small>Order ${n + 1}</small>${esc(line)}</div>`).join("")
-    : `<p class="empty-note">Nothing served yet</p>`;
+  $("#kitchen").innerHTML = drawKitchen(step.st, prev);
 
   const last = L.steps.length - 1;
   $("#count").textContent = `Step ${i} of ${last}`;
@@ -593,27 +710,6 @@ function render() {
   $("#b-next").textContent = i === 0 ? "Start cooking" : "Next step";
   $("#b-play").textContent = timer ? "Pause" : "Play";
   document.querySelectorAll("#lessons button").forEach(b => b.setAttribute("aria-pressed", b.dataset.id === L.id));
-
-  requestAnimationFrame(drawStrings);
-}
-
-function drawStrings() {
-  const scene = $("#scene"), svg = $("#strings"), sr = scene.getBoundingClientRect();
-  svg.setAttribute("viewBox", `0 0 ${sr.width} ${sr.height}`);
-  svg.setAttribute("width", sr.width); svg.setAttribute("height", sr.height);
-  let paths = "";
-  scene.querySelectorAll(".knot[data-to]").forEach(k => {
-    const obj = document.getElementById("obj-" + k.dataset.to);
-    if (!obj) return;
-    const a = k.getBoundingClientRect(), b = obj.getBoundingClientRect();
-    const sx = a.left + a.width / 2 - sr.left, sy = a.top + a.height / 2 - sr.top;
-    const tx = b.left + b.width / 2 - sr.left, ty = b.bottom - sr.top;
-    const dy = Math.max(40, Math.abs(sy - ty) / 2);
-    const p = `M${sx},${sy} C${sx},${sy - dy} ${tx},${ty + dy} ${tx},${ty + 4}`;
-    paths += `<path class="s${k.closest(".changed") ? " new" : ""}" d="${p}" marker-end="url(#knot-end)"/>`;
-  });
-  svg.innerHTML = `<defs><marker id="knot-end" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-    <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>${paths}`;
 }
 
 function go(n) { i = Math.max(0, Math.min(L.steps.length - 1, n)); render(); }
@@ -626,15 +722,9 @@ function pick(id) {
   render();
 }
 
-$("#glossary").innerHTML = GLOSSARY.map(([ico, k, py]) => `<span class="gl"><span class="ico">${ico}</span>${term(k, py)}</span>`).join("");
 $("#recipe-head").innerHTML = term("The recipe", "your code");
-$("#shelf-head").innerHTML = term("The shelf", "objects in memory");
-$("#counter-head").innerHTML = term("The countertop", "frames (the call stack)");
-$("#sink-head").innerHTML = term("Sink", "garbage collection");
-$("#hatch-head").innerHTML = `${term("Serving hatch 🛎️", "print() output")}`;
 $("#lessons").innerHTML = LESSONS.map((l, n) =>
   `<button type="button" data-id="${l.id}" aria-pressed="false"><span class="n">${n + 1}</span>${term(esc(l.title), esc(l.topic))}</button>`).join("");
-
 $("#lessons").addEventListener("click", e => { const b = e.target.closest("button"); if (b) pick(b.dataset.id); });
 $("#b-first").onclick = () => { stop(); go(0); };
 $("#b-prev").onclick = () => { stop(); go(i - 1); };
@@ -642,7 +732,7 @@ $("#b-next").onclick = () => { stop(); go(i + 1); };
 $("#b-play").onclick = () => {
   if (timer) { stop(); render(); return; }
   if (i === L.steps.length - 1) i = 0;
-  timer = setInterval(() => { if (i >= L.steps.length - 1) { stop(); render(); } else go(i + 1); }, 2200);
+  timer = setInterval(() => { if (i >= L.steps.length - 1) { stop(); render(); } else go(i + 1); }, 2400);
   render();
 };
 $("#scrub").oninput = e => { stop(); go(+e.target.value); };
@@ -651,8 +741,6 @@ document.addEventListener("keydown", e => {
   if (e.key === "ArrowRight") { stop(); go(i + 1); }
   if (e.key === "ArrowLeft") { stop(); go(i - 1); }
 });
-new ResizeObserver(() => drawStrings()).observe($("#scene"));
-if (document.fonts) document.fonts.ready.then(drawStrings);
 
 let start = location.hash.slice(1);
 if (!LESSONS.some(l => l.id === start)) { try { start = localStorage.getItem("pk-lesson") || ""; } catch (e) { start = ""; } }
