@@ -269,6 +269,11 @@ button:focus-visible { outline: 3px solid var(--hl-edge); outline-offset: 2px; }
 .counter-edge { fill: var(--steel-dark); } .under { fill: var(--steel-mid); } .door { fill: var(--steel); stroke: var(--steel-dark); stroke-width: 2; }
 .handle { fill: var(--steel-dark); }
 .board { fill: var(--board); stroke: var(--board-edge); stroke-width: 2.5; } .hole { fill: var(--steel); stroke: var(--board-edge); stroke-width: 2; }
+.board-front { fill: var(--board-edge); }
+.board-side { fill: var(--wood-dark); }
+.board-front-grain { stroke: #000; stroke-opacity: .12; stroke-width: 1.5; fill: none; }
+.board-sheen { fill: url(#sheen); pointer-events: none; }
+.board-shadow { fill: #000; opacity: .28; filter: url(#soft); }
 .board-grain { stroke: var(--board-edge); stroke-width: 1; opacity: .25; fill: none; }
 .ring { fill: none; stroke: var(--hl-edge); stroke-width: 5; }
 .waiting { opacity: .62; }
@@ -1577,6 +1582,8 @@ function backdrop(ring) {
       <stop offset="0" style="stop-color: var(--steel-hi)"/><stop offset=".25" style="stop-color: var(--steel)"/><stop offset="1" style="stop-color: var(--steel-mid)"/>
     </linearGradient>
     <radialGradient id="glow" cx=".5" cy="0" r="1"><stop offset="0" style="stop-color: var(--glow)"/><stop offset="1" stop-color="rgba(255,170,60,0)"/></radialGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".32"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".08"/></linearGradient>
+    <filter id="soft" x="-10%" y="-60%" width="120%" height="220%"><feGaussianBlur stdDeviation="5"/></filter>
     <marker id="tie" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--twine)"/></marker>
   </defs>
   <rect width="${W}" height="${COUNTER}" fill="url(#tiles)"/>`;
@@ -1670,61 +1677,86 @@ function drawKitchen(st, prev, fx) {
     });
     return { f, fi, rows, title, sub, w, h: 62 + Math.max(1, rows.length) * 50 };
   });
-  const total = boards.reduce((a, b) => a + b.w + 34, -34);
-  const sc = Math.min(1, (BOARD_X1 - BOARD_X0) / total, BOARD_MAXH / Math.max(...boards.map(b => b.h)));
+  /* cutting boards in 3D: the top surface tilts back (an oblique projection), with a visible front edge,
+     right-hand side and a soft shadow on the counter. Everything on a board is drawn on the tilted top,
+     so labels, plates and knots move with it; M() gives where a point on the board lands on screen. */
+  const TILT = 0.14, SQ = 0.86, THICK = 15;
+  const deep = b => b.w + TILT * b.h + 22;                       // footprint width including the receding side and handle
+  const total = boards.reduce((a, b) => a + deep(b) + 26, -26);
+  const sc = Math.min(1, (BOARD_X1 - BOARD_X0) / total, BOARD_MAXH / Math.max(...boards.map(b => b.h * SQ + THICK)));
   const T = (px, py) => [BOARD_X0 + (px - BOARD_X0) * sc, BOARD_Y + (py - BOARD_Y) * sc];
-  const shell = (bx, by, w, h) => `<rect x="${bx + w - 6}" y="${by + h / 2 - 16}" width="28" height="32" rx="12" class="board"/>
-      <circle cx="${bx + w + 10}" cy="${by + h / 2}" r="5" class="hole"/>
-      <rect x="${bx}" y="${by}" width="${w}" height="${h}" rx="16" class="board"/>
-      <path d="M${bx + 20},${by + h - 14} q${w / 3},-6 ${w - 40},0" class="board-grain"/>`;
+  const board3D = (bx, w, h, top) => {
+    const by = BOARD_Y, byb = by + h;                              // the front edge stays where the flat board ended
+    const M = (x, y) => [x + TILT * (byb - y), byb - SQ * (byb - y)];
+    const mat = `matrix(1 0 ${-TILT} ${SQ} ${TILT * byb} ${byb * (1 - SQ)})`;
+    const p = pts => pts.map(q => q.map(n => n.toFixed(1)).join(",")).join(" ");
+    const a1 = M(bx + w, by + 16), a2 = M(bx + w, byb - 16), hy = by + h / 2;
+    return {
+      M,
+      svg: `<rect x="${bx + 10}" y="${byb - 2}" width="${w + TILT * h * .4}" height="${THICK + 12}" rx="14" class="board-shadow"/>
+        <g transform="translate(0 ${THICK}) ${mat}"><rect x="${bx + w - 6}" y="${hy - 16}" width="28" height="32" rx="12" class="board-side"/></g>
+        <polygon points="${p([a1, a2, [a2[0], a2[1] + THICK], [a1[0], a1[1] + THICK]])}" class="board-side"/>
+        <rect x="${bx}" y="${byb - 20}" width="${w}" height="${20 + THICK}" rx="16" class="board-front"/>
+        <path d="M${bx + 14},${byb + THICK * .45} H${bx + w - 14}" class="board-front-grain"/>
+        <g transform="${mat}">
+          <rect x="${bx + w - 6}" y="${hy - 16}" width="28" height="32" rx="12" class="board"/>
+          <circle cx="${bx + w + 10}" cy="${hy}" r="5" class="hole"/>
+          <rect x="${bx}" y="${by}" width="${w}" height="${h}" rx="16" class="board"/>
+          <rect x="${bx}" y="${by}" width="${w}" height="${h}" rx="16" class="board-sheen"/>
+          <path d="M${bx + 20},${by + h - 14} q${w / 3},-6 ${w - 40},0 M${bx + 26},${by + h * .55} q${w / 4},5 ${w - 70},-2" class="board-grain"/>
+          ${top}
+        </g>`,
+    };
+  };
   let bs = "", bx = BOARD_X0;
   const pframes = prev ? prev.frames : [];
   for (const b of boards) {
     const isActive = b.fi === st.frames.length - 1, by = BOARD_Y;
     const pf = pframes[b.fi] && pframes[b.fi].name === b.f.name ? pframes[b.fi] : null;
     const fresh = prev && b.fi >= pframes.length;
-    bs += `<g class="${multi && !isActive ? "waiting" : ""}"><g class="${fresh ? "anim-slide" : ""}" data-gloss="${b.fi === 0 ? "main board" : "cutting board"}">${shell(bx, by, b.w, b.h)}
-      ${multi && isActive ? `<rect x="${bx - 4}" y="${by - 4}" width="${b.w + 8}" height="${b.h + 8}" rx="19" class="ring"/>` : ""}
+    const byb = by + b.h, M = (x, y) => [x + TILT * (byb - y), byb - SQ * (byb - y)];
+    let top = `${multi && isActive ? `<rect x="${bx - 4}" y="${by - 4}" width="${b.w + 8}" height="${b.h + 8}" rx="19" class="ring"/>` : ""}
       ${txt(bx + 16, by + 24, "t-k-board", b.title)}${txt(bx + 16, by + 41, "t-py", esc(b.sub))}
       ${multi ? txt(bx + b.w - 16, by + 24, "t-k-board", isActive ? "cooking" : "waiting", "end") + txt(bx + b.w - 16, by + 41, "t-py", isActive ? "running" : "paused", "end") : ""}`;
-    if (!b.rows.length) bs += txt(bx + 16, by + 82, "t-k-board", "No labels yet", "start", 'opacity=".6" font-style="italic"');
+    if (!b.rows.length) top += txt(bx + 16, by + 82, "t-k-board", "No labels yet", "start", 'opacity=".6" font-style="italic"');
     b.rows.forEach(([name, v], ri) => {
       const ry = by + 56 + ri * 50;
       const changed = prev && (!pf || JSON.stringify(pf.vars[name]) !== JSON.stringify(v));
-      if (changed) bs += `<rect x="${bx + 6}" y="${ry - 4}" width="${b.w - 12}" height="48" rx="8" class="flash"/>`;
-      bs += `<g class="${changed ? "anim-slap" : ""}" data-gloss="${name === "$ret" ? "plate" : name === "$err" ? "alarm" : "masking tape"}">`;
+      if (changed) top += `<rect x="${bx + 6}" y="${ry - 4}" width="${b.w - 12}" height="48" rx="8" class="flash"/>`;
+      top += `<g class="${changed ? "anim-slap" : ""}" data-gloss="${name === "$ret" ? "plate" : name === "$err" ? "alarm" : "masking tape"}">`;
       if (name === "$ret") {
-        bs += `<ellipse cx="${bx + 38}" cy="${ry + 20}" rx="24" ry="10" class="china"/><ellipse cx="${bx + 38}" cy="${ry + 19}" rx="15" ry="5.5" fill="none" stroke="var(--china-edge)" stroke-width="1.5"/>
+        top += `<ellipse cx="${bx + 38}" cy="${ry + 20}" rx="24" ry="10" class="china"/><ellipse cx="${bx + 38}" cy="${ry + 19}" rx="15" ry="5.5" fill="none" stroke="var(--china-edge)" stroke-width="1.5"/>
           ${txt(bx + 70, ry + 16, "t-k-board", "Plate")}${txt(bx + 70, ry + 33, "t-py", "return value")}`;
       } else if (name === "$err") {
-        bs += `<rect x="${bx + 10}" y="${ry - 2}" width="${b.w - 20}" height="44" rx="8" class="alarm"/>${emoji(bx + 32, ry + 28, 22, "🚨")}
+        top += `<rect x="${bx + 10}" y="${ry - 2}" width="${b.w - 20}" height="44" rx="8" class="alarm"/>${emoji(bx + 32, ry + 28, 22, "🚨")}
           ${txt(bx + 52, ry + 16, "t-white", "Alarm!")}${txt(bx + 52, ry + 33, "t-white", "exception raised", "start", 'font-size="11"')}
           ${txt(bx + b.w - 24, ry + 26, "t-white", esc(v.p), "end")}</g>`;
         return;
       } else {
-        bs += `<g transform="rotate(-1.5 ${bx + 16} ${ry})"><rect x="${bx + 16}" y="${ry}" width="${name.length * 10.5 + 22}" height="28" class="tape"/>
+        top += `<g transform="rotate(-1.5 ${bx + 16} ${ry})"><rect x="${bx + 16}" y="${ry}" width="${name.length * 10.5 + 22}" height="28" class="tape"/>
           ${txt(bx + 27, ry + 21, "t-hand", esc(name))}</g>${txt(bx + 18, ry + 42, "t-py", "variable")}`;
       }
       const xr = bx + b.w - 16, cy = ry + 16;
       if (v.r) {
-        bs += `<circle cx="${xr - 9}" cy="${cy}" r="8" class="knot" data-gloss="twine"/>`;
+        top += `<circle cx="${xr - 9}" cy="${cy}" r="8" class="knot" data-gloss="twine"/>`;
         if (anchors[v.r]) {
-          const [kx, ky] = T(xr - 9, cy), [ax, ay] = anchors[v.r], dy = Math.max(40, (ky - ay) / 2);
+          const [kx, ky] = T(...M(xr - 9, cy)), [ax, ay] = anchors[v.r], dy = Math.max(40, (ky - ay) / 2);
           const d = `M${kx},${ky} C${kx},${ky - dy} ${ax},${ay + dy} ${ax},${ay + 3}`;
           twine += `<g data-gloss="twine"><path d="${d}" class="twine${changed ? " new" : ""}" marker-end="url(#tie)"/><path d="${d}" class="twine-hit"/></g>`;
           if (changed) twine += `<circle r="7" class="knot-run"><animateMotion dur=".7s" fill="freeze" path="${d}"/></circle>`;
         }
-      } else bs += `<g data-gloss="value tag">${chipSVG(xr, cy, v)}</g>`;
-      bs += `</g>`;
+      } else top += `<g data-gloss="value tag">${chipSVG(xr, cy, v)}</g>`;
+      top += `</g>`;
     });
-    bs += `</g></g>`;
-    bx += b.w + 34;
+    bs += `<g class="${multi && !isActive ? "waiting" : ""}"><g class="${fresh ? "anim-slide" : ""}" data-gloss="${b.fi === 0 ? "main board" : "cutting board"}">${board3D(bx, b.w, b.h, top).svg}</g></g>`;
+    bx += deep(b) + 26;
   }
   // boards that were just put away slide off the counter
   pframes.slice(st.frames.length).forEach((f, k) => {
-    bs += `<g class="anim-out">${shell(bx, BOARD_Y, 210, 112)}${txt(bx + 16, BOARD_Y + 24, "t-k-board", `Cutting board ${st.frames.length + k}`)}
-      ${txt(bx + 16, BOARD_Y + 41, "t-py", `frame: ${esc(f.name)}() ends`)}${emoji(bx + 105, BOARD_Y + 88, 34, "💨")}</g>`;
-    bx += 244;
+    const gh = 112, top = `${txt(bx + 16, BOARD_Y + 24, "t-k-board", `Cutting board ${st.frames.length + k}`)}
+      ${txt(bx + 16, BOARD_Y + 41, "t-py", `frame: ${esc(f.name)}() ends`)}${emoji(bx + 105, BOARD_Y + 88, 34, "💨")}`;
+    bs += `<g class="anim-out">${board3D(bx, 210, gh, top).svg}</g>`;
+    bx += 210 + TILT * gh + 48;
   });
   s += `<g transform="translate(${BOARD_X0} ${BOARD_Y}) scale(${sc}) translate(${-BOARD_X0} ${-BOARD_Y})">${bs}</g>`;
 
