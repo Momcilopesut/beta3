@@ -280,6 +280,16 @@ button:focus-visible { outline: 3px solid var(--hl-edge); outline-offset: 2px; }
 .slip { filter: drop-shadow(0 2px 2px rgba(0,0,0,.18)); }
 .t-slip-code { fill: #23211b; font: 600 13px var(--mono); }
 .t-slip-py { fill: #2350c4; font: 500 12px var(--mono); }
+.t-calc { fill: #23211b; font: 600 12.5px var(--mono); } .t-calc .arr { fill: #b0443a; font-weight: 700; }
+.t-calc .res { fill: #1d7a3e; font-weight: 700; }
+.t-calc .step { animation: calcin .35s ease-out both; }
+@keyframes calcin { from { fill-opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .t-calc .step { animation: none; } }
+.chalk { fill: #2d4237; stroke: #8a6639; stroke-width: 6; } .t-chalk { fill: #f4f1e6; font: 700 16px var(--hand); }
+.t-chalk-s { fill: #cfe3d6; font: 500 11px var(--mono); } .t-chalk-v { fill: #f4f1e6; font: 600 13px var(--mono); }
+.tin { fill: #9aa6ad; stroke: #5d6a71; stroke-width: 2; } .tin-cup { fill: #6f7c83; stroke: #4d585e; stroke-width: 1.5; }
+.token { fill: #fff3c4; stroke: #b4932f; stroke-width: 1.5; }
+.t-card { fill: #2b2620; font: italic 600 15px Georgia, serif; }
 .board-side { fill: var(--wood-dark); }
 .board-front-grain { stroke: #000; stroke-opacity: .12; stroke-width: 1.5; fill: none; }
 .board-sheen { fill: url(#sheen); pointer-events: none; }
@@ -452,7 +462,7 @@ button:focus-visible { outline: 3px solid var(--hl-edge); outline-offset: 2px; }
     </div>
     <div class="scene-wrap">
       <p class="scene-hint">👆 Tap anything in the kitchen to look it up in the glossary.</p>
-      <svg id="kitchen" viewBox="0 0 1200 780" role="img" aria-label="Restaurant kitchen showing the program's memory"></svg>
+      <svg id="kitchen" viewBox="0 0 1200 840" role="img" aria-label="Restaurant kitchen showing the program's memory"></svg>
     </div>
   </div>
 </div>
@@ -500,7 +510,7 @@ const term = (k, py) => `<span class="term"><span class="tk">${k}</span><span cl
 const code = s => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>");
 const fmt = s => code(s).replace(/\[([^\]|]+)\|([^\]]+)\]/g, "<ruby>$1<rt>$2</rt></ruby>");
 
-const INGREDIENT = { "'bread'": "🍞", "'ham'": "🍖", "'cheese'": "🧀", "'tomato'": "🍅", "'margherita'": "🍕", "'egg'": "🥚", "'flour'": "🌾", "'milk'": "🥛", "'salt'": "🧂", "'mint'": "🌿", "'pepper'": "🌶️" };
+const INGREDIENT = { "'cupcake'": "🧁", "'golden'": "🍞", "'burnt'": "🔥", "'fork'": "🍴", "'knife'": "🔪", "'soup'": "🍲", "'tea'": "🍵", "'cake'": "🍰", "'bread'": "🍞", "'ham'": "🍖", "'cheese'": "🧀", "'tomato'": "🍅", "'margherita'": "🍕", "'egg'": "🥚", "'flour'": "🌾", "'milk'": "🥛", "'salt'": "🧂", "'mint'": "🌿", "'pepper'": "🌶️" };
 const P = (v, opt = {}) => ({ p: String(v), ...opt });
 const R = id => ({ r: id });
 const g = st => st.frames[0].vars;
@@ -509,7 +519,7 @@ const active = st => st.frames[st.frames.length - 1].vars;
 const KIND = {
   int: ["Sealed jar", "int object"], str: ["Sealed jar", "str object"], list: ["Mixing bowl", "list object"],
   dict: ["Spice cabinet", "dict object"], func: ["Recipe card", "function object"],
-  class: ["Blueprint", "class object"], obj: ["Oven", "Oven instance (object)"],
+  class: ["Blueprint", "class object"], obj: ["Oven", "Oven instance (object)"], range: ["Counting tray", "range object"],
 };
 
 /* A dish is a program. Each step: the line it runs, the right action [kitchen, python], wrong actions [kitchen, python, why],
@@ -682,6 +692,22 @@ const NEEDS = {
              ["🧤", "Oven mitts", "try"], ["🚨", "Alarm", "KeyError"], ["📋", "Backup plan", "except"]],
   oven:     [["📘", "Oven blueprint", "class Oven"], ["🔧", "Setup instructions", "__init__"], ["♨️", "Oven", "instance (object)"],
              ["🎛️", "Temperature dial", "attribute self.temp"], ["🔥", "Heat button", "method heat()"], ["🔪", "Cutting boards", "method frames"]],
+  card:     [["🗒️", "Order note", "str 'ada lovelace'"], ["🪧", "Table card", "new str from .title()"], ["✍️", "Capitals on each word", ".title()"], ["🔲", "Blank to fill in", "f-string {card}"]],
+  cupcakes: [["🧁", "Cupcakes", "'cupcake'"], ["🧁", "Muffin tin", "list"], ["🔢", "Counting tray 0, 1, 2", "range(3)"], ["🔁", "Bake once per token", "for loop"],
+             ["➕", "Next hole in the tin", "append()"], ["🔢", "Counting the tin", "len()"], ["🚰", "Dish sink", "garbage collection"]],
+  menu:     [["📋", "Menu board", "dict"], ["🍲", "Soup line", "key 'soup'"], ["🍵", "Tea line", "key 'tea'"], ["🍰", "Cake line", "new key 'cake'"],
+             ["🧽", "Rubbing out a price", "changing a value"], ["🔍", "Looking for cake", "not in"]],
+  golden:   [["🍞", "Golden toast", "'golden'"], ["🔥", "Burnt toast", "'burnt'"], ["🍽️", "Toast tray", "list"], ["🔢", "Tally", "good counter"],
+             ["🔁", "One slice at a time", "for loop"], ["❓", "Burnt check", "if =="], ["⏭️", "Set it aside", "continue"]],
+  knead:    [["🫓", "Dough", "the dish"], ["✊", "Knead count", "kneads counter"], ["♾️", "Keep kneading", "while True"], ["❓", "Three-knead check", "if =="], ["🛑", "Stop kneading", "break"]],
+  chalk:    [["🗒️", "Order note", "str 'soup'"], ["🖍️", "Chalkboard sign", "str, rebuilt each pass"], ["🔁", "One letter at a time", "for over a string"],
+             ["🔠", "Capital letters", ".upper()"], ["➕", "Adding a letter", "+ joins strings"], ["🚰", "Dish sink", "garbage collection"]],
+  tables:   [["🪑", "Table numbers 1 and 2", "outer list"], ["🍴", "Fork", "'fork'"], ["🔪", "Knife", "'knife'"], ["🍽️", "Cutlery tray", "inner list"],
+             ["🔁", "Every table, every piece", "nested for loops"], ["🚰", "Dish sink", "garbage collection"]],
+  halve:    [["🍽️", "Full-batch tray", "list grams"], ["🍽️", "Half-batch tray", "the new list"], ["✂️", "Halving", "// 2"],
+             ["🌾", "Flour", "200"], ["🧈", "Butter", "150"], ["🍫", "Chocolate", "50"], ["🔪", "A small board for the brackets", "comprehension scope"]],
+  bill:     [["📇", "Bill recipe card", "recursive function"], ["🧾", "Receipts", "lists"], ["✂️", "Tearing off the first line", "slice [1:]"],
+             ["❓", "Blank-receipt check", "if not prices: base case"], ["🔪", "A cutting board per receipt", "frames on the call stack"], ["🍽️", "Plates", "return values"]],
 };
 
 /* ---------------------------------------------------------------- the glossary
@@ -707,6 +733,7 @@ const GLOSS = {
   int:         E("Data types", "int (whole numbers)", "int", "integer number numbers", "Whole numbers like 0, 7 or -3. You can do arithmetic with them.", "A count of things: 6 glasses, 5 cubes.", "cups = 6", '"5" in quotes is text, not a number: `"5" + 1` is a TypeError.', ["str", "arithmetic"]),
   str:         E("Data types", "str (text)", "str", "string strings text quotes word", "Text inside single or double quotes. The quotes mark where the text starts and ends; they aren't part of it.", "The words on a label or an order.", 'dish = "soup"', 'Text and numbers don\'t mix with `+`: `"Cups: " + 6` fails. Pass them to print separately, or use `str(6)`.', ["int", "concat", "print"]),
   bool:        E("Data types", "bool (True / False)", "True / False", "boolean true false yes no", "The two values `True` and `False`. Comparisons like `8 > 6` produce them, and `if` and `while` use them to decide what to do.", "The answer to a yes-or-no kitchen check.", "8 > 6   # True", "They're capitalised: `true` is a NameError.", ["comparison", "if", "while"]),
+  fstring:     E("Data types", "f-strings", 'f"…{x}…"', "f-string fstring format formatting template placeholder", "A string with `f` before the quotes. Each name inside `{ }` is replaced by its value, so you can build text without `+`.", "A card with blanks that are filled in as it's written.", 'name = "Ada"\nprint(f"Hi {name}")   # Hi Ada', 'Forget the `f` and the braces are printed as they are: `"Hi {name}"` prints Hi {name}.', ["str", "concat", "print"]),
   none:        E("Data types", "None", "None", "nothing empty null", "Python's 'nothing here' value. Functions without a `return` give back None, and so do in-place methods like `append()`.", "An empty plate handed back.", 'result = print("hi")   # None', '`mixing = mixing.append("milk")` replaces your list with None.', ["return", "append"]),
   mutable:     E("Data types", "Mutable values", "", "mutation change modify in place", "Objects you can change in place, such as lists and dicts. Every name pointing at the object sees the change.", "An open bowl you can keep adding to.", 'bowl.append("milk")', "After `b = a`, `b.append(...)` changes `a` too. Use `.copy()` when you need a separate list.", ["aliasing", "copy", "list"]),
   immutable:   E("Data types", "Immutable values", "", "immutability unchangeable sealed", "Objects that can't be changed after they're made, such as numbers and text. 'Changing' one actually makes a new object.", "A sealed jar: to get 6 cubes you fill a new jar.", "x = 5\nx = x + 1   # a new 6", 'You can\'t change text in place: `"mint".append(...)` fails. Build new text with `+`.', ["int", "str", "reassign"]),
@@ -715,12 +742,19 @@ const GLOSS = {
   concat:      E("Operators", "Joining strings", "+", "concatenation concatenate combine text join", "`+` between two strings glues them end to end into a new string.", "Sticking two word strips together.", '"lemon" + "ade"   # lemonade', 'No space is added: `"lemon" + "ade"` is lemonade. Add `" "` yourself if you need one.', ["str", "arithmetic"]),
   augmented:   E("Operators", "Add to / take from", "+=  −=", "augmented assignment increment decrement running total", "`x += 5` is short for `x = x + 5`; `x -= 1` is short for `x = x - 1`.", "Adding to the reading on the scale.", "score += 1", "`x =+ 1` (the wrong way round) sets x to +1 instead of adding 1.", ["assignment", "accumulator"]),
   comparison:  E("Operators", "Comparisons", "==  <  >", "compare equal greater less than condition", "Compare two values and give `True` or `False`: `==` equal, `!=` not equal, `<` less, `>` greater, `<=` and `>=`.", "Checking the timer or thermometer against a mark.", "temp < 100", "Use `==` to compare, not `=`. And `<` excludes equal: `100 < 100` is False.", ["bool", "if", "while"]),
+  floordiv:    E("Operators", "Floor division", "//", "floor division integer division whole divide halve half", "`a // b` divides and rounds down to a whole number: `150 // 2` is 75, and `7 // 2` is 3.", "Halving a weight and keeping whole grams.", "7 // 2   # 3", "`/` always gives a decimal (`6 / 2` is `3.0`). Use `//` when you want a whole number.", ["arithmetic", "int"]),
   /* Control flow */
   if:          E("Control flow", "if / else", "if  else", "conditional condition branch decision choice", "Runs a block only when a condition is True; `else` runs when it's False. Exactly one of the two branches runs.", "Choosing the hard-boil or soft-boil path.", 'if minutes > 6:\n    egg = "hard"\nelse:\n    egg = "soft"', "Only one branch runs, so a variable set only inside `else` won't exist when the `if` branch runs.", ["comparison", "bool", "indentation"]),
   for:         E("Control flow", "for loop", "for … in", "loop loops iterate iteration each repeat", "Repeats a block once for every item in a collection, giving the current item a name each time.", "Weighing ingredients off the tray one at a time.", "for g in [200, 150]:\n    print(g)", "The loop variable keeps the last item after the loop ends.", ["loopvar", "list", "while"]),
   while:       E("Control flow", "while loop", "while", "loop loops repeat until condition", "Repeats a block for as long as its condition stays True, re-checking before every pass.", "Keep heating while the soup is below 100°.", "while temp < 100:\n    temp += 40", "If nothing inside the loop changes the condition, it never stops.", ["comparison", "for"]),
   loopvar:     E("Control flow", "Loop variable", "", "iterator counter item", "The name a `for` loop re-binds to each item in turn. After the loop it keeps the last item.", "The label you move onto each ingredient as you pick it up.", "for item in basket:", "Changing the loop variable inside the loop doesn't change the list.", ["for"]),
   accumulator: E("Control flow", "Running total", "", "accumulator sum total count add up", "A common pattern: start a variable at 0, then add to it inside a loop.", "Zeroing the scale, then adding each ingredient.", "total = 0\nfor n in nums:\n    total += n", "Start the total before the loop. Setting it to 0 inside the loop resets it on every pass.", ["augmented", "for"]),
+  range:       E("Control flow", "range()", "range()", "range count counting numbers times repeat", "A built-in that makes whole numbers on demand. `range(3)` gives 0, 1, 2: it starts at 0 and stops before 3. With `for`, it repeats something a set number of times.", "A counting tray of numbered tokens, handed out one at a time.", "for i in range(3):\n    print(i)   # 0, 1, 2", "`range(3)` stops before 3, so 3 itself never comes up. Use `range(1, 4)` for 1, 2, 3.", ["for", "loopvar", "int"]),
+  strloop:     E("Control flow", "Looping over a string", "for ch in text", "letters characters each letter string loop", "A `for` loop over a string hands you its characters one at a time, in order.", "Copying a word onto the board letter by letter.", 'for letter in "tea":\n    print(letter)', "Each item is a one-letter string, not a number: `letter + 1` is a TypeError.", ["for", "str", "index"]),
+  nested:      E("Control flow", "Nested loops", "", "nested loop inside loop inner outer", "A loop inside another loop. The inner loop runs all the way through on every pass of the outer loop.", "For each table, lay out every piece of cutlery.", 'for t in [1, 2]:\n    for c in ["a", "b"]:\n        print(t, c)', "The inner loop starts again from its first item on every outer pass, so its body runs outer × inner times.", ["for", "indentation"]),
+  break:       E("Control flow", "break", "break", "stop exit leave loop early", "Leaves the loop at once, skipping any passes that are left. Python carries on after the loop.", "Stopping the kneading as soon as the dough is ready.", "while True:\n    if done:\n        break", "`break` only leaves the innermost loop it's in, not every loop around it.", ["while", "continue", "for"]),
+  continue:    E("Control flow", "continue", "continue", "skip next pass", "Skips the rest of this pass and jumps to the next item (or, in a while loop, the next check).", "Setting a burnt slice aside and picking up the next one.", "for n in [1, 0, 2]:\n    if n == 0:\n        continue\n    print(n)", "Lines after `continue` don't run for that item, so a counter placed after it isn't updated.", ["break", "for", "if"]),
+  truthiness:  E("Control flow", "not & truthiness", "not", "not falsy truthy empty negate", "`not` flips True and False. Every value also counts as true or false in a test: an empty list, an empty string and 0 count as False; everything else as True.", "Checking whether the receipt has anything left on it.", "if not prices:\n    return 0", "`not` applies to what comes right after it: `not a == b` means `not (a == b)`. Add brackets when unsure.", ["bool", "if", "comparison"]),
   /* Collections */
   list:        E("Collections", "list", "[ ]", "array lists sequence square brackets collection", "An ordered collection in square brackets, like `[\"egg\", \"flour\"]`. Lists can change: you can add, remove and replace items.", "A mixing bowl, tray or plate holding things in order.", 'batter = ["flour", "egg"]', "Positions start at 0, so a 4-item list's last position is 3.", ["index", "append", "mutable"]),
   index:       E("Collections", "Indexing", "[0]", "index position zero-based first last", "Getting an item by its position with `[n]`. Counting starts at 0, so `[0]` is the first item and `[-1]` is the last.", "Spot 0 on the plate is the first thing you laid down.", "stack[0]", "Asking for a position past the end, like `stack[10]`, raises IndexError.", ["list", "itemassign"]),
@@ -734,6 +768,10 @@ const GLOSS = {
   items:       E("Collections", ".items()", ".items()", "pairs iterate dictionary loop over dict", "Dict method that gives each (key, value) pair, so a `for` loop can read both at once.", "Walking along the drawers, reading name and amount.", "for k, v in d.items():", "Looping over a dict directly gives only the keys. Use `.items()` to get both.", ["dict", "unpacking", "for"]),
   unpacking:   E("Collections", "Unpacking", "a, b = …", "multiple assignment tuple pair split", "Splitting a pair (or more) into several names at once.", "Copying a drawer's name and amount onto two labels.", 'name, qty = ("salt", 2)', "The number of names must match the number of values, or you get a ValueError.", ["items", "comma"]),
   methods:     E("Collections", "Methods", ".name()", "dot method call", "Functions that belong to an object, called with a dot: `bowl.append(\"milk\")`.", "A tool that belongs to a particular container.", "text.upper()", "A method needs its parentheses: `stack.pop` without `()` does nothing.", ["dot", "append"]),
+  strmethods:  E("Collections", "String methods", ".upper()  .title()", "upper lower title capitalize uppercase capitals text methods", "Methods that strings have, like `.upper()` (all capitals) or `.title()` (a capital at the start of each word). They return a new string; the original never changes.", "Writing a neat copy of the name; the original note is untouched.", '"ada lovelace".title()   # \'Ada Lovelace\'', "Strings can't change, so `name.upper()` on its own line does nothing useful. Keep the result: `name = name.upper()`.", ["str", "methods", "immutable"]),
+  slicing:     E("Collections", "Slicing", "[1:]", "slice part sublist substring rest", "`x[a:b]` takes part of a list or string as a new one, from position `a` up to (not including) `b`. Leave a number out to mean the start or the end.", "Tearing the first line off a receipt to get the rest.", "[4, 3, 2][1:]   # [3, 2]", "The stop position isn't included: `[0:2]` gives positions 0 and 1 only.", ["index", "list", "str"]),
+  membership:  E("Collections", "in / not in", "in", "membership contains exists has", "`x in collection` is True when `x` is in it; for a dict, it checks the keys. `not in` is the opposite.", "Looking along the menu board for a dish.", '"tea" in {"tea": 3}   # True', 'For a dict, `in` looks at keys, not values: `3 in {"tea": 3}` is False.', ["dict", "list", "if"]),
+  comprehension: E("Collections", "List comprehensions", "[x for x in …]", "comprehension transform each new list", "A short way to build a new list: `[expression for name in collection]` works out the expression once per item and collects the results in order.", "Halving every weight and lining the halves up on a new tray.", "[g // 2 for g in [200, 150]]   # [100, 75]", "The loop name only exists inside the brackets: after `[g // 2 for g in grams]`, using `g` is a NameError.", ["list", "for", "loopvar"]),
   /* Functions */
   function:    E("Functions", "Functions", "def", "def function functions procedure reuse call", "A named, reusable block of code made with `def`. Defining it saves the recipe; calling it with `()` runs it.", "A recipe card: written once, used for every order.", 'def greet(name):\n    return "Hi " + name', "`def` only saves the recipe. Nothing in it runs until you call the function with `()`.", ["params", "return", "callstack"]),
   params:      E("Functions", "Parameters & arguments", "(leaf)", "parameter argument input pass", "Parameters are the names in a function's definition (`leaf` in `def make_tea(leaf)`); arguments are the values you pass when calling it (`\"mint\"`).", "The ingredient slot on the card, and the ingredient you hand over.", 'make_tea("mint")', "Calling with the wrong number of arguments raises TypeError.", ["function", "parens"]),
@@ -792,6 +830,13 @@ const GLOSS = {
   "recipe card":    K("Recipe card", "a function object", "A saved recipe. Writing it cooks nothing; using it opens a fresh cutting board.", ["function", "params", "return"]),
   "blueprint":      K("Blueprint", "a class object", "Describes every oven: how to set one up and what buttons it has.", ["class", "init", "methods"]),
   "oven":           K("Oven", "an instance (object)", "A real oven built from the blueprint, with its own dial setting.", ["instance", "attributes", "self"]),
+  "muffin tin":     K("Muffin tin", "a list", "A list being filled with `append()`: each cupcake goes in the next hole, counted from [0].", ["list", "append"]),
+  "counting tray":  K("Counting tray", "a range object", "Numbered tokens 0, 1, 2… that a `for` loop hands out one at a time. `range(3)` stops before 3.", ["range", "for"]),
+  "order note":     K("Order note", "a str object", "Text written on a note. Looping over it gives one letter at a time, counted from [0].", ["str", "strloop"]),
+  "table card":     K("Table card", "a str object", "A new string made by a string method: here the guest's name with capitals.", ["str", "strmethods"]),
+  "chalkboard":     K("Chalkboard", "a str object", "The sign being written. Strings can't change, so every new letter means a new board, and the old one goes to the sink.", ["str", "immutable", "concat"]),
+  "menu board":     K("Menu board", "a dict", "Each dish's name (the key) next to its price (the value). `in` checks whether a dish is on the board.", ["dict", "keys", "membership"]),
+  "receipt":        K("Receipt", "a list", "A list of prices. Slicing with `[1:]` makes a new, shorter receipt without the first line.", ["list", "slicing", "recursion"]),
 };
 const TAGS = GLOSS;
 
@@ -804,7 +849,10 @@ const ROLE_TAGS = [
   [/^integer literal/, ["int"]], [/^string literal/, ["str"]], [/list literal/, ["list"]], [/dict literal/, ["dict"]],
   [/^square brackets: lookup/, ["index"]], [/key to change/, ["itemassign"]],
   [/\(join\)/, ["concat"]], [/\((add|subtract|multiply)\)/, ["arithmetic"]], [/^augmented/, ["augmented"]], [/^comparison/, ["comparison", "bool"]],
-  [/^keyword: (if|else)/, ["if"]], [/^keyword: for/, ["for"]], [/^keyword: while/, ["while"]], [/^keyword: def/, ["function"]],
+  [/^keyword: (if|else)/, ["if"]], [/^keyword: for$/, ["for"]], [/^keyword: while/, ["while"]], [/^keyword: def/, ["function"]],
+  [/list comprehension/, ["comprehension", "list"]], [/slice/, ["slicing"]], [/membership|not in/, ["membership"]], [/^keyword: not$/, ["truthiness"]],
+  [/^keyword: break/, ["break"]], [/^keyword: continue/, ["continue"]], [/^boolean literal/, ["bool"]], [/^f-string/, ["fstring", "str"]],
+  [/^built-in function: range/, ["range"]], [/^string method/, ["strmethods"]], [/floor division/, ["floordiv", "arithmetic"]],
   [/^keyword: return/, ["return"]], [/^keyword: class/, ["class"]], [/^keyword: (try|except)/, ["tryexcept"]], [/^exception type: KeyError/, ["keyerror"]],
   [/^built-in function: print/, ["print"]], [/^built-in function: len/, ["len"]],
   [/^list method: append/, ["append"]], [/^list method: pop/, ["pop"]], [/^method: copy/, ["copy"]], [/^dict method: items/, ["items"]], [/method/, ["methods"]],
@@ -830,6 +878,15 @@ function analyse(d) {
       if (/^(function|class) call/.test(x.role) && toks[j + 2] && toks[j + 2].t !== ")") add("params", n);
     });
     if (/^\s*\w+\s*=\s*[A-Za-z_]\w*\s*$/.test(src)) add("aliasing", n);  // a = b: a second name for the same object
+    const loop = src.match(/^(\s*)for\s.+\sin\s+(\w+)\s*:/);
+    if (loop && d.code.some(l => new RegExp(`^\\s*${loop[2]}\\s*=\\s*["']`).test(l))) add("strloop", n);  // looping over a string: one letter at a time
+    if (/^\s+for\s/.test(src)) {                                     // a for inside another for's block: nested loops
+      const ind = src.match(/^\s*/)[0].length;
+      for (let k = n - 2, lim = ind; k >= 0; k--) {
+        const h = d.code[k], hi = h.match(/^\s*/)[0].length;
+        if (h.trim() && hi < lim) { if (/^\s*for\s/.test(h)) { add("nested", n); break; } lim = hi; }
+      }
+    }
     if (/^\s+/.test(src) && toks.some(x => /^augmented/.test(x.role))) {  // += inside a loop body: a running total
       const ind = src.match(/^\s*/)[0].length;
       for (let k = n - 2; k >= 0; k--) {
@@ -845,8 +902,9 @@ function analyse(d) {
     if (!k) return;
     const a = d.steps[k - 1].st, b = s.st, n = s.line;
     readLine(n); (s.also || []).forEach(readLine);
-    if (b.frames.length > 1) add("callstack", n);
-    const names = b.frames.slice(1).map(f => f.name);
+    const calls = b.frames.slice(1).filter(f => !f.comp);            // a comprehension's board isn't a function call
+    if (calls.length) add("callstack", n);
+    const names = calls.map(f => f.name);
     if (new Set(names).size < names.length) add("recursion", n);
     b.frames.forEach((f, fi) => {
       const pf = a.frames[fi];
@@ -1020,7 +1078,7 @@ const DISHES = [
          ["Go straight to the pass", "skip the loop", "The loop runs its body for every item first.", 'print(weight, "g of cookie dough")']],
         `[Take the next item|next iteration] off the [prep tray|list]. The \`grams\` [tape|variable] reads ${gr}.`,
         `The \`for\` loop takes item ${k} and binds \`grams\` to ${gr}.`,
-        st => { if (k === 0) st.heap.o1 = { t: "list", vessel: "tray", k: "Prep tray", hold: true, items: ing.map(([, i, n]) => P(n, { ico: i })) };
+        st => { if (k === 0) st.heap.o1 = { t: "list", vessel: "tray", unit: "g", k: "Prep tray", hold: true, items: ing.map(([, i, n]) => P(n, { ico: i })) };
                 st.heap.o1.hl = k; g(st).grams = P(gr, { ico }); });
       const before = total; total += gr;
       step(3, [`Add it to the scale: ${before} + ${gr} = ${total}`, `weight += grams gives ${total}`],
@@ -1398,20 +1456,472 @@ const DISHES = [
       "`oven.temp` looks up the attribute, so `print` serves `Oven at 200 degrees`.",
       st => { st.out.push("Oven at 200 degrees"); });
   }),
+
+  /* ---------- loops, strings, lists, dicts and recursion ---------- */
+  dish({ id: "card", tier: 1, pic: "🪧", name: "Reserved table card", topics: "strings · .title() · f-strings",
+    code: ['guest = "ada lovelace"', "card = guest.title()", 'print(f"Reserved for {card}")'] }, step => {
+    step(1, ["Write \"ada lovelace\" on an order note and label it `guest`", "create the str 'ada lovelace', bind guest"],
+      [["Write the name on a label, with no note", "a name without quotes", "Without quotes Python reads `ada lovelace` as two names side by side: SyntaxError.", "guest = ada lovelace"],
+       ["Write it with capitals straight away", "strings fix their own capitals", "Python stores the text exactly as written, all lowercase. The capitals come on line 2.", 'guest = "Ada Lovelace"'],
+       ["Write the word \"guest\" on the note", "the name in quotes", "The value is the text after `=`, not the label's name.", 'guest = "guest"']],
+      "The booking goes on the rack as an [order note|str object] labeled `guest`.",
+      "`\"ada lovelace\"` is a string, and `guest` is bound to it.",
+      st => { st.heap.o1 = { t: "str", v: "'ada lovelace'", vessel: "notepad", k: "Order note" }; g(st).guest = R("o1"); });
+    step(2, ["Write a new table card with capitals, \"Ada Lovelace\", and label it `card`", "title() returns a new string 'Ada Lovelace'"],
+      [["Fix the capitals on the order note itself", "title() changes guest in place", "Strings are sealed: `.title()` can't change `guest`. It hands back a new string, and the note stays lowercase.", "guest.title()"],
+       ["Write \"ADA LOVELACE\" on the card", "title() makes every letter a capital", "That's `.upper()`. `.title()` capitalises the first letter of each word.", "card = guest.upper()"],
+       ["Tie `card` to the order note", "card is another name for guest", "`.title()` makes a new string, and `card` is tied to that one.", "card = guest"]],
+      "A [new card|new str object] is written. The [order note|original string] doesn't change.",
+      "`guest.title()` returns a new string with a capital at the start of each word, and `card` refers to it.",
+      st => { st.heap.o2 = { t: "str", v: "'Ada Lovelace'", vessel: "placecard", k: "Table card" }; g(st).card = R("o2"); });
+    step(3, ["Fill in the blank and send \"Reserved for Ada Lovelace\" to the pass", "the f-string puts card's value into the text"],
+      [["Send \"Reserved for {card}\"", "the braces are printed as they are", "The `f` before the quotes tells Python to fill in `{card}` with its value.", 'print("Reserved for {card}")'],
+       ["Send \"Reserved for card\"", "the name, not the value", "Inside an f-string, `{card}` is replaced by what `card` refers to.", 'print("Reserved for card")'],
+       ["Send \"Reserved for ada lovelace\"", "use the original note", "The ticket fills in `card`, the copy with capitals.", 'print(f"Reserved for {guest}")']],
+      "Fill in the [blank on the card|the {card} placeholder] and call it out at [the pass|output].",
+      "`f\"Reserved for {card}\"` builds the text `Reserved for Ada Lovelace`, and `print` shows it.",
+      st => { st.out.push("Reserved for Ada Lovelace"); });
+  }),
+
+  dish({ id: "cupcakes", tier: 2, pic: "🧁", name: "Three cupcakes", topics: "for loops · range() · append()",
+    code: ["tin = []", "for i in range(3):", '    tin.append("cupcake")', 'print(len(tin), "cupcakes")'] }, step => {
+    step(1, ["Set out an empty muffin tin and label it `tin`", "create an empty list, bind tin"],
+      [["Put three cupcakes in the tin now", "fill the list straight away", "`[]` is an empty list. The loop fills it later.", 'tin = ["cupcake", "cupcake", "cupcake"]'],
+       ["Use a sealed jar", "a tuple", "`()` would make a tuple, which can't be added to. Square brackets make a list.", "tin = ()"],
+       ["Set out a spice cabinet", "curly braces", "`{}` makes an empty dict. Square brackets make a list.", "tin = {}"]],
+      "An [empty tin|empty list] goes on the rack, labeled `tin`.",
+      "`[]` creates an empty list, and `tin` is bound to it.",
+      st => { st.heap.o1 = { t: "list", vessel: "tin", k: "Muffin tin", items: [] }; g(st).tin = R("o1"); });
+    [0, 1, 2].forEach(k => {
+      step(2, [k ? `Take the next token from the counting tray: ${k}` : "Set out a counting tray of 0, 1, 2 and take the first token: 0", `the loop binds i to ${k}`],
+        [k ? ["Start again from token 0", "the loop restarts", "Each pass takes the next number.", "i = 0"] : ["Take token 1 first", "range starts at 1", "`range(3)` counts from 0: 0, 1, 2.", "i = 1"],
+         k ? ["Take all the tokens at once", "i is the whole range", "A for loop hands out one number per pass.", "i = range(3)"] : ["Set out tokens 1, 2, 3", "range(3) includes 3", "`range(3)` stops before 3: it gives 0, 1, 2.", "for i in range(1, 4):"],
+         ["Bake without counting", "skip the loop header", "The header hands out the next number before every pass.", 'tin.append("cupcake")']],
+        k ? `The [next token|next number] comes off the [counting tray|range]. The \`i\` [tape|loop variable] reads ${k}.` : "A [counting tray|range object] of 0, 1, 2 comes out. The `i` [tape|loop variable] reads 0.",
+        `The \`for\` loop takes the next number from \`range(3)\` and binds \`i\` to ${k}.`,
+        st => { if (!k) st.heap.o2 = { t: "range", v: "range(3)", k: "Counting tray", hold: true, items: [P(0), P(1), P(2)] };
+                st.heap.o2.hl = k; g(st).i = P(k); });
+      step(3, [`Put cupcake number ${k + 1} in the next hole of the same tin`, `append adds 'cupcake' at index ${k}`],
+        [["Put the cupcake in a new tin", "make a new list", "`.append()` adds to the tin that's already there. Nothing new is made.", 'tin = ["cupcake"]'],
+         [`Put ${k + 1} cupcakes in`, "append adds i + 1 items", "`append` adds exactly one item each time it's called.", 'tin.extend(["cupcake"] * (i + 1))'],
+         ["Put the cupcake at the front", "insert at 0", "`.append()` always adds to the end.", 'tin.insert(0, "cupcake")']],
+        `The [tin|list] now holds ${k + 1}.`,
+        `\`tin.append("cupcake")\` adds one item, so the list has ${k + 1}.`,
+        st => { delete st.heap.o2.hl; st.heap.o1.items.push(P("'cupcake'")); });
+    });
+    step(2, ["The counting tray is empty: stop baking", "range(3) is used up, the loop ends"],
+      [["Take token 3", "range(3) includes 3", "`range(3)` stops before 3.", "i = 3"],
+       ["Start the tray again", "loop again", "A for loop goes through the range once.", "for i in range(3):"],
+       ["Throw the tin away", "the loop deletes the list", "The loop only used the counting tray. `tin` keeps its cupcakes.", "del tin"]],
+      "No tokens left, so [the repeating stops|the loop ends]. The used counting tray goes to the [sink|garbage].",
+      "`range(3)` has given 0, 1 and 2, so the loop ends. `i` keeps its last value, 2.",
+      st => { delete st.heap.o2.hold; });
+    step(4, ["Count the tin and send \"3 cupcakes\" to the pass", "len(tin) is 3, print outputs 3 cupcakes"],
+      [["Send \"2 cupcakes\"", "print the last value of i", "`i` ended at 2, but `len(tin)` counts the cupcakes: 3.", 'print(i, "cupcakes")'],
+       ["Send the whole tin", "print the list", "This line prints `len(tin)`, the count, not the list itself.", "print(tin)"],
+       ["Send \"len(tin) cupcakes\"", "print the code as text", "Without quotes, `len(tin)` runs and gives 3.", 'print("len(tin)", "cupcakes")']],
+      "The sink is [washed|garbage-collected]. [Count the tin|len()] and call it out at [the pass|output].",
+      "`len(tin)` returns 3, and `print` serves `3 cupcakes`.",
+      st => { delete st.heap.o2; st.out.push("3 cupcakes"); });
+  }),
+
+  dish({ id: "menu", tier: 2, pic: "📋", name: "Menu with three prices", topics: "dicts · changing a value · not in",
+    code: ['menu = {"soup": 5, "tea": 2}', 'menu["tea"] = 3', 'if "cake" not in menu:', '    menu["cake"] = 4', "print(menu)"] }, step => {
+    step(1, ["Chalk up a menu board, soup 5 and tea 2, and label it `menu`", "create a dict with two keys"],
+      [["Write dishes and prices as one long list", "a list", "Square brackets make a list. Curly braces with `key: value` make a dict.", 'menu = ["soup", 5, "tea", 2]'],
+       ["Label a pot of soup `soup`", "soup is a variable", "\"soup\" is a key inside the dict, not a variable.", "soup = 5"],
+       ["Write the prices first: 5 soup, 2 tea", "values before keys", "The key goes before the colon and the value after it.", 'menu = {5: "soup", 2: "tea"}']],
+      "A [menu board|dict]: each line has a [dish name|key] and a [price|value].",
+      "`menu` refers to a dict with the keys `'soup'` and `'tea'`.",
+      st => { st.heap.o1 = { t: "dict", vessel: "menuboard", k: "Menu board", items: [["'soup'", P(5)], ["'tea'", P(2)]] }; g(st).menu = R("o1"); });
+    step(2, ["Rub out the tea price and chalk 3 in its place", "the key 'tea' now maps to 3"],
+      [["Add a second tea line priced 3", "keys can repeat", "Each key appears once. Assigning to an existing key replaces its value.", 'menu["tea 2"] = 3'],
+       ["Add 3 to the tea price: 5", "= adds to the value", "`=` replaces the value. Adding would be `+=`.", 'menu["tea"] += 3'],
+       ["Wipe the board and write only tea 3", "replace the whole dict", "Only the `\"tea\"` line changes; soup stays.", 'menu = {"tea": 3}']],
+      "[Same line|same key], new [price|value].",
+      "Assigning to an existing key replaces its value: `'tea'` now maps to 3.",
+      st => { st.heap.o1.hl = 1; st.heap.o1.items[1][1] = P(3); });
+    step(3, ["Look along the board for cake. It's not there, so go on to add it", "\"cake\" not in menu is True: enter the if block"],
+      [["Cake isn't there, so skip the next line", "not in is False", "`not in` is True when the key is missing, and cake is missing.", 'if "cake" in menu:'],
+       ["Look for a price called cake", "in checks the values", "For a dict, `in` checks the keys: the dish names.", 'if "cake" not in menu.values():'],
+       ["Open the cake line and set off the alarm", "a KeyError", "`in` only looks; it never raises an error for a missing key.", 'menu["cake"]']],
+      "[Check the board|membership test]: there's no cake line yet.",
+      "`\"cake\" not in menu` checks the keys. `'cake'` isn't one of them, so the test is True.",
+      st => { delete st.heap.o1.hl; });
+    step(4, ["Chalk a new line at the bottom: cake 4", "add the key 'cake' with the value 4"],
+      [["Error: there's no cake line", "KeyError", "Assigning to a missing key creates it. Only reading one fails.", 'print(menu["cake"])'],
+       ["Write cake at the top", "new keys go first", "A dict keeps keys in the order they were added, so cake goes last.", 'menu = {"cake": 4, "soup": 5, "tea": 3}'],
+       ["Replace the soup line with cake", "overwrite the first key", "The other keys stay. A new one is added.", 'menu["soup"] = 4']],
+      "A [new line|new key] goes at the bottom of the board.",
+      "Assigning to a new key adds it, after the keys already there.",
+      st => { st.heap.o1.hl = 2; st.heap.o1.items.push(["'cake'", P(4)]); });
+    step(5, ["Hang the board at the pass: soup 5, tea 3, cake 4", "print shows the dict"],
+      [["Show tea at 2", "the update didn't stick", "Line 2 replaced the tea price with 3.", 'print({"soup": 5, "tea": 2, "cake": 4})'],
+       ["Show the board without cake", "the if block was skipped", "Cake was missing, so the if block ran and added it.", 'print({"soup": 5, "tea": 3})'],
+       ["Show only the prices", "print the values", "Printing a dict shows every `key: value` pair.", "print(list(menu.values()))"]],
+      "Hang the [menu board|dict] at [the pass|output].",
+      "`print(menu)` shows `{'soup': 5, 'tea': 3, 'cake': 4}`.",
+      st => { delete st.heap.o1.hl; st.out.push("{'soup': 5, 'tea': 3, 'cake': 4}"); });
+  }),
+
+  dish({ id: "golden", tier: 3, pic: "✨", name: "Two golden slices", topics: "for loops · if · continue",
+    code: ['slices = ["golden", "burnt", "golden"]', "good = 0", "for toast in slices:", '    if toast == "burnt":', "        continue", "    good += 1", 'print(good, "golden slices")'] }, step => {
+    const toast = ["golden", "burnt", "golden"];
+    step(1, ["Line up golden, burnt and golden toast on a tray labeled `slices`", "create a list of three strings"],
+      [["Throw the burnt slice out before lining them up", "the list skips 'burnt'", "A list keeps exactly what's written. The loop deals with the burnt slice.", 'slices = ["golden", "golden"]'],
+       ["Put each slice under its own label", "three variables", "Square brackets make one list holding all three.", 'a, b, c = "golden", "burnt", "golden"'],
+       ["Line them up in a sealed box", "a tuple", "Round brackets would make a tuple. Square brackets make a list.", 'slices = ("golden", "burnt", "golden")']],
+      "Three slices of toast in order on a [tray|list], counted from [0|index 0].",
+      "`slices` refers to a list of three strings.",
+      st => { st.heap.o1 = { t: "list", vessel: "tray", k: "Toast tray", items: toast.map(x => P(`'${x}'`)) }; g(st).slices = R("o1"); });
+    step(2, ["Start a count of good slices: write 0 on a `good` label", "bind good to 0"],
+      [["Start the count at 3", "count every slice up front", "The count starts at 0. The loop adds the good ones.", "good = 3"],
+       ["Count the slices now", "len gives the good ones", "`len(slices)` would be 3, burnt one included.", "good = len(slices)"],
+       ["Leave the count blank", "no starting value", "`good += 1` needs a number to add to; `None + 1` fails.", "good = None"]],
+      "A [tally|counter variable] starts at 0.",
+      "`good` is bound to 0.",
+      st => { g(st).good = P(0, { ico: "🔢" }); });
+    let good = 0;
+    toast.forEach((t, k) => {
+      const ord = ["first", "second", "third"][k], burnt = t === "burnt";
+      step(3, [`Pick up the ${ord} slice: ${t}`, `the loop binds toast to '${t}'`],
+        [k ? ["Pick up the first slice again", "the loop restarts", "Each pass moves on to the next item.", 'toast = "golden"'] : ["Pick up the whole tray", "toast is the list", "A for loop hands you one item per pass.", "toast = slices"],
+         ["Pick up the last slice first", "loops go backwards", "A for loop goes from the first item to the last.", "toast = slices[-1]"],
+         ["Go straight to the pass", "skip the loop", "The loop body runs for every slice first.", 'print(good, "golden slices")']],
+        `[Take the next slice|next iteration] off the [tray|list]. The \`toast\` [tape|loop variable] reads ${t}.`,
+        `The \`for\` loop takes item ${k} and binds \`toast\` to \`'${t}'\`.`,
+        st => { st.heap.o1.hold = true; st.heap.o1.hl = k; g(st).toast = P(`'${t}'`); });
+      step(4, burnt ? ["Check: is it burnt? Yes", "'burnt' == 'burnt' is True: enter the if block"] : ["Check: is it burnt? No, it's golden", "'golden' == 'burnt' is False: skip the if block"],
+        burnt ? [["No, it's fine", "treat it as False", "`'burnt' == 'burnt'` is True.", "if False:"],
+                 ["Check whether it's golden", "compare with golden", "The ticket compares with `\"burnt\"`.", 'if toast == "golden":'],
+                 ["Set the label to burnt", "= instead of ==", "One `=` assigns; the ticket compares with `==`.", 'toast = "burnt"']]
+              : [["Yes, it's burnt", "treat it as True", `\`'golden' == 'burnt'\` is False.`, "if True:"],
+                 ["Skip the check", "remove the if", "The check runs on every pass.", "# if toast == \"burnt\":"],
+                 ["Set the label to burnt", "= instead of ==", "One `=` assigns; the ticket compares with `==`.", 'toast = "burnt"']],
+        burnt ? "[Check the slice|if test]: this one is burnt." : "[Check the slice|if test]: golden, so the indented step is skipped.",
+        burnt ? "`toast == \"burnt\"` is True, so Python enters the if block." : "`toast == \"burnt\"` is False, so the if block is skipped.");
+      if (burnt) {
+        step(5, ["Set the burnt slice aside and pick up the next one", "continue skips the rest of this pass"],
+          [["Count it anyway", "continue does nothing", "`continue` jumps straight to the next pass, so `good += 1` doesn't run for this slice.", "good += 1"],
+           ["Stop checking slices", "continue leaves the loop", "That's `break`. `continue` only skips the rest of this pass.", "break"],
+           ["Throw the whole tray away", "continue clears the list", "`continue` only moves on to the next item; the list stays.", "slices.clear()"]],
+          "[Skip|continue] the counting step and go back for the [next slice|next item].",
+          "`continue` jumps back to the `for` line; the rest of this pass doesn't run.");
+      } else {
+        good += 1;
+        const was = good - 1;
+        step(6, [`Count it: ${was} + 1 = ${good}`, `good += 1 gives ${good}`],
+          [[`Set the count to 1`, "replace the count", "`+=` adds to the count; `=` would replace it.", "good = 1"],
+           ["Skip counting this one", "the if block skipped this too", "Only the indented `continue` belonged to the if. This line runs for golden slices.", "pass"],
+           [`Count it twice: ${was + 2}`, "+= 2", "One `+= 1` per golden slice.", "good += 2"]],
+          `The [tally|counter] reads ${good}.`,
+          `\`good += 1\` means \`good = good + 1\`, so \`good\` becomes ${good}.`,
+          st => { g(st).good = P(good, { ico: "🔢" }); });
+      }
+    });
+    step(3, ["No slices left: stop", "the loop ends"],
+      [["Pick up the burnt slice again", "continue repeats an item", "Each slice is visited once.", 'toast = "burnt"'],
+       ["Start over from the first slice", "loop again", "A for loop goes through the list once.", "for toast in slices:"],
+       ["Count one more", "a 4th pass", "There were 3 slices, so there were 3 passes.", "good += 1"]],
+      "No more slices, so [the repeating stops|the loop ends]. The tray stays: `slices` still labels it.",
+      "The list is used up and the loop finishes. `toast` keeps its last value.",
+      st => { delete st.heap.o1.hold; delete st.heap.o1.hl; });
+    step(7, ["Send \"2 golden slices\" to the pass", "print outputs 2 golden slices"],
+      [["Send \"3 golden slices\"", "count every slice", "The burnt slice was skipped by `continue`.", 'print(len(slices), "golden slices")'],
+       ["Send \"golden golden slices\"", "print the last slice", "`toast` is the last slice; `good` is the count.", 'print(toast, "golden slices")'],
+       ["Send \"1 golden slices\"", "continue skipped the last slice too", "`continue` only skipped the pass for the burnt slice.", 'print(1, "golden slices")']],
+      "Call out the count at [the pass|output].",
+      "`print` serves `2 golden slices`.",
+      st => { st.out.push("2 golden slices"); });
+  }),
+
+  dish({ id: "knead", tier: 3, pic: "🫓", name: "Dough kneaded 3 times", topics: "while True · break",
+    code: ["kneads = 0", "while True:", "    kneads += 1", "    if kneads == 3:", "        break", 'print("Dough kneaded", kneads, "times")'] }, step => {
+    step(1, ["Flour the counter and write 0 on a `kneads` label", "bind kneads to 0"],
+      [["Write 3 on the label", "kneads is the target", "The 3 is in the check on line 4. Counting starts at 0.", "kneads = 3"],
+       ["Start kneading before setting a count", "run line 3 first", "Line 1 runs first; `kneads += 1` on a missing name is a NameError.", "kneads += 1"],
+       ["Write \"0\" as text", "a string", "Text can't be added to: `\"0\" + 1` is a TypeError.", 'kneads = "0"']],
+      "A [tally|counter variable] starts at 0.",
+      "`kneads` is bound to 0.",
+      st => { g(st).kneads = P(0, { ico: "✊" }); });
+    [1, 2, 3].forEach(n => {
+      step(2, [n === 1 ? "Start kneading: `while True` means keep going until something says stop" : "Back to the top: True is still true, so keep kneading", "True is always True: run the loop body"],
+        n === 1 ? [["Skip the loop: True isn't a real check", "while True never runs", "`True` is always true, so the loop body runs. Only a `break` stops it.", "while False:"],
+                   ["Knead exactly 3 times, no checks", "while True runs 3 times", "`while True` doesn't know about 3. The `if` and `break` inside decide.", "for n in range(3):"],
+                   ["Check whether the dough is True", "compare with True", "`while True:` doesn't compare anything; `True` is the condition itself.", "while kneads == True:"]]
+                : [["Stop: you've already kneaded", "the loop ends by itself", "`while True` never ends by itself. Only a `break` stops it.", "break"],
+                   ["Reset the count to 0", "a while loop restarts its variables", "Nothing resets `kneads`; it keeps its value.", "kneads = 0"],
+                   ["Go straight to the pass", "leave the loop", "The `break` hasn't run yet, so the loop carries on.", 'print("Dough kneaded", kneads, "times")']],
+        n === 1 ? "[Keep kneading|while True:] has no finish line of its own: the [stop rule|if … break] is inside." : "Back to the [top of the loop|while line]. True never changes, so keep going.",
+        "`True` is always true, so the loop body runs again.");
+      step(3, [`Knead once more: ${n - 1} + 1 = ${n}`, `kneads += 1 gives ${n}`],
+        [[`Set the count to 1`, "replace the count", "`+=` adds to the count; `=` would replace it.", "kneads = 1"],
+         [`Knead twice: ${n + 1}`, "+= 2", "Each pass adds 1.", "kneads += 2"],
+         ["Take a knead off", "-= instead of +=", "`+=` adds.", "kneads -= 1"]],
+        `The [tally|counter] reads ${n}.`,
+        `\`kneads += 1\` means \`kneads = kneads + 1\`, so \`kneads\` becomes ${n}.`,
+        st => { g(st).kneads = P(n, { ico: "✊" }); });
+      step(4, n < 3 ? [`Check: is that 3 kneads? No, only ${n}`, `${n} == 3 is False: keep going`] : ["Check: is that 3 kneads? Yes!", "3 == 3 is True: enter the if block"],
+        n < 3 ? [["Yes, stop now", "treat it as True", `\`${n} == 3\` is False.`, "if True:"],
+                 ["Set the count to 3", "= instead of ==", "One `=` assigns. The ticket compares with `==`.", "kneads = 3"],
+                 ["Check for more than 3", "> instead of ==", "The ticket checks `== 3`.", "if kneads > 3:"]]
+              : [["No, keep kneading", "treat it as False", "`3 == 3` is True.", "if False:"],
+                 ["Set the count to 3", "= instead of ==", "One `=` assigns. The ticket compares with `==`.", "kneads = 3"],
+                 ["Knead one more for luck", "skip the if block", "The test is True, so the indented `break` runs.", "kneads += 1"]],
+        n < 3 ? "[Check the count|if test]: not 3 yet, so the stop step is skipped." : "[Check the count|if test]: that's 3, the dough is ready.",
+        n < 3 ? `\`${n} == 3\` is False, so \`break\` is skipped.` : "`3 == 3` is True, so Python enters the if block.");
+    });
+    step(5, ["The dough is smooth: stop kneading now", "break leaves the while loop"],
+      [["Knead once more, then stop", "break finishes the pass first", "`break` leaves the loop at once.", "kneads += 1"],
+       ["Go back to the top of the loop", "continue", "That's `continue`. `break` leaves the loop.", "continue"],
+       ["Stop the whole kitchen", "break ends the program", "`break` only leaves the loop; line 6 still runs.", "exit()"]],
+      "[Stop|break]: Python jumps out of the loop to the first line after it.",
+      "`break` exits the `while True` loop immediately.");
+    step(6, ["Send \"Dough kneaded 3 times\" to the pass", "print outputs Dough kneaded 3 times"],
+      [["Send \"Dough kneaded 4 times\"", "one more pass after break", "`break` stopped the loop straight after the third knead.", 'print("Dough kneaded", 4, "times")'],
+       ["Send \"Dough kneaded True times\"", "print the condition", "The ticket prints `kneads`, which is 3.", 'print("Dough kneaded", True, "times")'],
+       ["Send \"Dough kneaded kneads times\"", "print the name as text", "With quotes it's just the word. Without them, the value (3) is printed.", 'print("Dough kneaded", "kneads", "times")']],
+      "The dough goes out at [the pass|output].",
+      "`print` serves `Dough kneaded 3 times`.",
+      st => { st.out.push("Dough kneaded 3 times"); });
+  }),
+
+  dish({ id: "chalk", tier: 3, pic: "🖍️", name: "SOUP of the day sign", topics: "looping over a string · .upper() · building text",
+    code: ['word = "soup"', 'sign = ""', "for letter in word:", "    sign = sign + letter.upper()", 'print(sign, "of the day")'] }, step => {
+    step(1, ["Write \"soup\" on an order note and label it `word`", "create the str 'soup', bind word"],
+      [["Write SOUP in capitals", "store it in capitals", "The ticket's text is lowercase; capitals come from `.upper()` later.", 'word = "SOUP"'],
+       ["Write each letter on its own note", "a list of letters", "One string holds all four letters. A loop can still go through them one by one.", 'word = ["s", "o", "u", "p"]'],
+       ["Write soup without quotes", "a name, not text", "Without quotes `soup` is a name, and none exists: NameError.", "word = soup"]],
+      "The [order note|str object] says soup. Its letters are counted from [0|index 0].",
+      "`word` is bound to the string `'soup'`.",
+      st => { st.heap.o1 = { t: "str", v: "'soup'", vessel: "notepad", letters: true, k: "Order note" }; g(st).word = R("o1"); });
+    step(2, ["Set up a blank chalkboard and label it `sign`", "bind sign to the empty string ''"],
+      [["Leave the board out until later", "no starting value", "`sign + ...` on line 4 needs a string to add to.", "sign = None"],
+       ["Write \"soup\" on the board straight away", "copy the word", "The ticket starts the sign empty: `\"\"`.", "sign = word"],
+       ["Write a space on the board", "\"\" is a space", "`\"\"` has nothing between the quotes: it's empty, not a space.", 'sign = " "']],
+      "A [blank board|empty string]: two quotes with nothing between them.",
+      "`\"\"` is the empty string; `sign` is bound to it.",
+      st => { st.heap.o2 = { t: "str", v: "''", vessel: "chalkboard", k: "Chalkboard" }; g(st).sign = R("o2"); });
+    let sofar = "", id = 2;
+    [..."soup"].forEach((c, k) => {
+      const ord = ["first", "second", "third", "fourth"][k];
+      step(3, [`Read the ${ord} letter of the note: ${c}`, `the loop binds letter to '${c}'`],
+        [k ? ["Read the first letter again", "the loop restarts", "Each pass moves on to the next letter.", 'letter = "s"'] : ["Read the whole word at once", "letter is 'soup'", "Looping over a string hands you one letter per pass.", "letter = word"],
+         ["Read the letters from the end", "loops go backwards", "A for loop goes from the first letter to the last.", "letter = word[-1]"],
+         [`Read letter number ${k + 1}`, "index from 1", `Counting from 0, this is position ${k}.`, `letter = word[${k + 1}]`]],
+        `[Take the next letter|next iteration] off the [note|string]. The \`letter\` [tape|loop variable] reads ${c}.`,
+        `The \`for\` loop takes the character at position ${k} and binds \`letter\` to \`'${c}'\`.`,
+        st => { st.heap.o1.hl = k; g(st).letter = P(`'${c}'`); });
+      const before = sofar, C = c.toUpperCase();
+      sofar += C;
+      step(4, [`Chalk a new board, "${before}" + "${C}" = "${sofar}", and move the \`sign\` label to it`, `a new string '${sofar}'; sign is rebound`],
+        [[`Add "${c}" to the old board`, "keep the lowercase letter", "`letter.upper()` gives the capital first.", "sign = sign + letter"],
+         [`Write ${C} on the old board`, "change the string in place", "Strings are sealed, so `+` makes a new one. The old board goes to the sink.", "sign.append(letter.upper())"],
+         [`Write just "${C}"`, "replace the sign", "`sign + ...` keeps what's already there and adds to it.", "sign = letter.upper()"]],
+        `Strings can't change, so a [new board|new str object] is chalked and the [label|name] moves. The old board goes to the [sink|garbage].`,
+        `\`letter.upper()\` gives \`'${C}'\`, and \`sign + '${C}'\` makes the new string \`'${sofar}'\`.`,
+        st => { const live = reachable(st); Object.keys(st.heap).filter(x => !live.has(x)).forEach(x => delete st.heap[x]);
+                id += 1; st.heap[`o${id}`] = { t: "str", v: `'${sofar}'`, vessel: "chalkboard", k: "Chalkboard" }; g(st).sign = R(`o${id}`); });
+    });
+    step(3, ["No letters left: stop", "the loop ends"],
+      [["Read the s again", "loop forever", "A for loop visits each letter once.", 'letter = "s"'],
+       ["Add a space at the end", "the loop adds a space", "Nothing is added once the loop ends.", 'sign = sign + " "'],
+       ["Wipe the board", "the loop clears the string", "The sign keeps everything chalked so far.", 'sign = ""']],
+      "No more letters, so [the repeating stops|the loop ends].",
+      "Every character of `'soup'` has been used, so the loop finishes.",
+      st => { delete st.heap.o1.hl; });
+    step(5, ["Send \"SOUP of the day\" to the pass", "print outputs SOUP of the day"],
+      [["Send \"soup of the day\"", "upper() wasn't used", "Each letter went through `.upper()`.", 'print(word, "of the day")'],
+       ["Send \"P of the day\"", "sign is the last letter", "`sign` collected all four letters.", 'print(letter.upper(), "of the day")'],
+       ["Send \"S O U P of the day\"", "+ adds spaces", "`+` joins strings with no space.", 'print(" ".join(sign), "of the day")']],
+      "The sink is [washed|garbage-collected] and the sign goes to [the pass|output].",
+      "`print` serves `SOUP of the day`.",
+      st => { const live = reachable(st); Object.keys(st.heap).filter(x => !live.has(x)).forEach(x => delete st.heap[x]); st.out.push("SOUP of the day"); });
+  }),
+
+  dish({ id: "tables", tier: 4, pic: "🍴", name: "Two tables set", topics: "nested for loops",
+    code: ["for table in [1, 2]:", '    for item in ["fork", "knife"]:', '        print("Table", table, item)', 'print("Tables set")'] }, step => {
+    const tables = [1, 2], cutlery = ["fork", "knife"];
+    tables.forEach((t, k) => {
+      step(1, [k ? "Walk to the next table: 2" : "Line up table numbers 1 and 2 on a tray and walk to table 1", `the outer loop binds table to ${t}`],
+        k ? [["Set table 1 again", "the outer loop restarts", "The outer loop moves on to its next item.", "table = 1"],
+             ["Stop: one table is enough", "leave the outer loop", "There's still table 2 on the list.", "break"],
+             ["Walk to table 3", "skip a table", "The list is [1, 2], so the next one is 2.", "table = 3"]]
+          : [["Set both tables at once", "table is the whole list", "A for loop hands out one item per pass.", "table = [1, 2]"],
+             ["Start with the cutlery", "run the inner loop first", "The outer `for` runs first and picks a table.", 'for item in ["fork", "knife"]:'],
+             ["Walk to table 0", "lists start at 0", "Positions start at 0, but the first item here is the number 1.", "table = 0"]],
+        `[Walk to the next table|outer loop, next pass]. The \`table\` [tape|loop variable] reads ${t}.`,
+        `The outer \`for\` binds \`table\` to ${t}.`,
+        st => { if (!k) st.heap.o1 = { t: "list", vessel: "tray", k: "Table numbers", hold: true, items: tables.map(n => P(n, { ico: "🪑" })) };
+                st.heap.o1.hl = k; g(st).table = P(t, { ico: "🪑" }); });
+      cutlery.forEach((c, j) => {
+        step(2, [j ? "Take the next piece: a knife" : `${k ? "Fill a fresh" : "Fill a"} cutlery tray with a fork and a knife, and take the fork`, `the inner loop binds item to '${c}'`],
+          j ? [["Go to the next table", "the inner loop ends early", "There's still a knife on the cutlery tray.", "break"],
+               ["Take the fork again", "the inner loop repeats an item", "The inner loop moves on to the knife.", 'item = "fork"'],
+               ["Take both pieces at once", "item is the whole list", "A for loop hands out one item per pass.", 'item = ["fork", "knife"]']]
+            : [[k ? "Carry on from the knife" : "Take the knife first", k ? "the inner loop continues where it stopped" : "loops go backwards", k ? "The inner loop starts again from its first item on every outer pass." : "A for loop goes from first to last.", 'item = "knife"'],
+               ["Walk to the next table", "skip the inner loop", "The inner loop runs fully for every table.", "table = 2"],
+               ["Lay the whole tray down as one item", "item is the list", "A for loop hands out one item per pass.", 'item = ["fork", "knife"]']],
+          j ? "[Next piece|inner loop, next pass]: the knife." : `A ${k ? "[new cutlery tray|new list]: the list in the code is made again on every outer pass" : "[cutlery tray|list]"}. The \`item\` [tape|loop variable] reads fork.`,
+          `The inner \`for\` binds \`item\` to \`'${c}'\`.`,
+          st => { if (!j) { const live = reachable(st); Object.keys(st.heap).filter(x => !live.has(x)).forEach(x => delete st.heap[x]);
+                            st.heap[`o${2 + k}`] = { t: "list", vessel: "tray", k: "Cutlery tray", hold: true, items: cutlery.map(x => P(`'${x}'`)) }; }
+                  st.heap[`o${2 + k}`].hl = j; g(st).item = P(`'${c}'`); });
+        step(3, [`Lay the ${c} at table ${t} and call "Table ${t} ${c}"`, `print outputs Table ${t} ${c}`],
+          [[`Call "Table ${t ? 3 - t : 1} ${c}"`, "the other table", `\`table\` is ${t} on this pass.`, `print("Table", ${3 - t}, item)`],
+           [`Call "Table table ${c}"`, "print the name as text", `Without quotes, \`table\`'s value (${t}) is printed.`, 'print("Table", "table", item)'],
+           [`Call "Table ${t} ${cutlery[1 - j]}"`, "the other piece", `\`item\` is ${c} on this pass.`, `print("Table", table, "${cutlery[1 - j]}")`]],
+          "[Call it out|print] at [the pass|output].",
+          `Prints \`Table ${t} ${c}\`. Both loop variables are read: \`table\` from the outer loop and \`item\` from the inner one.`,
+          st => { st.out.push(`Table ${t} ${c}`); });
+      });
+      step(2, [`Table ${t} is done: the cutlery tray is empty`, "the inner loop ends"],
+        [["Take the fork again", "the inner loop restarts by itself", "The inner loop only restarts when the outer loop comes round again.", 'item = "fork"'],
+         ["Stop everything", "the inner loop ends both loops", "The outer loop carries on with its next table.", 'print("Tables set")'],
+         ["Lay a spoon too", "add a third item", "The cutlery list has two items.", 'item = "spoon"']],
+        "No cutlery left, so [the inner loop ends|inner loop finished]. The empty cutlery tray goes to the [sink|garbage]; back to the [outer loop|outer for].",
+        "The inner list is used up. Python goes back to the outer `for` line.",
+        st => { const o = st.heap[`o${2 + k}`]; delete o.hold; delete o.hl; });
+    });
+    step(1, ["No tables left: stop", "the outer loop ends"],
+      [["Set table 1 again", "loop again", "The outer loop goes through [1, 2] once.", "table = 1"],
+       ["Go to table 3", "one more pass", "There are only two tables.", "table = 3"],
+       ["Lay one more fork", "the inner loop runs again", "The inner loop only runs inside the outer one.", 'item = "fork"']],
+      "No tables left, so [the outer loop ends|outer loop finished]. The table-number tray goes to the [sink|garbage].",
+      "The outer list is used up. Both loops have finished.",
+      st => { delete st.heap.o1.hold; delete st.heap.o1.hl; });
+    step(4, ["Call \"Tables set\"", "print outputs Tables set"],
+      [["Call \"Tables set\" after every table", "the line is inside the loop", "It isn't indented, so it runs once, after both loops.", 'print("Tables set") # inside the loop'],
+       ["Call \"Table 2 knife\" again", "print the last values", "This line prints its own text.", 'print("Table", table, item)'],
+       ["Call nothing", "the loops ended the program", "Lines after a loop still run.", "pass"]],
+      "The sink is [washed|garbage-collected] and the last call goes to [the pass|output].",
+      "`print` serves `Tables set`.",
+      st => { const live = reachable(st); Object.keys(st.heap).filter(x => !live.has(x)).forEach(x => delete st.heap[x]); st.out.push("Tables set"); });
+  }),
+
+  dish({ id: "halve", tier: 4, pic: "✂️", name: "Half-batch weights", topics: "list comprehensions · //",
+    code: ["grams = [200, 150, 50]", "half = [g // 2 for g in grams]", 'print(half, "grams")'] }, step => {
+    const ing = [["flour", "🌾", 200], ["butter", "🧈", 150], ["chocolate", "🍫", 50]];
+    step(1, ["Line up the full-batch weights, 200, 150 and 50 g, on a tray labeled `grams`", "create a list of three ints"],
+      [["Weigh them into one total: 400", "add them up", "Square brackets keep three separate items. Adding them is `sum()`.", "grams = 200 + 150 + 50"],
+       ["Write the weights as text", "a list of strings", "In quotes they'd be text, and `//` doesn't work on text.", 'grams = ["200", "150", "50"]'],
+       ["Halve them straight away", "store the halves", "Line 1 stores the full batch. The halving is on line 2.", "grams = [100, 75, 25]"]],
+      "The full recipe's weights in order on a [tray|list].",
+      "`grams` refers to a list of three ints.",
+      st => { st.heap.o1 = { t: "list", vessel: "tray", unit: "g", k: "Full-batch weights", items: ing.map(([, i, n]) => P(n, { ico: i })) }; g(st).grams = R("o1"); });
+    ing.forEach(([name, ico, gr], k) => {
+      step(2, [k ? `Take the next weight: ${gr} g of ${name}` : "Get out an empty tray for the halves, open a small board for the brackets, and take the first weight: 200 g", `the comprehension binds g to ${gr}`],
+        k ? [["Take the first weight again", "the comprehension restarts", "It moves on to the next item.", "g = 200"],
+             ["Stop: one half is enough", "the comprehension stops early", "It goes through every item in `grams`.", "half = [100]"],
+             ["Take the whole tray", "g is the whole list", "Like a for loop, it hands out one item at a time.", "g = grams"]]
+          : [["Halve the weights on the same tray", "change grams in place", "A list comprehension builds a brand-new list. `grams` isn't touched.", "grams[0] = grams[0] // 2"],
+             ["Put the `g` label on the main board", "g is a global variable", "The comprehension's loop name only exists inside the brackets.", "g = 200"],
+             ["Tie `half` to the empty tray now", "half is bound before the list is built", "The whole right side is worked out first; `half` is tied on at the end.", "half = []"]],
+        k ? `[Next weight|next item]: the \`g\` [tape|loop variable] reads ${gr}.` : "A [new tray|new list] is started, and a [small board|its own scope] comes out for the brackets. The `g` [tape|loop variable] lives only there.",
+        `The comprehension takes item ${k} of \`grams\` and binds \`g\` to ${gr}.`,
+        st => { if (!k) { st.heap.o2 = { t: "list", vessel: "tray", unit: "g", k: "Half-batch tray", hold: true, holdNote: "being built", items: [] };
+                          st.frames.push({ name: "list comprehension", comp: true, vars: {} }); }
+                st.heap.o1.hl = k; active(st).g = P(gr, { ico }); });
+      step(2, [`Halve it, ${gr} // 2 = ${gr / 2}, and put ${gr / 2} g on the new tray`, `g // 2 is ${gr / 2}, added to the new list`],
+        [[`Put ${gr * 2} g on the tray`, "double it", "`//` divides.", "g * 2"],
+         [`Put ${gr / 2}.0 g on the tray`, "// gives a decimal", "`//` rounds down to a whole number. Only `/` gives decimals.", "g / 2"],
+         [`Put ${gr / 2} g back on the full-batch tray`, "change grams", "Results go on the new list. `grams` stays the same.", `grams[${k}] = g // 2`]],
+        `The [half-batch tray|new list] holds ${k + 1} ${k ? "weights" : "weight"}.`,
+        `\`${gr} // 2\` is ${gr / 2}, which becomes item ${k} of the new list.`,
+        st => { st.heap.o2.items.push(P(gr / 2, { ico })); });
+    });
+    step(2, ["No weights left: put the small board away and label the new tray `half`", "the comprehension ends; half refers to the new list"],
+      [["Keep the `g` label for later", "g survives the comprehension", "`g` lived on the comprehension's board and goes with it.", "print(g)"],
+       ["Label the full-batch tray `half`", "half is grams", "The comprehension built a new list, and `half` is tied to that one.", "half = grams"],
+       ["Halve the halves again", "go round once more", "Each item was halved once.", "half = [g // 2 for g in half]"]],
+      "The [small board|comprehension scope] is put away and the [new tray|new list] gets the `half` [label|variable].",
+      "The list comprehension finishes and returns the new list `[100, 75, 25]`, which is bound to `half`.",
+      st => { st.frames.pop(); delete st.heap.o1.hl; delete st.heap.o2.hold; delete st.heap.o2.holdNote; g(st).half = R("o2"); });
+    step(3, ["Send \"[100, 75, 25] grams\" to the pass", "print outputs [100, 75, 25] grams"],
+      [["Send \"[200, 150, 50] grams\"", "grams was halved", "The comprehension made a new list; `grams` is unchanged.", 'print(grams, "grams")'],
+       ["Send \"[100.0, 75.0, 25.0] grams\"", "decimal halves", "`//` gives whole numbers.", 'print([g / 2 for g in grams], "grams")'],
+       ["Send \"25 grams\"", "print the last half", "`half` is the whole new list.", 'print(half[-1], "grams")']],
+      "Serve the [half-batch tray|new list] at [the pass|output].",
+      "`print` serves `[100, 75, 25] grams`.",
+      st => { st.out.push("[100, 75, 25] grams"); });
+  }),
+
+  dish({ id: "bill", tier: 5, pic: "🧾", name: "A 7-euro dinner bill", topics: "recursion on a list · slicing · not",
+    code: ["def total(prices):", "    if not prices:", "        return 0", "    return prices[0] + total(prices[1:])", "", 'print(total([4, 3]), "euros")'] }, step => {
+    step(1, ["Write the bill recipe card and put it on the rack", "def creates the function total"],
+      [["Add up the bill now", "run the body immediately", "`def` only saves the recipe. It runs when called on line 6.", "total([4, 3])"],
+       ["Write a card that only adds 4 and 3", "hard-code the answer", "The card works for any list of prices.", "def total(): return 4 + 3"],
+       ["Skip the card", "def is ignored", "`def` creates the function and labels it `total`.", "# def total(prices):"]],
+      "The [recipe card|function] says: no prices left means 0; otherwise add the first price to the total of the rest. It [uses itself|is recursive].",
+      "Defines a recursive function that adds up a list.",
+      st => { st.heap.o1 = { t: "func", v: "total(prices)" }; g(st).total = R("o1"); });
+    const receipts = [[4, 3], [3], []];
+    receipts.forEach((list, k) => {
+      const id = `o${k + 2}`, shown = `[${list.join(", ")}]`;
+      step(k ? 4 : 6, [k ? `Tear off the first line: get board ${k + 1} with the receipt ${shown}` : "Print a receipt of 4 and 3, and get cutting board 1 with it as `prices`", `call total(${shown}): a new frame with prices = ${shown}`],
+        k ? [[`Finish board ${k} first`, "skip the smaller bill", `Board ${k} can't add until it gets the rest of the bill back.`, "return prices[0]"],
+             [`Reuse board ${k} for ${shown}`, "overwrite prices", "Every call gets its own frame and its own `prices`.", "prices = prices[1:]"],
+             [`Pass the same receipt again`, "no slice", "Without `[1:]` the receipt never gets shorter, so the calls never stop: RecursionError.", "total(prices)"]]
+          : [["Send the recipe card to the pass", "print without calling", "`print` needs the total, so `total([4, 3])` must run first.", 'print(total, "euros")'],
+             ["Hand over 4 and 3 separately", "two arguments", "The card takes one list. `total(4, 3)` is a TypeError.", "total(4, 3)"],
+             ["Add the prices on the main board", "no function call", "The ticket calls `total` to do the adding.", "prices = [4, 3]"]],
+        k ? `Board ${k} [waits|pauses mid-line]. [Slicing|prices[1:]] makes a [new, shorter receipt|new list] for [board ${k + 1}|a new frame].` : "The order is in: a [receipt|list] is printed and [board 1|frame for total] comes out.",
+        k ? `\`prices[1:]\` makes the new list \`${shown}\`, and \`total(${shown})\` is called with it.` : "`total([4, 3])` creates a frame where `prices` refers to the list `[4, 3]`.",
+        st => { st.heap[id] = { t: "list", vessel: "receipt", unit: "€", k: "Receipt", items: list.map(n => P(n)) }; st.frames.push({ name: "total", vars: { prices: R(id) } }); });
+      const empty = !list.length;
+      step(2, empty ? ["Check: is the receipt empty? Yes!", "not [] is True: the base case"] : [`Check: is the receipt empty? No, it shows ${list.join(" and ")}`, `not ${shown} is False`],
+        empty ? [["No, keep tearing", "an empty list counts as True", "An empty list counts as False, so `not []` is True.", "return prices[0] + total(prices[1:])"],
+                 ["Read the first price: 0", "prices[0] of an empty list", "There's no first price. `[][0]` raises IndexError.", "prices[0]"],
+                 ["Skip the check", "remove the if", "Without the check, the recursion would never stop.", "# if not prices:"]]
+              : [["Yes, it's empty", "a list counts as False", "A list with items counts as True, so `not` it is False.", "if True:"],
+                 ["Check whether the first price is 0", "compare prices[0]", "`not prices` checks whether the list is empty.", "if prices[0] == 0:"],
+                 ["Skip the check", "remove the if", "The check runs on every call.", "# if not prices:"]],
+        empty ? "The [easy case|base case]: a blank receipt adds up to 0." : "[Check the receipt|if not prices]: there are still prices on it.",
+        empty ? "`not []` is True: an empty list counts as False. This base case stops the recursion." : `\`${shown}\` has items, so it counts as True and \`not\` it is False.`);
+    });
+    step(3, ["A blank receipt adds up to 0: put 0 on board 3's plate", "total([]) returns 0"],
+      [["Send 0 to the pass", "print it", "`return` hands it back to board 2, not the pass.", "print(0)"],
+       ["Hand back an empty receipt", "return the list", "The base case returns the number 0.", "return prices"],
+       ["Hand back nothing", "return None", "`return 0` gives a number that the boards below can add to. `None` would break the adding.", "return"]],
+      "The 0 goes on the [plate|return value].",
+      "`total([])` returns 0.",
+      st => { active(st).$ret = P(0); });
+    step(4, ["Put board 3 away; board 2 adds its 3 to the 0 and plates 3", "frame 3 ends; total([3]) returns 3 + 0 = 3"],
+      [["Board 2 plates just the 0", "drop prices[0]", "Board 2 adds its first price to what it got back.", "return total(prices[1:])"],
+       ["Board 1 takes the 0", "skip a level", "Each return goes to the board that called it.", "return 4 + 0"],
+       ["Board 2 adds 4", "use board 1's price", "Board 2's receipt is [3], so `prices[0]` is 3.", "return 4 + 0"]],
+      "Board 3 is [put away|frame destroyed], and its blank receipt goes to the [sink|garbage]. Board 2 [resumes|continues its line].",
+      "Back in the `prices = [3]` frame: `3 + 0` is 3.",
+      st => { st.frames.pop(); active(st).$ret = P(3); });
+    step(4, ["Put board 2 away; board 1 adds its 4 to the 3 and plates 7", "total([4, 3]) returns 4 + 3 = 7"],
+      [["Board 1 plates 4", "ignore what came back", "Board 1 adds its 4 to the 3 it got back.", "return prices[0]"],
+       ["Board 1 adds 4 and 4", "prices[0] twice", "The 3 came back from board 2.", "return prices[0] + prices[0]"],
+       ["Send the 3 to the pass", "print the middle result", "It goes back to board 1, which still has a price to add.", "print(3)"]],
+      "Board 2 is put away (its receipt goes to the [sink|garbage]) and board 1 finishes.",
+      "Back in the `prices = [4, 3]` frame: `4 + 3` is 7.",
+      st => { delete st.heap.o4; st.frames.pop(); active(st).$ret = P(7); });
+    step(6, ["Put board 1 away and send \"7 euros\" to the pass", "print outputs 7 euros"],
+      [["Send \"0 euros\"", "only the base case counts", "Every board added its price on the way back.", 'print(total([]), "euros")'],
+       ["Send \"4 euros\"", "only the first price", "Board 1 added 4 to the 3 it got back.", 'print(4, "euros")'],
+       ["Send \"[4, 3] euros\"", "print the list", "`total` hands back the sum, not the list.", 'print([4, 3], "euros")']],
+      "All boards are put away and the bill goes to [the pass|output].",
+      "The stack unwinds and `print` serves `7 euros`.",
+      st => { delete st.heap.o3; st.frames.pop(); st.out.push("7 euros"); });
+  }),
 ];
 
 const TIERS = [
   [1, "Starters", "variables & print"], [2, "Easy", "values, ifs & lists"], [3, "Mains", "loops & functions"],
-  [4, "Hard", "mutation & dicts"], [5, "Chef's specials", "recursion & errors"],
+  [4, "Hard", "nesting, mutation & dicts"], [5, "Chef's specials", "recursion & errors"],
 ];
 
 /* ------------------------------------------------------------------ drawing */
 
-const W = 1200, H = 780;
+const W = 1200, H = 840;
 const SHELF_LOW = 372, SHELF_HIGH = 196, PLANK = 12, SHELF_X0 = 30, SHELF_X1 = 870;
-const COUNTER = 462, COUNTER_END = 700, EDGE = 12;
-const BOARD_X0 = 30, BOARD_X1 = 880, BOARD_Y = 516, BOARD_MAXH = 176;
-const SINK = { x: 930, y: 520, w: 240, h: 110 };
+const COUNTER = 462, COUNTER_END = 760, EDGE = 12;
+const BOARD_X0 = 30, BOARD_X1 = 880, BOARD_Y = 548, BOARD_MAXH = 196;
+const SINK = { x: 930, y: 560, w: 240, h: 110 };
 const PASS = { x: 905, y: 40, w: 270, h: 252 };
 
 const ingOf = v => v.ico || INGREDIENT[v.p] || "";
@@ -1459,7 +1969,7 @@ function chipSVG(xr, cy, v) {
 }
 
 function vessel(o) {
-  const kind = o.vessel || { int: "jar", str: "jar", list: "bowl", dict: "cabinet", func: "card", class: "blueprint", obj: "oven" }[o.t];
+  const kind = vesselKind(o);
   if (kind === "jar") {
     let fill = "";
     if (o.cubes) for (let k = 0; k < o.cubes; k++) fill += `<rect class="cube" x="${19 + (k % 3) * 20}" y="${-24 - Math.floor(k / 3) * 19}" width="16" height="16" rx="2"/>`;
@@ -1570,17 +2080,89 @@ function vessel(o) {
     });
     return { w, h, svg: s };
   }
-  if (kind === "tray") {
-    const n = o.items.length, w = n * 78 + 24;
+  if (kind === "tin") {
+    const n = o.items.length, holes = Math.max(3, n), w = holes * 62 + 24;
+    let s = `<rect x="0" y="-48" width="${w}" height="48" rx="8" class="tin"/>`;
+    for (let k = 0; k < holes; k++) {
+      const cx = 43 + k * 62;
+      s += `<ellipse cx="${cx}" cy="-30" rx="25" ry="11" class="tin-cup"/>`;
+      if (o.items[k]) s += emoji(cx, -22, 34, ingOf(o.items[k])) + txt(cx, -5, "t-white", `[${k}]`, "middle", 'font-size="11"');
+    }
+    if (!n) s += txt(w / 2, -5, "t-white", "[ ]  empty list", "middle", 'font-size="11"');
+    return { w, h: 70, svg: s };
+  }
+  if (kind === "rangetray") {
+    const n = o.items.length, w = n * 56 + 30;
     let s = "";
     o.items.forEach((v, i) => {
-      const cx = 51 + i * 78;
-      if (o.hl === i) s += `<rect x="${cx - 34}" y="-78" width="68" height="50" rx="8" class="hl"/>`;
+      const cx = 43 + i * 56;
+      if (o.hl === i) s += `<rect x="${cx - 25}" y="-76" width="50" height="50" rx="8" class="hl"/>`;
+      s += `<circle cx="${cx}" cy="-50" r="17" class="token"/>${txt(cx, -45, "t-val", esc(v.p), "middle")}`;
+    });
+    s += `<rect x="0" y="-30" width="${w}" height="30" rx="5" class="steel"/><rect x="-4" y="-34" width="${w + 8}" height="7" rx="3" class="steel-dark"/>
+      ${txt(w / 2, -10, "t-val", esc(o.v), "middle")}`;
+    return { w, h: 80, svg: s };
+  }
+  if (kind === "notepad") {
+    const t = o.v.slice(1, -1), w = o.letters ? Math.max(120, t.length * 28 + 30) : Math.max(120, o.v.length * 8 + 30);
+    let s = `<rect x="0" y="-96" width="${w}" height="96" rx="4" class="paper"/>`;
+    for (let x = 14; x < w - 6; x += 16) s += `<circle cx="${x}" cy="-96" r="4" class="steel"/>`;
+    if (o.letters) {
+      s += txt(12, -74, "t-val", esc(o.v));
+      [...t].forEach((c, k) => {
+        const cx = 29 + k * 28;
+        if (o.hl === k) s += `<rect x="${cx - 13}" y="-62" width="26" height="54" rx="5" class="hl"/>`;
+        s += txt(cx, -35, "t-recipe", esc(c), "middle") + txt(cx, -15, "t-py", `[${k}]`, "middle", 'font-size="11"');
+      });
+    } else s += `<path d="M12,-30 H${w - 12}" stroke="var(--paper-edge)" stroke-width="1.5"/>${txt(w / 2, -46, "t-val", esc(o.v), "middle")}`;
+    return { w, h: 104, svg: s };
+  }
+  if (kind === "placecard") {
+    const w = Math.max(150, o.v.length * 9 + 40);
+    return { w, h: 84, svg:
+      `<path d="M6,0 L20,-78 L${w - 20},-78 L${w - 6},0 Z" class="paper"/><path d="M20,-78 H${w - 20}" stroke="var(--paper-edge)" stroke-width="3"/>
+       ${txt(w / 2, -52, "t-tiny", "RESERVED", "middle")}${txt(w / 2, -24, "t-card", esc(o.v), "middle")}` };
+  }
+  if (kind === "chalkboard") {
+    const w = Math.max(130, o.v.length * 11 + 50);
+    return { w, h: 100, svg:
+      `<path d="M24,0 L40,-34 M${w - 24},0 L${w - 40},-34" stroke="var(--wood-dark)" stroke-width="6" stroke-linecap="round"/>
+       <rect x="4" y="-96" width="${w - 8}" height="66" rx="4" class="chalk"/>${txt(w / 2, -58, "t-chalk", esc(o.v), "middle")}
+       ${txt(w / 2, -40, "t-chalk-s", "the sign so far", "middle")}` };
+  }
+  if (kind === "menuboard") {
+    const n = o.items.length, w = 240, h = 46 + n * 34;
+    let s = `<rect x="0" y="${-h}" width="${w}" height="${h}" rx="5" class="chalk"/>
+      ${txt(w / 2, -h + 22, "t-chalk-s", "MENU", "middle")}${txt(44, -h + 38, "t-chalk-s", "key")}${txt(w - 18, -h + 38, "t-chalk-s", "value", "end")}`;
+    o.items.forEach(([k, v], i) => {
+      const y = -h + 44 + i * 34;
+      if (o.hl === i) s += `<rect x="10" y="${y}" width="${w - 20}" height="30" rx="4" class="hl" opacity=".5"/>`;
+      s += `${emoji(26, y + 22, 18, INGREDIENT[k])}${txt(44, y + 20, "t-chalk-v", esc(k))}
+        <path d="M${50 + k.length * 8},${y + 18} H${w - 40}" stroke="#cfe3d6" stroke-width="1.5" stroke-dasharray="2 4"/>${txt(w - 18, y + 20, "t-chalk-v", esc(v.p), "end")}`;
+    });
+    return { w, h, svg: s };
+  }
+  if (kind === "receipt") {
+    const n = o.items.length, w = 112, h = 46 + Math.max(n, 1) * 22;
+    let teeth = "";
+    for (let x = w; x > 0; x -= 8) teeth += ` L${x - 4},0 L${x - 8},-6`;
+    let s = `<path d="M0,${-h} H${w} V-6${teeth} Z" class="paper"/>${txt(w / 2, -h + 17, "t-tiny", "RECEIPT", "middle")}
+      <path d="M10,${-h + 25} H${w - 10}" stroke="var(--paper-edge)" stroke-width="1.5" stroke-dasharray="3 3"/>`;
+    o.items.forEach((v, k) => { s += txt(12, -h + 44 + k * 22, "t-py", `[${k}]`) + txt(w - 12, -h + 44 + k * 22, "t-val", `${esc(v.p)}${o.unit ? " " + o.unit : ""}`, "end"); });
+    if (!n) s += txt(w / 2, -h + 44, "t-py", "[ ] empty", "middle");
+    return { w, h, svg: s };
+  }
+  if (kind === "tray") {
+    const n = o.items.length, gap = Math.max(78, ...o.items.map(v => trunc(v.p, 8).length * 8 + (o.unit ? 20 : 0) + 34)), w = n * gap + 24;
+    let s = "";
+    o.items.forEach((v, i) => {
+      const cx = 12 + gap / 2 + i * gap;
+      if (o.hl === i) s += `<rect x="${cx - gap / 2 + 5}" y="-78" width="${gap - 10}" height="50" rx="8" class="hl"/>`;
       s += emoji(cx, -36, 34, ingOf(v));
     });
     s += `<rect x="0" y="-30" width="${w}" height="30" rx="5" class="steel"/><rect x="-4" y="-34" width="${w + 8}" height="7" rx="3" class="steel-dark"/>`;
     o.items.forEach((v, i) => {
-      s += `<text x="${51 + i * 78}" y="-10" text-anchor="middle"><tspan class="t-val">${esc(v.p)} g </tspan><tspan class="t-py">[${i}]</tspan></text>`;
+      s += `<text x="${12 + gap / 2 + i * gap}" y="-10" text-anchor="middle"><tspan class="t-val">${esc(trunc(v.p, 8))}${o.unit ? " " + o.unit : ""} </tspan><tspan class="t-py">[${i}]</tspan></text>`;
     });
     return { w, h: 80, svg: s };
   }
@@ -1609,6 +2191,156 @@ function reachable(st) {
   st.frames.forEach(f => Object.values(f.vars).forEach(visit));
   Object.entries(st.heap).forEach(([id, o]) => { if (o.hold) visit(R(id)); });
   return seen;
+}
+
+/* ---- the working on the order slip: how Python gets from a line to its value, e.g. lemons * 2 → 3 * 2 → 6.
+   Names are filled in from the state before the step (or, when a call has just returned, from the board it returned to). */
+function valRepr(st, v) {
+  if (!v) return "None";
+  if (v.p != null) return v.p;
+  const o = st.heap[v.r];
+  if (!o) return "?";
+  if (o.t === "list") return `[${o.items.map(x => valRepr(st, x)).join(", ")}]`;
+  if (o.t === "dict") return `{${o.items.map(([k, x]) => `${k}: ${valRepr(st, x)}`).join(", ")}}`;
+  if (o.t === "func") return `<function ${o.v.split("(")[0]}>`;
+  if (o.t === "class") return `<class ${o.v}>`;
+  if (o.t === "obj") return `${o.v}(${o.attrs.map(([k, x]) => `${k}=${valRepr(st, x)}`).join(", ")})`;
+  return o.v;
+}
+const topOf = st => st.frames[st.frames.length - 1];
+const lookup = (st, name) => { const f = topOf(st).vars; return name in f ? f[name] : st.frames[0].vars[name]; };
+const PY_WORDS = new Set(["not", "in", "and", "or", "is", "True", "False", "None", "for", "if", "else", "print", "len", "range", "str", "int", "repr", "sorted"]);
+const isContainer = (st, v) => v && v.r && st.heap[v.r] && /^(list|dict|obj|func|class|range)$/.test(st.heap[v.r].t);
+const unquote = r => /^'.*'$/.test(r) ? r.slice(1, -1) : r;
+/* index of the bracket that closes the one at s[k] */
+function closeAt(s, k) {
+  const open = s[k], close = { "(": ")", "[": "]", "{": "}" }[open];
+  let depth = 0, q = null;
+  for (let j = k; j < s.length; j++) {
+    const c = s[j];
+    if (q) { if (c === q) q = null; continue; }
+    if (c === '"' || c === "'") q = c;
+    else if (c === open) depth++;
+    else if (c === close && --depth === 0) return j;
+  }
+  return s.length - 1;
+}
+/* x[...] worked out: a list position or slice, a dict key, or a letter of a string. null when it can't be (a missing key) */
+function subscript(st, v, inner) {
+  const o = v.r ? st.heap[v.r] : null, text = o ? (o.t === "str" ? o.v : null) : v.p;
+  const sl = inner.match(/^(-?\d*)\s*:\s*(-?\d*)$/), idx = /^-?\d+$/.test(inner) ? +inner : null;
+  const cut = arr => arr.slice(sl[1] === "" ? 0 : +sl[1], sl[2] === "" ? undefined : +sl[2]);
+  if (o && o.t === "list") {
+    if (sl) return `[${cut(o.items).map(x => valRepr(st, x)).join(", ")}]`;
+    if (idx != null) { const it = o.items.at(idx); return it ? valRepr(st, it) : null; }
+  }
+  if (o && o.t === "dict") { const key = inner.replace(/^"(.*)"$/, "'$1'"), it = o.items.find(([k]) => k === key); return it ? valRepr(st, it[1]) : null; }
+  if (text && /^'.*'$/.test(text)) {
+    const t = text.slice(1, -1);
+    if (sl) return `'${cut([...t]).join("")}'`;
+    if (idx != null && t.at(idx)) return `'${t.at(idx)}'`;
+  }
+  return null;
+}
+/* the expression with every name replaced by its value */
+function subst(st, e) {
+  const re = /f?"[^"]*"|f?'[^']*'|[A-Za-z_]\w*|\d+|\s+|./g;
+  let out = "", m;
+  while ((m = re.exec(e))) {
+    const t = m[0], at = m.index, end = re.lastIndex, rest = e.slice(end), after = (rest.match(/^\s*(\S)/) || [])[1];
+    if (/^f["']/.test(t)) { out += '"' + t.slice(2, -1).replace(/\{(\w+)\}/g, (all, n) => { const v = lookup(st, n); return v ? unquote(valRepr(st, v)) : all; }) + '"'; continue; }
+    const v = /^[A-Za-z_]/.test(t) && !PY_WORDS.has(t) && !/\.\s*$/.test(e.slice(0, at)) ? lookup(st, t) : null;
+    if (!v || after === "(") { out += t; continue; }
+    const am = rest.match(/^\.(\w+)\b(?!\s*\()/), attrs = v.r && st.heap[v.r] ? st.heap[v.r].attrs : null;
+    const attr = am && attrs && attrs.find(([k]) => k === am[1]);
+    if (attr) { out += valRepr(st, attr[1]); re.lastIndex = end + am[0].length; continue; }
+    if (after === "." && isContainer(st, v)) { out += t; continue; }
+    if (after === "[") {
+      const k0 = e.indexOf("[", end), k1 = closeAt(e, k0), r = subscript(st, v, subst(st, e.slice(k0 + 1, k1)).trim());
+      if (r != null) { out += r; re.lastIndex = k1 + 1; continue; }
+    }
+    out += valRepr(st, v);
+  }
+  return out;
+}
+/* the call in a line that opened (or just closed) the board f */
+function findCall(src, f) {
+  const m = src.match(f.name === "__init__" ? /\b[A-Z]\w*\(/ : new RegExp(`(\\b\\w+\\.)?\\b${f.name}\\(`));
+  return m ? { at: m.index, end: closeAt(src, m.index + m[0].length - 1) + 1 } : null;
+}
+/* swap the call that just returned for the value it handed back */
+function replaceCall(e, a, b) {
+  const f = topOf(a), c = findCall(e, f);
+  if (!c) return e;
+  const ret = f.name === "__init__" ? f.vars.self : f.vars.$ret;
+  const val = ret ? valRepr(ret.r && !b.heap[ret.r] ? a : b, ret) : "None";
+  return e.slice(0, c.at) + val + e.slice(c.end);
+}
+const sameText = (x, y) => x.replace(/"/g, "'").replace(/\s+/g, "") === y.replace(/"/g, "'").replace(/\s+/g, "");
+function chainOf(...parts) {
+  const p = parts.filter(Boolean).filter((x, k, all) => !k || !sameText(x, all[k - 1]));
+  return p.length > 1 ? p : [];
+}
+function calcChain(d, i) {
+  const s = d.steps[i];
+  if (!s || !s.line) return [];
+  const a = d.steps[i - 1].st, b = s.st, src = d.code[s.line - 1].trim();
+  const pushed = b.frames.length > a.frames.length, popped = b.frames.length < a.frames.length;
+  const S = e => subst(popped ? b : a, e);
+  const printed = b.out.slice(a.out.length);
+  const err = !a.frames.some(f => f.vars.$err) && b.frames.map(f => f.vars.$err).find(Boolean);
+  let m;
+  if (/^(def|class|try|else|except|break|continue|pass)\b/.test(src)) return [];
+  if ((m = src.match(/^(?:if|elif|while)\s+(.+):$/))) {
+    const t = /\bFalse\b/.test(s.right[1]) ? "False" : /\bTrue\b/.test(s.right[1]) ? "True" : null;
+    return chainOf(m[1], S(m[1]), t);
+  }
+  if ((m = src.match(/\[(.+) for (\w+) in (.+)\]/))) {
+    const [whole, expr, v] = m, cf = topOf(b);
+    if (popped) { const t = src.match(/^(\w+)\s*=/); return chainOf(whole, t && valRepr(b, lookup(b, t[1]))); }
+    if (cf.comp && JSON.stringify(pushed ? undefined : topOf(a).vars[v]) !== JSON.stringify(cf.vars[v])) return [`${v} ← ${valRepr(b, cf.vars[v])}`];
+    const grown = Object.keys(b.heap).find(id => a.heap[id] && b.heap[id].items && b.heap[id].items.length > a.heap[id].items.length);
+    return grown ? chainOf(expr, S(expr), valRepr(b, b.heap[grown].items.at(-1))) : [];
+  }
+  if ((m = src.match(/^for\s+(.+?)\s+in\s+(.+):$/))) {
+    const names = m[1].split(",").map(x => x.trim()), now = topOf(b).vars, was = topOf(a).vars;
+    if (names.every(n => JSON.stringify(was[n]) === JSON.stringify(now[n]))) return ["nothing left", "the loop ends"];
+    return [`${names.join(", ")} ← ${names.map(n => valRepr(b, now[n])).join(", ")}`];
+  }
+  if (pushed) {
+    const f = topOf(b), c = findCall(src, f), call = c ? src.slice(c.at, c.end) : src;
+    const names = Object.entries(f.vars).filter(([k]) => k[0] !== "$").map(([k, v]) => `${k} = ${valRepr(b, v)}`);
+    return chainOf(call, S(call), `new board: ${names.join(", ") || "no names yet"}`);
+  }
+  if ((m = src.match(/^print\((.*)\)$/))) {
+    const filled = S(popped ? replaceCall(m[1], a, b) : m[1]), shown = printed.length && `prints ${printed.join(" / ")}`;
+    // the line itself is already on the slip, so a long chain starts from the filled-in values
+    return chainOf(m[1].length + filled.length + (shown || "").length + 10 > CHAIN_FIT ? null : m[1], filled, shown);
+  }
+  let e = src, lhs = null, op = null, res = null;
+  if ((m = src.match(/^return\s+(.+)$/))) e = m[1];
+  else if ((m = src.match(/^([A-Za-z_][\w.]*(?:\[[^\]]*\])?)\s*(\+=|-=|=)(?!=)\s*(.+)$/))) { [, lhs, op, e] = m; if (op !== "=") e = `${lhs} ${op[0]} ${e}`; }
+  const base = lhs ? lhs.match(/^\w+/)[0] : (src.match(/^(\w+)\.\w+\(/) || [])[1];
+  if (err) res = err.p;
+  else if (/^return\b/.test(src)) res = valRepr(b, topOf(b).vars.$ret);
+  else if (lhs && lhs.includes("[") && op === "=") res = `${base} = ${valRepr(b, lookup(b, base))}`;
+  else if (lhs && /[.[]/.test(lhs)) res = subst(b, lhs);
+  else if (lhs) res = valRepr(b, lookup(b, lhs));
+  else if (base && !popped && isContainer(b, lookup(b, base))) res = `${base} = ${valRepr(b, lookup(b, base))}`;
+  return chainOf(e, S(popped ? replaceCall(e, a, b) : e), res);
+}
+/* shorten the working to fit the slip, trimming the longest middle part first so the result stays readable */
+const CHAIN_FIT = 60;
+function fitChain(parts, budget) {
+  const p = parts.slice(), len = () => p.reduce((n, x) => n + x.length, 0) + (p.length - 1) * 5;
+  while (p.length && len() > budget) {
+    let k = -1;
+    p.forEach((x, j) => { if (j < p.length - 1 && x.length > 8 && (k < 0 || x.length > p[k].length)) k = j; });
+    if (k < 0) k = p.length - 1;
+    if (p[k].length <= 4) break;
+    p[k] = p[k].slice(0, p[k].length - 2) + "…";
+  }
+  return p;
 }
 
 function backdrop(ring) {
@@ -1675,12 +2407,15 @@ function drawKitchen(st, prev, fx, work) {
   /* the order slip clipped above the boards: the line the station just worked on, and what Python did */
   {
     const sx = 300, sy = COUNTER + 6, sw = 570, cut = (t, n) => t.length > n ? t.slice(0, n - 1) + "…" : t;
+    const calc = work ? fitChain(work.calc || [], CHAIN_FIT) : [];
+    const steps = calc.map((c, k) => `${k ? `<tspan class="arr${prev ? " step" : ""}" style="animation-delay:${(k * .45 - .2).toFixed(2)}s">  →  </tspan>` : ""}<tspan class="${k === calc.length - 1 && k ? "res " : ""}${prev ? "step" : ""}" style="animation-delay:${(k * .45).toFixed(2)}s">${esc(c)}</tspan>`).join("");
     s += `<g class="${prev ? "anim-ticket" : ""}" data-gloss="ticket printer">
-      <rect x="${sx}" y="${sy}" width="${sw}" height="44" rx="3" class="paper slip"/>
+      <rect x="${sx}" y="${sy}" width="${sw}" height="${calc.length ? 66 : 44}" rx="3" class="paper slip"/>
       <rect x="${sx + sw / 2 - 16}" y="${sy - 6}" width="32" height="10" rx="2" class="steel"/>
       ${work ? `${txt(sx + 12, sy + 16, "t-tiny", `JUST COOKED · LINE ${work.n}`)}
         <text x="${sx + 166}" y="${sy + 17}" class="t-slip-code">${esc(cut(work.code, 48))}</text>
-        ${txt(sx + 12, sy + 35, "t-slip-py", "→ " + esc(cut(work.what, 78)))}`
+        ${calc.length ? `${txt(sx + 12, sy + 37, "t-tiny", "WORKED OUT")}<text x="${sx + 104}" y="${sy + 38}" class="t-calc">${steps}</text>` : ""}
+        ${txt(sx + 12, sy + (calc.length ? 57 : 35), "t-slip-py", "→ " + esc(cut(work.what, 78)))}`
       : `${txt(sx + 12, sy + 16, "t-tiny", "WAITING FOR THE FIRST LINE")}${txt(sx + 12, sy + 35, "t-slip-py", "Pick your first move and the station gets to work.")}`}
     </g>`;
   }
@@ -1704,7 +2439,7 @@ function drawKitchen(st, prev, fx, work) {
       cy += 12;
     }
     s += txt(cx, cy, "t-k", o.k || kname, "middle") + txt(cx, cy + 16, "t-py", pyname, "middle");
-    if (o.hold) { s += txt(cx, cy + 32, "t-py", "being looped over", "middle"); cy += 16; }
+    if (o.hold) { s += txt(cx, cy + 32, "t-py", o.holdNote || "being looped over", "middle"); cy += 16; }
     anchors[id] = [cx, cy + 24];
     x += w + 34;
   }
@@ -1719,8 +2454,8 @@ function drawKitchen(st, prev, fx, work) {
   const boards = st.frames.map((f, fi) => {
     const rows = Object.entries(f.vars);
     const title = fi === 0 ? "Main board" : `Cutting board ${fi}`;
-    const sub = fi === 0 ? "global frame" : `frame: ${f.name}()`;
-    let w = Math.max(210, title.length * 8.6 + (multi ? 96 : 30), sub.length * 7.9 + 30);
+    const sub = fi === 0 ? "global frame" : `frame: ${f.name}${f.comp ? "" : "()"}`;
+    let w = Math.max(210, title.length * 8.6 + (multi ? 96 : 30), sub.length * 7.9 + (multi ? 96 : 30));
     rows.forEach(([name, v]) => {
       const left = name.startsWith("$") ? 150 : Math.max(name.length * 10.5 + 26, 76);
       w = Math.max(w, 16 + left + 22 + (v.r ? 24 : chipW(v)) + 16);
@@ -1804,7 +2539,7 @@ function drawKitchen(st, prev, fx, work) {
   // boards that were just put away slide off the counter
   pframes.slice(st.frames.length).forEach((f, k) => {
     const gh = 112, top = `${txt(bx + 16, BOARD_Y + 24, "t-k-board", `Cutting board ${st.frames.length + k}`)}
-      ${txt(bx + 16, BOARD_Y + 41, "t-py", `frame: ${esc(f.name)}() ends`)}${emoji(bx + 105, BOARD_Y + 88, 34, "💨")}`;
+      ${txt(bx + 16, BOARD_Y + 41, "t-py", `frame: ${esc(f.name)}${f.comp ? "" : "()"} ends`)}${emoji(bx + 105, BOARD_Y + 88, 34, "💨")}`;
     bs += `<g class="anim-out">${board3D(bx, 210, gh, top).svg}</g>`;
     bx += 210 + TILT * gh + 48;
   });
@@ -1837,7 +2572,7 @@ function chefSVG(fx) {
   const bits = (fx === "right" ? [[-80, -150, "✨"], [70, -160, "✨"], [-10, -190, "⭐"], [-120, -100, "✨"]]
                                : [[-60, -150, "💨"], [50, -160, "💨"], [-5, -185, "💢"]])
     .map(([dx, dy, e], k) => `<text x="0" y="-60" class="emoji bit" font-size="28" text-anchor="middle" style="--dx:${dx}px;--dy:${dy + 60}px;animation-delay:${.3 + k * .07}s">${e}</text>`).join("");
-  return `<g transform="translate(1112 788)"><g class="chef chef-${fx}">${bits}
+  return `<g transform="translate(1112 ${H + 8})"><g class="chef chef-${fx}">${bits}
     <g class="bubble"><path d="M${-62 - bw},-150 h${bw} a22,22 0 0 1 0,44 h${-bw + 30} l-16,14 l2,-14 h-16 a22,22 0 0 1 0,-44 z" class="bubble-bg"/>
       ${txt(-62 - bw / 2, -121, "t-bubble", say, "middle")}</g>
     <g class="chef-face">${emoji(0, 0, 104, "🧑‍🍳")}</g></g></g>`;
@@ -1846,7 +2581,7 @@ function chefSVG(fx) {
 /* ------------------------------------------------------------------ game */
 
 function highlight(src) {
-  const re = /("[^"]*"|'[^']*')|\b(def|class|return|if|for|in|while|else|elif|try|except)\b|\b(\d+)\b|\b(print|len|range)\b/g;
+  const re = /(f?"[^"]*"|f?'[^']*')|\b(def|class|return|if|for|in|while|else|elif|try|except|break|continue|not|True|False|None)\b|\b(\d+)\b|\b(print|len|range)\b/g;
   let out = "", last = 0, m;
   while ((m = re.exec(src))) {
     out += esc(src.slice(last, m.index));
@@ -1910,29 +2645,35 @@ const KW = {
   in:     ["keyword: in", "In a `for` loop, separates the loop variable from the collection being looped over.", "Which tray to take the items from."],
   while:  ["keyword: while", "Starts a loop that repeats its block for as long as the test is True, re-checking before every pass.", "Keep heating while the thermometer is below the mark."],
   try:    ["keyword: try", "Starts a block that Python attempts while watching for errors.", "Putting on oven mitts before a risky step."],
+  break:  ["keyword: break", "Leaves the loop immediately. Python carries on with the first line after the loop.", "Stopping work on this batch right now."],
+  continue: ["keyword: continue", "Skips the rest of this pass through the loop and goes straight on to the next item.", "Setting this one aside and picking up the next."],
+  not:    ["keyword: not", "Flips True to False and False to True. On its own, `not x` is True when `x` is empty or zero.", "Checking whether something is missing."],
   except: ["keyword: except", "Names the error type to catch. If that error happens inside `try`, this block runs instead of the program crashing.", "The backup plan for when the alarm goes off."],
 };
 const BUILTIN = {
   print: ["built-in function: print", "Shows values as output. Several values are separated by spaces, and strings appear without their quotes.", "Calling the dish out at the pass."],
   len:   ["built-in function: len", "Returns how many items a collection holds.", "Counting what's in the bowl."],
+  range: ["built-in function: range", "Makes a range of whole numbers: `range(3)` counts 0, 1, 2. It stops just before the number you give it.", "A counting tray of numbered tokens, handed out one at a time."],
 };
 const METHOD = {
   append: ["list method: append", "Adds one item to the end of the list. It changes the existing list in place and makes no copy.", "Pouring one more ingredient into the same bowl."],
   pop:    ["list method: pop", "Removes an item and hands it back. With no argument it takes the last item.", "Lifting the top item off the plate."],
   heat:   ["method: heat", "A function defined in the class. Called as `oven.heat(20)`, Python passes `oven` in as `self`.", "Pressing this oven's heat button."],
   copy:   ["method: copy", "Builds a new list (or dict) holding the same items. Later changes to one don't affect the other.", "Getting a second bowl and filling it the same way."],
+  upper:  ["string method: upper", "Returns a new string in capital letters. The original string is unchanged.", "Writing the same word again in capitals."],
+  title:  ["string method: title", "Returns a new string with the first letter of each word in capitals.", "Writing a name neatly on a card."],
   items:  ["dict method: items", "Gives the dict's (key, value) pairs, one per entry, in insertion order.", "Walking along the drawers, reading each name and amount."],
 };
 
 function tokenize(src) {
   const out = [], indent = src.match(/^ */)[0];
   if (indent) out.push({ t: indent, k: "indent" });
-  const re = /("[^"]*"|'[^']*')|(\d+)|([A-Za-z_]\w*)|(\+=|-=|==|!=|<=|>=|[=+\-*\/<>])|([()\[\]{}:,.])|(\s+)/y;
+  const re = /(f?"[^"]*"|f?'[^']*')|(\d+)|([A-Za-z_]\w*)|(\+=|-=|==|!=|<=|>=|\/\/|[=+\-*\/<>])|([()\[\]{}:,.])|(\s+)/y;
   re.lastIndex = indent.length;
   let m;
   while (re.lastIndex < src.length && (m = re.exec(src))) {
     if (m[6]) continue;
-    out.push({ t: m[0], k: m[1] ? "str" : m[2] ? "num" : m[3] ? "id" : m[4] ? "op" : "punc" });
+    out.push({ t: m[0], k: m[1] ? (m[0][0] === "f" ? "fstr" : "str") : m[2] ? "num" : m[3] ? "id" : m[4] ? "op" : "punc" });
   }
   return out;
 }
@@ -1944,6 +2685,7 @@ function explainTokens(src) {
   const hasAssign = toks.some(x => ["=", "+=", "-="].includes(x.t));
   const assignAt = toks.findIndex(x => ["=", "+=", "-="].includes(x.t));
   let inParams = false, afterFor = false, depth = 0;
+  const sq = [];                       // open square brackets, so a colon or a for inside them can be read correctly
   toks.forEach((x, j) => {
     const p = toks[j - 1], n = toks[j + 1];
     const set = (cat, role, py, kit) => Object.assign(x, { cat, role, py, kit });
@@ -1953,8 +2695,13 @@ function explainTokens(src) {
       return set("lit", "string literal (str)", `Text written directly in the code. The quotes mark where the text starts and ends; they aren't part of the value, which is ${x.t.slice(1, -1) ? `the text ${x.t.slice(1, -1)}` : "empty text"}.`,
         ing ? `The ingredient itself, ${ing} ${x.t.slice(1, -1)}.` : "Words written out exactly, like a strip of text on the ticket.");
     }
+    if (x.k === "fstr") return set("lit", "f-string literal", `Text with an \`f\` before the quotes. Each name inside \`{ }\` is replaced by its value when the line runs.`, "A card with blanks that are filled in as it's written.");
     if (x.k === "num") return set("lit", "integer literal (int)", `The whole number ${x.t}, written directly in the code.`, `A fixed amount written on the ticket: ${x.t}.`);
     if (x.k === "id") {
+      if (x.t === "True" || x.t === "False") return set("lit", `boolean literal: ${x.t}`, `One of Python's two truth values. \`while True:\` loops until a \`break\` stops it.`, x.t === "True" ? "A check that always says yes." : "A check that always says no.");
+      if (x.t === "in" && !afterFor) return set("kw", "keyword: in (membership)", "Asks whether the value on the left is in the collection on the right. For a dict, it checks the keys.", "Looking for a drawer with that name.");
+      if (x.t === "not" && n && n.t === "in") return set("kw", "keyword: not (in not in)", "`not in` asks whether the value is missing from the collection: the opposite of `in`.", "Checking the board doesn't have it yet.");
+      if (x.t === "for" && sq.length) { afterFor = true; sq[sq.length - 1].comp = true; return set("kw", "keyword: for (in a list comprehension)", "Inside square brackets, `for` repeats the expression before it once for every item, collecting the results into a new list.", "Doing the same thing to every item and lining the results up on a new tray."); }
       if (KW[x.t]) {
         if (x.t === "for") afterFor = true;
         if (x.t === "in") afterFor = false;
@@ -1982,7 +2729,8 @@ function explainTokens(src) {
       return set("name", "variable (being read)", `Python looks up \`${x.t}\` and follows its reference to the object it points to.`, "Reading a label and following its twine to the container on the rack.");
     }
     if (x.k === "op") {
-      const strNear = (p && p.k === "str") || (n && n.k === "str") || (toks.slice(j + 1).some(y => y.k === "str") && x.t === "+" && p && p.t === ")");
+      const strNear = (p && p.k === "str") || (n && n.k === "str") || (toks.slice(j + 1).some(y => y.k === "str") && x.t === "+" && p && p.t === ")")
+        || (x.t === "+" && /\.(upper|title|lower)\(/.test(src));
       const ops = {
         "=":  ["assignment operator", "Works out the right side first, then binds the name on the left to the result. It never copies the object.", "Tying a label to something with twine."],
         "==": ["comparison: equal to", "Asks whether the two sides are equal and gives True or False. One `=` assigns; two `==` compare.", "Checking whether the order matches."],
@@ -1994,6 +2742,7 @@ function explainTokens(src) {
         "*":  ["operator: * (multiply)", "Multiplies two numbers, producing a new number.", "Scaling the amount up."],
         "+=": ["augmented assignment: +=", "`x += y` is short for `x = x + y`. The name is re-bound to the new total.", "Adding to the running total on the scale."],
         "-=": ["augmented assignment: -=", "`x -= y` is short for `x = x - y`.", "Taking some out and writing down the new amount."],
+        "//": ["operator: // (floor division)", "Divides and rounds down to a whole number: `150 // 2` is 75, `7 // 2` is 3.", "Halving and keeping whole grams."],
       };
       return set("op", ...(ops[x.t] || [`operator ${x.t}`, "An operator.", "A kitchen action."]));
     }
@@ -2001,6 +2750,7 @@ function explainTokens(src) {
     if (x.t === ")" || x.t === "]" || x.t === "}") {
       if (x.t === ")") inParams = false;
       if (x.t === "}") depth -= 1;
+      if (x.t === "]") sq.pop();
       return set("hide");
     }
     if (x.t === "(") {
@@ -2009,12 +2759,18 @@ function explainTokens(src) {
       return set("punc", "parentheses: grouping", "Groups part of an expression so it's worked out first.", "Doing this part first.");
     }
     if (x.t === "[") {
+      const close = toks.findIndex((y, k) => k > j && y.t === "]" && toks.slice(j + 1, k).filter(z => z.t === "[").length === toks.slice(j + 1, k).filter(z => z.t === "]").length);
+      const inside = toks.slice(j + 1, close < 0 ? toks.length : close);
+      sq.push({ comp: false });
+      if (inside.some(y => y.t === "for")) return set("punc", "square brackets: list comprehension", "Builds a new list by working out the expression for every item of the collection after `in`, up to the matching `]`.", "A new tray, filled by doing the same thing to every item.");
+      if (p && ((p.k === "id" && !KW[p.t]) || p.t === ")") && inside.some(y => y.t === ":")) return set("punc", "square brackets: slice", "Takes part of a list or string: `[1:]` is everything from position 1 to the end. It makes a new list; the original is unchanged.", "Tearing off the receipt below the first line.");
       if (p && ((p.k === "id" && !KW[p.t]) || p.t === ")")) return hasAssign && j < assignAt
         ? set("punc", "square brackets: key to change", "Chooses which key (in a dict) or position (in a list) to store into, up to the matching `]`.", "Picking which drawer to open.")
         : set("punc", "square brackets: lookup", "Gets the item stored under this key or position. A missing dict key raises KeyError.", "Opening the drawer with this name.");
       return set("punc", "square brackets: list literal", "Builds a new list from the items inside, separated by commas, up to the matching `]`.", "A mixing bowl or tray holding these items in order.");
     }
     if (x.t === "{") { depth += 1; return set("punc", "curly braces: dict literal", "Builds a new dictionary of `key: value` pairs, up to the matching `}`.", "A spice cabinet or fridge with named drawers."); }
+    if (x.t === ":" && sq.length && !sq[sq.length - 1].comp) return set("punc", "colon: slice", "Inside square brackets, separates where the slice starts from where it stops. A missing number means 'from the start' or 'to the end'.", "Where to tear the strip.");
     if (x.t === ":") return depth > 0
       ? set("punc", "colon: key → value", "Inside a dict, separates a key from its value.", "Drawer name on the front, amount inside.")
       : set("punc", "colon: start of a block", "Ends this header line. The indented lines below belong to it.", "\"…then do these sub-steps:\"");
@@ -2028,6 +2784,11 @@ function explainTokens(src) {
 }
 
 const PATTERNS = [
+  [/^\s*break\s*$/, "break", "Leave the loop right now and carry on after it."],
+  [/^\s*continue\s*$/, "continue", "Skip the rest of this pass and go straight to the next item."],
+  [/^\s*while True:/, "while True:", "Loop forever, until a break inside the loop stops it."],
+  [/\[.+ for .+ in .+\]/, "[expression for name in collection]", "Build a new list by working out the expression once for every item."],
+  [/^\s*if .* in /, "if value in collection:", "Run the block below only if the value is (or, with not in, isn't) in the collection."],
   [/^\s*class /, "class Name:", "Define a blueprint for objects. The indented methods below belong to it."],
   [/^\s*\w+\.\w+\s*(=|\+=)/, "object.attribute = value", "Store or update a value on that object."],
   [/^\s*def /, "def name(parameters):", "Define a new function. Nothing inside it runs until it's called."],
@@ -2079,14 +2840,14 @@ function showBreakdown() {
 }
 
 /* code lines in the answer comparison, with words that differ from the ticket marked */
-const lexLine = s => s.match(/"[^"]*"|'[^']*'|#.*$|\w+|\s+|[^\s\w]/g) || [];
-const PYKW = new Set(["class", "self", "def", "return", "if", "else", "for", "in", "while", "try", "except", "del", "global", "pass", "break", "raise", "True", "False", "None"]);
+const lexLine = s => s.match(/f?"[^"]*"|f?'[^']*'|#.*$|\w+|\/\/|\s+|[^\s\w]/g) || [];
+const PYKW = new Set(["class", "self", "def", "return", "if", "else", "for", "in", "while", "try", "except", "del", "global", "pass", "break", "continue", "not", "raise", "True", "False", "None"]);
 function tokClass(t) {
   if (t[0] === "#") return "cm";
-  if (t[0] === '"' || t[0] === "'") return "st";
+  if (/^f?["']/.test(t)) return "st";
   if (/^\d+$/.test(t)) return "nu";
   if (PYKW.has(t)) return "kw";
-  if (/^(print|len|repr|sorted)$/.test(t)) return "bi";
+  if (/^(print|len|repr|sorted|range|str|int)$/.test(t)) return "bi";
   return "";
 }
 function diffHTML(a, b) {
@@ -2108,7 +2869,7 @@ function render() {
   const cur = D.steps[i], next = D.steps[i + 1], prev = fx === "right" && i > 0 ? D.steps[i - 1].st : null;
   document.querySelectorAll("#lines li.cl").forEach(li => li.classList.toggle("next", !!next && next.line === +li.dataset.n));
   showBreakdown();
-  $("#kitchen").innerHTML = drawKitchen(cur.st, prev, fx, i > 0 ? { n: cur.line, code: D.code[cur.line - 1].trim(), what: cur.right[1] } : null);
+  $("#kitchen").innerHTML = drawKitchen(cur.st, prev, fx, i > 0 ? { n: cur.line, code: D.code[cur.line - 1].trim(), what: cur.right[1], calc: calcChain(D, i) } : null);
   if (fx === "wrong") { const sw = $(".scene-wrap"); sw.classList.remove("shake"); void sw.offsetWidth; sw.classList.add("shake"); }
   fx = null;
 
@@ -2221,8 +2982,9 @@ function topicFor(q) {
 /* ---- glossary: where each entry is used, and how an entry is shown ---- */
 const VESSEL_TO_KITCHEN = { jar: "sealed jar", bowl: "mixing bowl", tray: "prep tray", plate: "sandwich plate", cabinet: "spice cabinet", fridge: "fridge",
   card: "recipe card", blueprint: "blueprint", oven: "oven", cup: "teacup", pitcher: "pitcher", basket: "bread basket", crate: "lemon crate",
-  glasses: "tray of glasses", herbpot: "herb pot", pizzabox: "pizza box" };
-const vesselKind = o => o.vessel || { int: "jar", str: "jar", list: "bowl", dict: "cabinet", func: "card", class: "blueprint", obj: "oven" }[o.t];
+  glasses: "tray of glasses", herbpot: "herb pot", pizzabox: "pizza box", tin: "muffin tin", rangetray: "counting tray", notepad: "order note",
+  placecard: "table card", chalkboard: "chalkboard", menuboard: "menu board", receipt: "receipt" };
+function vesselKind(o) { return o.vessel || { int: "jar", str: "jar", list: "bowl", dict: "cabinet", func: "card", class: "blueprint", obj: "oven", range: "rangetray" }[o.t]; }
 const EVERY_DISH = new Set(["ticket printer", "steel rack", "masking tape", "main board", "the pass", "objects", "references"]);
 /* the first step (in running order) where a kitchen object, or an immutable value, appears */
 function firstSeen(d, test) {
@@ -2324,6 +3086,7 @@ function refreshEntries() {
 function glossFor(role) {
   if (/self/.test(role)) return "self";
   if (/__init__/.test(role)) return "init";
+  if (/slice/.test(role)) return "slicing";
   if (/^colon/.test(role)) return "colon";
   if (/^comma: separator/.test(role)) return "comma";
   if (/^parentheses/.test(role)) return "parens";
